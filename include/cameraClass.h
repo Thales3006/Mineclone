@@ -15,7 +15,8 @@ class Camera{
         glm::vec3 up;
 
         //angles
-        float yaw, pitch;
+        float yaw = 0;
+        float pitch = 0;
 
         //keys
         int forward_key = GLFW_KEY_UP;
@@ -29,9 +30,9 @@ class Camera{
         float fov = M_PI_2/2;
 
     public:
-        Camera(glm::vec3 pos){
+        Camera(glm::vec3 pos, float newYaw, float newPitch){
             position = pos;
-            direction = glm::vec3(0.0f, 0.0f, -1.0f);
+            setCameraDirection(newYaw, newPitch);
             up = glm::vec3(0.0f, 1.0f, 0.0f);
         }
 
@@ -85,10 +86,10 @@ class Camera{
             setCameraDirection(yaw, pitch);
         }
 
-        void setCameraDirection( float yaw, float pitch){
-            direction.x = cos(yaw) * cos(pitch);
-            direction.y = sin(pitch);
-            direction.z = sin(yaw) * cos(pitch);
+        void setCameraDirection(float newYaw, float newPitch){
+            yaw = newYaw;
+            pitch = newPitch;
+            direction = glm::vec3(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch));
         }
 };
 #endif

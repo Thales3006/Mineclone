@@ -72,7 +72,7 @@ int cubePositions[] = {
 };
 
 
-Camera camera = Camera(glm::vec3(0.0f,0.0f, 0.0f));
+Camera camera = Camera(glm::vec3(0.0f,0.0f, 0.0f), 0.0f, 0.0f);
 
 int main(){
 	if (!glfwInit()){
