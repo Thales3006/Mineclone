@@ -17,7 +17,7 @@
 
 #define WINDOW_SIZE 600
 
-float windowHeight = WINDOW_SIZE, windowWidth = WINDOW_SIZE;
+int windowHeight = WINDOW_SIZE, windowWidth = WINDOW_SIZE;
 
 void drawingScene(GLFWwindow* window, Shader shader, Camera* camera, int VAO, int VBO, int EBO);
 void cameraDir(GLFWwindow* window, Camera* camera);
@@ -122,6 +122,8 @@ int main(){
 	glfwSetCursorPosCallback(window, mouseCallback); 
 
 	while(!glfwWindowShouldClose(window)){
+		glViewport(0, 0, windowWidth, windowHeight);
+		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
 		camera.cameraMovement(window);
 
@@ -153,7 +155,7 @@ void drawingScene(GLFWwindow* window, Shader shader, Camera* camera, int VAO, in
 	glBindVertexArray(VAO);
 
 	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), windowWidth/windowHeight, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), float(windowWidth)/windowHeight, 0.1f, 100.0f);
 	shader.setMat4("projection", projection);
 
 	glm::mat4 view = glm::mat4(1.0f);
