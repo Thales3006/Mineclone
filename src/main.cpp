@@ -41,15 +41,15 @@ int main(){
 	glViewport(0, 0, windowWidth, windowHeight);
 
     std::vector<Vertex> vertices = {
-        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //0
+        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},  //1
+        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //2
+        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},//3
 
-        Vertex{glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}  
+        Vertex{glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)}, //4
+        Vertex{glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},   //5
+        Vertex{glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},  //6
+        Vertex{glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)}  //7
     };
 
     std::vector<unsigned int> indices = {
@@ -74,12 +74,13 @@ int main(){
         0,0,1,
         0,0,2,
         0,1,0,
+        2,0,2
     };
 
     std::vector<Texture> texturas = {
-        Texture("diffuse", "textures/container.jpg"),
-        Texture("diffuse", "textures/a.png"),
-        Texture("diffuse", "textures/blocks_01.png")
+        Texture("texture_diffuse", "textures/container.jpg"),
+        Texture("texture_diffuse", "textures/a.png"),
+        Texture("texture_diffuse", "textures/blocks_01.png")
     };
 
 	Shader shader = Shader("shaders/shader.vert", "shaders/shader.frag");
@@ -91,21 +92,17 @@ int main(){
 
 	glEnable(GL_DEPTH_TEST);
 
-	shader.use();
-	shader.setInt("tex0",0);
 
 	camera.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
 	glfwSetCursorPosCallback(window, mouseCallback); 
 
 	while(!glfwWindowShouldClose(window)){
+        glfwGetWindowSize(window, &windowWidth, &windowHeight); 
 		glViewport(0, 0, windowWidth, windowHeight);
-		glfwGetWindowSize(window, &windowWidth, &windowHeight);
-
-		camera.cameraMovement(window);
-        
         glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        camera.cameraMovement(window);
 
         shader.use();
 
