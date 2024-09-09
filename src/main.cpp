@@ -23,52 +23,10 @@ void drawingScene(GLFWwindow* window, Shader shader, Camera* camera, Mesh* mesh)
 void cameraDir(GLFWwindow* window, Camera* camera);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
-std::vector<Vertex> vertices = {
-    Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-
-    Vertex{glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}  
-};
-
-std::vector<unsigned int> indices = {
-    0,1,5,
-    0,4,5,
-    1,2,6,
-    1,5,6,
-    2,3,7,
-    7,6,2,
-    3,0,4,
-    4,7,3,
-    0,3,2,
-    0,1,2,
-    4,5,6,
-    4,7,6
-};
-
-int cubePositions[] = {
-	0,0,0,
-    1,0,0,
-    2,0,0,
-    0,0,1,
-    0,0,2,
-    0,1,0,
-};
-
-std::vector<Texture> texturas = {
-    Texture("diffuse", "textures/container.jpg"),
-    Texture("diffuse", "textures/a.png"),
-    Texture("diffuse", "textures/blocks_01.png")
-};
-
-
 Camera camera = Camera(glm::vec3(0.0f,0.0f, 0.0f), 0.0f, 0.0f);
 
 int main(){
+    
 	if (!glfwInit()){
 		std::cout << "Failed to initialize GLFW.\n";
 		return -1;
@@ -76,13 +34,53 @@ int main(){
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Mineclone", NULL, NULL);
 	glfwMakeContextCurrent(window);
 
-	gladLoadGL();
 	if (!gladLoadGL()){
 		std::cout << "Failed to initialize Glad.\n";
 		return -1;
 	}
 	glViewport(0, 0, windowWidth, windowHeight);
 
+    std::vector<Vertex> vertices = {
+        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+
+        Vertex{glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}  
+    };
+
+    std::vector<unsigned int> indices = {
+        0,1,5,
+        0,4,5,
+        1,2,6,
+        1,5,6,
+        2,3,7,
+        7,6,2,
+        3,0,4,
+        4,7,3,
+        0,3,2,
+        0,1,2,
+        4,5,6,
+        4,7,6
+    };
+
+    int cubePositions[] = {
+        0,0,0,
+        1,0,0,
+        2,0,0,
+        0,0,1,
+        0,0,2,
+        0,1,0,
+    };
+
+    std::vector<Texture> texturas = {
+        Texture("diffuse", "textures/container.jpg"),
+        Texture("diffuse", "textures/a.png"),
+        Texture("diffuse", "textures/blocks_01.png")
+    };
 
 	Shader shader = Shader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -104,7 +102,7 @@ int main(){
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
 		camera.cameraMovement(window);
-
+        
         glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

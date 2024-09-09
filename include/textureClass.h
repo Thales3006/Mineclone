@@ -3,8 +3,8 @@
 
 #include <glad/glad.h>
 #include "stb/stb_image.h"
-#include <string>
 #include <iostream>
+#include <string>
 
 class Texture{
     public:
@@ -13,8 +13,7 @@ class Texture{
         std::string path;
     public:
         Texture(std::string tipo, const char* imagePath){
-
-            glGenTextures(1,&ID);
+            glGenTextures(1, &ID);
             glBindTexture(GL_TEXTURE_2D, ID);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
