@@ -1,3 +1,5 @@
 *.zip
 *.exe
 .vscode
+.exe
+mineclone
