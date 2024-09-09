@@ -1,14 +1,19 @@
 #ifndef TEXTURE_CLASS_H
 #define TEXTURE_CLASS_H
 
-#include<glad/glad.h>
-#include"stb/stb_image.h"
+#include <glad/glad.h>
+#include "stb/stb_image.h"
+#include <string>
+#include <iostream>
 
 class Texture{
     public:
         unsigned int ID;
+        std::string type;
+        std::string path;
     public:
-        Texture(const char* imagePath){
+        Texture(std::string tipo, const char* imagePath){
+
             glGenTextures(1,&ID);
             glBindTexture(GL_TEXTURE_2D, ID);
 
@@ -27,6 +32,9 @@ class Texture{
             else{
                 std::cout << "Erro ao carregar imagem." << std::endl; 
             }
+
+            path = imagePath;
+            type = tipo;
 
             stbi_image_free(data);
             glBindTexture(GL_TEXTURE_2D, 0);
