@@ -39,6 +39,9 @@ int main(){
 		return -1;
 	}
 	glViewport(0, 0, windowWidth, windowHeight);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable( GL_CULL_FACE);
 
     std::vector<Vertex> vertices = {
         Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //0
@@ -53,18 +56,18 @@ int main(){
     };
 
     std::vector<unsigned int> indices = {
-        0,1,5,
-        0,4,5,
-        1,2,6,
-        1,5,6,
-        2,3,7,
-        7,6,2,
-        3,0,4,
-        4,7,3,
-        0,3,2,
-        0,1,2,
-        4,5,6,
-        4,7,6
+        0,1,5,//face 1
+        0,5,4,
+        1,2,6,//face 2
+        1,6,5,
+        2,3,7,//face 3
+        2,7,6,
+        3,0,4,//face 4
+        3,4,7,
+        0,3,2,//face 5
+        0,2,1,
+        4,5,6,//face 6
+        6,7,4
     };
 
     int cubePositions[] = {
@@ -90,11 +93,10 @@ int main(){
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 
-	glEnable(GL_DEPTH_TEST);
-
 
 	camera.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
-	glfwSetCursorPosCallback(window, mouseCallback); 
+	glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
 
 	while(!glfwWindowShouldClose(window)){
         glfwGetWindowSize(window, &windowWidth, &windowHeight); 
