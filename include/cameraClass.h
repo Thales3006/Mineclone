@@ -36,8 +36,11 @@ class Camera{
             up = glm::vec3(0.0f, 1.0f, 0.0f);
         }
 
-        glm::mat4 viewMat(){
+        glm::mat4 matrixView(){
             return glm::lookAt(position, position+direction, up);
+        }
+        glm::mat4 matrixProjection(float aspect){
+            return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
         }
 
         void setKeys(int forward, int back, int left, int right, int upward, int downward){
