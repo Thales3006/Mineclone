@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -17,12 +18,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <math.h>
-
 int windowHeight = 600, windowWidth = 800;
 
-void drawingScene(GLFWwindow* window, Shader shader, Camera* camera, Mesh* mesh);
-void cameraDir(GLFWwindow* window, Camera* camera);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
 Camera camera = Camera(glm::vec3(0.0f,0.0f, 0.0f), 0.0f, 0.0f);
