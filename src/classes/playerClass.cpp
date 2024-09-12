@@ -44,10 +44,10 @@ void Player::processMouseMovement(double xoffset, double yoffset){
     yaw   += xoffset;
     pitch += yoffset;
 
-    if (pitch > M_PI/2)
-        pitch = M_PI/2;
-    if (pitch < -M_PI/2)
-        pitch = -M_PI/2;
+    if (pitch > M_PI/2-0.000001)
+        pitch = M_PI/2-0.000001;
+    if (pitch < -M_PI/2+0.000001)
+        pitch = -M_PI/2+0.000001;
 
     setDirection(yaw, pitch);
 }
