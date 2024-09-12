@@ -7,8 +7,9 @@
 
 #include "shaderClass.h"
 #include "textureClass.h"
-#include "cameraClass.h"
+#include "playerClass.h"
 #include "meshClass.h"
+#include "playerClass.h"
 #include "opengl.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -22,7 +23,7 @@ int windowHeight = 600, windowWidth = 800;
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
-Camera camera = Camera(glm::vec3(0.0f,0.0f, 0.0f), 0.0f, 0.0f);
+Player player = Player(glm::vec3(0.0f, 0.0f, 0.0f));
 
 int main(){
     
@@ -112,7 +113,7 @@ int main(){
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 
-	camera.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
+	player.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
 	glfwSetCursorPosCallback(window, mouseCallback);
     glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
 
@@ -122,10 +123,11 @@ int main(){
         glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        camera.processKeyMovement(window);
+        player.processKeyMovement(window);
+        player.update();
 
-        shader.setMat4("projection", camera.getMatrixProjection(float(windowWidth)/windowHeight));
-        shader.setMat4("view", camera.getMatrixView());
+        shader.setMat4("projection", player.getMatrixProjection(float(windowWidth)/windowHeight));
+        shader.setMat4("view", player.getMatrixView());
 
         for(int i=0; i<sizeof(cubePositions)/sizeof(int); i+=3){
 
@@ -144,6 +146,6 @@ int main(){
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos){
 	static double xlast = windowWidth/2, ylast = windowHeight/2;
-	camera.processMouseMovement(xpos-xlast, ylast-ypos);
+	player.processMouseMovement(xpos-xlast, ylast-ypos);
 	xlast = xpos; ylast = ypos;
 }
