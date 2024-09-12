@@ -1,11 +1,16 @@
-#include <glad/glad.h>
-#include <vector>
-#include <string>
 #include "meshClass.h"
         
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures){
     this->vertices = vertices;
     this->indices = indices;
+    this->textures = textures;
+
+    setupMesh();
+}
+
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures){
+    this->vertices = vertices;
+    this->indices = std::vector<unsigned int>();
     this->textures = textures;
 
     setupMesh();
@@ -50,7 +55,7 @@ void Mesh::draw(Shader &shader){
 
     for(unsigned int i = 0; i < textures.size(); i++){
         std::string number;
-        std::string name = textures[i].type;
+        std::string name = textures[i].getType();
 
         glActiveTexture(GL_TEXTURE0 + i);
 
@@ -59,7 +64,7 @@ void Mesh::draw(Shader &shader){
         else if(name == "texture_specular")
             number = std::to_string(specularNr++);
         else
-            std::cout << "tipo não identificado!" << std::endl;
+            std::cout << "tipo da textura não identificado!" << std::endl;
 
         shader.setInt((name + number).c_str(), i);
         textures[i].bind();

@@ -2,10 +2,14 @@
 #define MESH_CLASS_H
 
 #include <vector>
-#include "textureClass.h"
-#include "shaderClass.h"
+
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "textureClass.h"
+#include "shaderClass.h"
+
 
 struct Vertex {
     glm::vec3 Position;
@@ -20,6 +24,7 @@ class Mesh {
         std::vector<Texture>      textures;
 
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+        Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures);
 
         void draw(Shader &shader);
 

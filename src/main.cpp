@@ -27,9 +27,7 @@ Camera camera = Camera(glm::vec3(0.0f,0.0f, 0.0f), 0.0f, 0.0f);
 int main(){
     
     GLFWwindow* window = openGLInit(windowWidth, windowHeight);
-    if(window == NULL){
-        return -1;
-    }
+    if(window == NULL) return -1;
 
     std::vector<Vertex> vertices = {
         //face 1
@@ -109,11 +107,10 @@ int main(){
 
 	Shader shader = Shader("shaders/shader.vert", "shaders/shader.frag");
 
-    Mesh mesh = Mesh(vertices, std::vector<unsigned int>(), texturas);
+    Mesh mesh = Mesh(vertices, texturas);
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
-
 
 	camera.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
 	glfwSetCursorPosCallback(window, mouseCallback);
@@ -125,10 +122,10 @@ int main(){
         glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        camera.cameraMovement(window);
+        camera.processKeyMovement(window);
 
-        shader.setMat4("projection", camera.matrixProjection(float(windowWidth)/windowHeight));
-        shader.setMat4("view", camera.matrixView());
+        shader.setMat4("projection", camera.getMatrixProjection(float(windowWidth)/windowHeight));
+        shader.setMat4("view", camera.getMatrixView());
 
         for(int i=0; i<sizeof(cubePositions)/sizeof(int); i+=3){
 

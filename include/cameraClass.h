@@ -1,18 +1,27 @@
 #ifndef CAMERA_CLASS_H
 #define CAMERA_CLASS_H
 
+#include <math.h>
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#ifndef M_PI_2
-#define M_PI_2 1.57079
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
 #endif
+
 class Camera{
     private:
-        glm::vec3 position;
         glm::vec3 direction;
         glm::vec3 up;
+
+        float sensitivity = 0.005f;
+        float FOV = M_PI/4;
+
+
+    public:
+        glm::vec3 position;
 
         //angles
         float yaw = 0;
@@ -26,73 +35,23 @@ class Camera{
         int up_key = GLFW_KEY_RIGHT_SHIFT;
         int down_key = GLFW_KEY_RIGHT_CONTROL;
 
-        float sensitivity = 0.005f;
-        float fov = M_PI_2/2;
+        Camera(glm::vec3 pos, float newYaw, float newPitch);
 
-    public:
-        Camera(glm::vec3 pos, float newYaw, float newPitch){
-            position = pos;
-            setCameraDirection(newYaw, newPitch);
-            up = glm::vec3(0.0f, 1.0f, 0.0f);
-        }
+        glm::mat4 getMatrixView();
+        glm::mat4 getMatrixProjection(float aspect);
 
-        glm::mat4 matrixView(){
-            return glm::lookAt(position, position+direction, up);
-        }
-        glm::mat4 matrixProjection(float aspect){
-            return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
-        }
+        void setKeys(int forward, int back, int left, int right, int upward, int downward);
 
-        void setKeys(int forward, int back, int left, int right, int upward, int downward){
-            forward_key = forward;
-            back_key = back;
-            left_key = left;
-            right_key = right;
-            up_key = upward;
-            down_key = downward;
-        }
+        void processKeyMovement(GLFWwindow* window);
+        void processMouseMovement(double xoffset, double yoffset);
 
-        void cameraMovement(GLFWwindow* window){
-            if(glfwGetKey(window, forward_key)){
-                position += glm::normalize(glm::vec3(direction.x, 0, direction.z))*0.1f;
-            }
-            if (glfwGetKey(window, back_key)){
-                position -= glm::normalize(glm::vec3(direction.x, 0, direction.z))*0.1f;
-            }
-            if (glfwGetKey(window, left_key)){
-                position += glm::normalize(glm::cross(up,direction))*0.1f;
-            }
-            if (glfwGetKey(window, right_key)){
-                position -= glm::normalize(glm::cross(up,direction))*0.1f;  
-            }
-            if (glfwGetKey(window, up_key)){
-                position += up*0.1f;
-            }
-            if (glfwGetKey(window, down_key)){
-                position -= up*0.1f;
-            }
+        void setDirection(float newYaw, float newPitch);
+        void setSensitivity(float newSensitivity);
+        void setFOV(float newFOV);
 
-        }
-
-        void processMouseMovement(double xoffset, double yoffset){
-            xoffset *= sensitivity;
-            yoffset *= sensitivity;
-
-            yaw   += xoffset;
-            pitch += yoffset;
-
-            if (pitch > M_PI_2)
-                pitch = M_PI_2;
-            if (pitch < -M_PI_2)
-                pitch = -M_PI_2;
-
-            setCameraDirection(yaw, pitch);
-        }
-
-        void setCameraDirection(float newYaw, float newPitch){
-            yaw = newYaw;
-            pitch = newPitch;
-            direction = glm::vec3(cos(yaw) * cos(pitch), sin(pitch), sin(yaw) * cos(pitch));
-        }
+        glm::vec3 getDirection();
+        float getSensitivity();
+        float getFOV();
 };
+
 #endif
