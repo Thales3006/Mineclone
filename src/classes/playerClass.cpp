@@ -1,6 +1,8 @@
 #include "playerClass.h"
 
 Player::Player(glm::vec3 pos): Camera(pos, 0.0f, 0.0f){
+    height=1.8;
+    width=0.9;
 
 }
 
@@ -51,8 +53,29 @@ void Player::processMouseMovement(double xoffset, double yoffset){
 
     setDirection(yaw, pitch);
 }
+/*
+bool colision(glm::vec3 player, glm::vec3 block){
+    return 
+    player.x < block.x + block.width && player.x + player.width > block.x && 
+    player.y < block.y + block.height && player.y + player.height > block.y &&
+    player.z < block.z + block.width && player.z + player.width > block.z; 
+}*/
 
-void Player::update(){
+bool colisionBlock(glm::vec3 player, glm::vec3 block){
+    return 
+    player.x <= block.x + 1.0 && player.x + 0.7 >= block.x && 
+    player.y <= block.y + 1.0 && player.y + 1.8 >= block.y &&
+    player.z <= block.z + 1.0 && player.z + 0.7 >= block.z; 
+}
+
+
+void Player::update(std::vector<Block> blocks){
     position += velocity;
-    velocity -= glm::vec3(velocity.x/MAX_VELOCITY,velocity.y/MAX_VELOCITY,velocity.z/MAX_VELOCITY);//glm::vec3(0, gravity, 0);
+
+    for(Block block : blocks){
+        if(colisionBlock(position, block.position))
+            position -= velocity;
+    }
+    velocity -= velocity / glm::vec3(MAX_VELOCITY * 2);
+
 }

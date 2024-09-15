@@ -7,17 +7,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "entityClass.h"
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-class Camera{
+class Camera : public Entity {
     private:
         float sensitivity = 0.005f;
         float FOV = M_PI/4;
 
     public:
-        glm::vec3 position;
         glm::vec3 direction;
         glm::vec3 up;
 

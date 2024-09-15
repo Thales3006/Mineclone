@@ -9,6 +9,7 @@
 #include "textureClass.h"
 #include "playerClass.h"
 #include "meshClass.h"
+#include "blockClass.h"
 #include "playerClass.h"
 #include "opengl.h"
 
@@ -23,7 +24,7 @@ int windowHeight = 600, windowWidth = 800;
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
-Player player = Player(glm::vec3(0.0f, 0.0f, 0.0f));
+Player player = Player(glm::vec3(0.0f, 4.0f, 0.0f));
 
 int main(){
     
@@ -91,14 +92,14 @@ int main(){
         6,7,4
     };
 
-    int cubePositions[] = {
-        0,0,0,
-        1,0,0,
-        2,0,0,
-        0,0,1,
-        0,0,2,
-        0,1,0,
-        2,0,2
+    std::vector<Block> cubes = {
+        Block{glm::vec3(0.0f, 0.0f, 0.0f), true},
+        Block{glm::vec3(0.0f, 1.0f, 0.0f), true},
+        Block{glm::vec3(1.0f, 0.0f, 0.0f), true},
+        Block{glm::vec3(2.0f, 0.0f, 0.0f), true},
+        Block{glm::vec3(0.0f, 0.0f, 1.0f), true},
+        Block{glm::vec3(0.0f, 0.0f, 2.0f), true},
+        Block{glm::vec3(2.0f, 0.0f, 2.0f), true},
     };
 
     std::vector<Texture> texturas = {
@@ -124,14 +125,14 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         player.processKeyMovement(window);
-        player.update();
+        player.update(cubes);
 
         shader.setMat4("projection", player.getMatrixProjection(float(windowWidth)/windowHeight));
         shader.setMat4("view", player.getMatrixView());
 
-        for(int i=0; i<sizeof(cubePositions)/sizeof(int); i+=3){
+        for(int i=0; i<cubes.size(); i++){
 
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(cubePositions[i+0],cubePositions[i+1],cubePositions[i+2]));
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), cubes[i].position);
             shader.setMat4("model", model);
 
             mesh.draw(shader);
