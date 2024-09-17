@@ -10,6 +10,7 @@
 #include "playerClass.h"
 #include "meshClass.h"
 #include "blockClass.h"
+//#include "chunkClass.h"
 #include "playerClass.h"
 #include "opengl.h"
 
