@@ -13,14 +13,15 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-class Camera : public Entity {
+class Camera {
     private:
         float sensitivity = 0.005f;
         float FOV = M_PI/4;
 
     public:
+        glm::vec3 position;
         glm::vec3 direction;
-        glm::vec3 up;
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
         //angles
         float yaw = 0;

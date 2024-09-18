@@ -1,8 +1,8 @@
 #include "cameraClass.h"
 
-Camera::Camera(glm::vec3 pos, float newYaw, float newPitch) : Entity(pos, 0.0, 0.0){
+Camera::Camera(glm::vec3 pos, float newYaw, float newPitch) {
+    position = pos;
     setDirection(newYaw, newPitch);
-    up = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
 glm::mat4 Camera::getMatrixView(){

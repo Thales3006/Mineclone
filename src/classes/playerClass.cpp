@@ -1,8 +1,7 @@
 #include "playerClass.h"
 
-Player::Player(glm::vec3 pos): Camera(pos, 0.0f, 0.0f){
-    height=1.8;
-    width=0.9;
+Player::Player(glm::vec3 pos): Camera(pos+glm::vec3(size.x/2, size.y*0.95, size.z/2), 0.0f, 0.0f), Entity(pos, glm::vec3(0.5, 0.7, 0.5)) {
+    size = glm::vec3(0.5, 1.75, 0.5);
 
 }
 
@@ -34,9 +33,8 @@ void Player::processKeyMovement(GLFWwindow* window){
     if (glfwGetKey(window, down_key)){
         velocity -= up * acceleration;
     }
-    velocity.x = velocity.x >= MAX_VELOCITY? MAX_VELOCITY : velocity.x;
-    velocity.y = velocity.y >= MAX_VELOCITY? MAX_VELOCITY : velocity.y;
-    velocity.z = velocity.z >= MAX_VELOCITY? MAX_VELOCITY : velocity.z;
+    
+    Camera::position = Entity::position + glm::vec3(size.x/2, size.y*0.95, size.z/2);
 }
 
 void Player::processMouseMovement(double xoffset, double yoffset){
@@ -52,30 +50,4 @@ void Player::processMouseMovement(double xoffset, double yoffset){
         pitch = -M_PI/2+0.000001;
 
     setDirection(yaw, pitch);
-}
-/*
-bool colision(glm::vec3 player, glm::vec3 block){
-    return 
-    player.x < block.x + block.width && player.x + player.width > block.x && 
-    player.y < block.y + block.height && player.y + player.height > block.y &&
-    player.z < block.z + block.width && player.z + player.width > block.z; 
-}*/
-
-bool colisionBlock(glm::vec3 player, glm::vec3 block){
-    return 
-    player.x <= block.x + 1.0 && player.x + 0.7 >= block.x && 
-    player.y <= block.y + 1.0 && player.y + 1.8 >= block.y &&
-    player.z <= block.z + 1.0 && player.z + 0.7 >= block.z; 
-}
-
-
-void Player::update(std::vector<Block> blocks){
-    position += velocity;
-
-    for(Block block : blocks){
-        if(colisionBlock(position, block.position))
-            position -= velocity;
-    }
-    velocity -= velocity / glm::vec3(MAX_VELOCITY * 2);
-
 }
