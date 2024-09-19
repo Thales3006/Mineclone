@@ -17,5 +17,8 @@ GLFWwindow* openGLInit(int windowWidth, int windowHeight){
     glDepthFunc(GL_LESS);
     glEnable( GL_CULL_FACE);
 
+    glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
+
     return window;
 }
