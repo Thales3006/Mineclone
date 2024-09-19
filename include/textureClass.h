@@ -7,41 +7,21 @@
 #include <string>
 
 class Texture{
-    public:
+    private:
         unsigned int ID;
         std::string type;
         std::string path;
+        int width, height, nrChannels;
     public:
-        Texture(std::string tipo, const char* imagePath){
-            glGenTextures(1, &ID);
-            glBindTexture(GL_TEXTURE_2D, ID);
+        Texture(std::string tipo, const char* imagePath);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        void bind();
 
-            int width, height, nrChannels;
-            stbi_set_flip_vertically_on_load(true);  
-            unsigned char* data = stbi_load(imagePath, &width, &height, &nrChannels, 0);
-            if(data){
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-                glGenerateMipmap(GL_TEXTURE_2D);
-            }
-            else{
-                std::cout << "Erro ao carregar imagem." << std::endl; 
-            }
+        void changeTexture(std::string tipo, const char* imagePath);
 
-            path = imagePath;
-            type = tipo;
-
-            stbi_image_free(data);
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
-
-        void bind(){
-            glBindTexture(GL_TEXTURE_2D, ID);
-        }
+        unsigned int getID();
+        std::string getType();
+        std::string getPath();
 };
 
 #endif
