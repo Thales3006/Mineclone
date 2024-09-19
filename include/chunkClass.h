@@ -10,12 +10,13 @@
 class Chunk {
     public:
         int position[3];
-        Block block[chunkwidth][chunkheight][chunkdepth] = {Block(glm::vec3(0,0,0), false)};
+        int block[chunkwidth][chunkheight][chunkdepth] = {0};
 
         Chunk(int x, int y, int z) {
             position[0] = x;
             position[1] = y;
             position[2] = z;
+
         }
 }
 

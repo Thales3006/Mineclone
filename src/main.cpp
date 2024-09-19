@@ -10,7 +10,7 @@
 #include "playerClass.h"
 #include "meshClass.h"
 #include "blockClass.h"
-#include "chunkClass.h"
+//#include "chunkClass.h"
 #include "playerClass.h"
 #include "opengl.h"
 
@@ -78,23 +78,20 @@ int main(){
     };
 
     std::vector<Block> cubes = {
-        Block{glm::vec3(0.0f, 0.0f, 0.0f), true},
-        Block{glm::vec3(0.0f, 1.0f, 0.0f), true},
-        Block{glm::vec3(1.0f, 0.0f, 0.0f), true},
-        Block{glm::vec3(2.0f, 0.0f, 0.0f), true},
-        Block{glm::vec3(0.0f, 0.0f, 1.0f), true},
-        Block{glm::vec3(0.0f, 0.0f, 2.0f), true},
-        Block{glm::vec3(2.0f, 0.0f, 1.0f), true},
-        Block{glm::vec3(1.0f, 0.0f, 2.0f), true},
-        Block{glm::vec3(1.0f, 0.0f, 1.0f), true},
-        Block{glm::vec3(2.0f, 0.0f, 2.0f), true},
+        Block{glm::vec3(0.0f, 0.0f, 0.0f), 1, true},
+        Block{glm::vec3(0.0f, 1.0f, 0.0f), 1, true},
+        Block{glm::vec3(1.0f, 0.0f, 0.0f), 1, true},
+        Block{glm::vec3(2.0f, 0.0f, 0.0f), 1, true},
+        Block{glm::vec3(0.0f, 0.0f, 1.0f), 1, true},
+        Block{glm::vec3(0.0f, 0.0f, 2.0f), 1, true},
+        Block{glm::vec3(2.0f, 0.0f, 1.0f), 1, true},
+        Block{glm::vec3(1.0f, 0.0f, 2.0f), 1, true},
+        Block{glm::vec3(1.0f, 0.0f, 1.0f), 1, true},
+        Block{glm::vec3(2.0f, 0.0f, 2.0f), 1, true},
     };
 
-    Chunk chunk = Chunk(0, 0, 0);
-    chunk[0][0][0] = Block(glm::vec3(0, 0, 0), true);
-
     std::vector<Texture> texturas = {
-        Texture("texture_diffuse", "textures/container.jpg"),
+        Texture("texture_diffuse", "textures/blocks_01.png"),
         Texture("texture_diffuse", "textures/blocks_01.png")
     };
 
