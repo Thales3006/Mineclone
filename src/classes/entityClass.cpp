@@ -58,10 +58,12 @@ bool Entity::update(std::vector<Block> blocks){
     glm::vec3 friction = glm::vec3(0.4, 0.1, 0.4);
     glm::vec3 correction = glm::vec3(0.0);
 
-    for(Block block : blocks)
+    for(Block block : blocks){
         colisionContinuous(block.position, glm::vec3(1.0), correction);
+        printf("correction: %G %G %G\n", correction.x, correction.y, correction.z);
+    }
 
-    position += velocity + correction;
+    position += velocity + correction * glm::vec3(1.001);
 
     velocity.y -= gravity;
     velocity -= velocity * glm::vec3(friction);

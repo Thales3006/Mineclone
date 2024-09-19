@@ -52,7 +52,7 @@ void Player::processMouseMovement(double xoffset, double yoffset){
 
 void Player::updatePlayer(GLFWwindow* window, std::vector<Block> blocks){
     processKeyMovement(window);
-    onGround = update(blocks)? true : onGround;
+    onGround = update(blocks);
 
     Camera::position = Entity::position + glm::vec3(size.x/2, size.y*0.9, size.z/2);
 }
