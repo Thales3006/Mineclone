@@ -18,9 +18,13 @@ class Player: public Camera, public Entity {
         int up_key = GLFW_KEY_RIGHT_SHIFT;
         int down_key = GLFW_KEY_RIGHT_CONTROL;
 
-        Player(glm::vec3 pos);
+        bool onGround = true;
+
+        Player(glm::vec3 pos, glm::vec3 siz);
 
         void setKeys(int forward, int back, int left, int right, int upward, int downward);
+
+        void updatePlayer(GLFWwindow* window, std::vector<Block> blocks);
 
         void processKeyMovement(GLFWwindow* window);
         void processMouseMovement(double xoffset, double yoffset);

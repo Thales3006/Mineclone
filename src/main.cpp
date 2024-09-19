@@ -25,7 +25,7 @@ int windowHeight = 600, windowWidth = 800;
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
-Player player = Player(glm::vec3(0.0f, 4.0f, 0.0f));
+Player player = Player(glm::vec3(0.0f, 4.0f, 0.0f), glm::vec3(0.5, 1.75, 0.5));
 
 int main(){
     
@@ -145,7 +145,10 @@ int main(){
         Block{glm::vec3(2.0f, 0.0f, 0.0f), true},
         Block{glm::vec3(0.0f, 0.0f, 1.0f), true},
         Block{glm::vec3(0.0f, 0.0f, 2.0f), true},
-        Block{glm::vec3(0.0f, 0.0f, 0.0f), true},
+        Block{glm::vec3(2.0f, 0.0f, 1.0f), true},
+        Block{glm::vec3(1.0f, 0.0f, 2.0f), true},
+        Block{glm::vec3(1.0f, 0.0f, 1.0f), true},
+        Block{glm::vec3(2.0f, 0.0f, 2.0f), true},
     };
 
     std::vector<Texture> texturas = {
@@ -170,8 +173,7 @@ int main(){
         glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        player.processKeyMovement(window);
-        player.update(cubes);
+        player.updatePlayer(window, cubes);
 
         shader.setMat4("projection", player.getMatrixProjection(float(windowWidth)/windowHeight));
         shader.setMat4("view", player.getMatrixView());

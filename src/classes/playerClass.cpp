@@ -1,7 +1,6 @@
 #include "playerClass.h"
 
-Player::Player(glm::vec3 pos): Camera(pos+glm::vec3(size.x/2, size.y*0.95, size.z/2), 0.0f, 0.0f), Entity(pos, glm::vec3(0.5, 0.7, 0.5)) {
-    size = glm::vec3(0.5, 1.75, 0.5);
+Player::Player(glm::vec3 pos, glm::vec3 siz): Camera(pos+glm::vec3(siz.x/2, siz.y*0.9, siz.z/2), 0.0f, 0.0f), Entity(pos, siz) {
 
 }
 
@@ -27,14 +26,13 @@ void Player::processKeyMovement(GLFWwindow* window){
     if (glfwGetKey(window, right_key)){
         velocity -= glm::normalize(glm::cross(up,direction)) * acceleration;  
     }
-    if (glfwGetKey(window, up_key)){
-        velocity += up * acceleration;
+    if (onGround && glfwGetKey(window, up_key)){
+        velocity = up * acceleration;
+        onGround= false;
     }
-    if (glfwGetKey(window, down_key)){
-        velocity -= up * acceleration;
-    }
-    
-    Camera::position = Entity::position + glm::vec3(size.x/2, size.y*0.95, size.z/2);
+    //if (glfwGetKey(window, down_key)){
+    //    velocity -= up * acceleration;
+    //}
 }
 
 void Player::processMouseMovement(double xoffset, double yoffset){
@@ -50,4 +48,11 @@ void Player::processMouseMovement(double xoffset, double yoffset){
         pitch = -M_PI/2+0.000001;
 
     setDirection(yaw, pitch);
+}
+
+void Player::updatePlayer(GLFWwindow* window, std::vector<Block> blocks){
+    processKeyMovement(window);
+    onGround = update(blocks)? true : onGround;
+
+    Camera::position = Entity::position + glm::vec3(size.x/2, size.y*0.9, size.z/2);
 }
