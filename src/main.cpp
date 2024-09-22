@@ -10,7 +10,7 @@
 #include "playerClass.h"
 #include "meshClass.h"
 #include "blockClass.h"
-//#include "chunkClass.h"
+#include "chunkClass.h"
 #include "playerClass.h"
 #include "opengl.h"
 
@@ -27,7 +27,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
 Player player = Player(glm::vec3(0.0f, 4.0f, 0.0f), glm::vec3(0.5, 1.75, 0.5));
 
-int main(){
+int main(){std::cout << "AAAAAAAAAAA\n";
 
     GLFWwindow* window = openGLInit(windowWidth, windowHeight);
     if(window == NULL) return -1;
@@ -77,23 +77,14 @@ int main(){
         Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)}  //7
     };
 
-    std::vector<Block> cubes = {
-        Block{glm::vec3(0.0f, 0.0f, 0.0f), 1, true},
-        Block{glm::vec3(0.0f, 1.0f, 0.0f), 1, true},
-        Block{glm::vec3(1.0f, 0.0f, 0.0f), 1, true},
-        Block{glm::vec3(2.0f, 0.0f, 0.0f), 1, true},
-        Block{glm::vec3(0.0f, 0.0f, 1.0f), 1, true},
-        Block{glm::vec3(0.0f, 0.0f, 2.0f), 1, true},
-        Block{glm::vec3(2.0f, 0.0f, 1.0f), 1, true},
-        Block{glm::vec3(1.0f, 0.0f, 2.0f), 1, true},
-        Block{glm::vec3(1.0f, 0.0f, 1.0f), 1, true},
-        Block{glm::vec3(2.0f, 0.0f, 2.0f), 1, true},
+    std::vector<Texture> texturas = {
+        Texture("texture_diffuse", "textures/container.jpg"),
+        Texture("texture_diffuse", "textures/blocks_01.png"),
+        
     };
 
-    std::vector<Texture> texturas = {
-        Texture("texture_diffuse", "textures/blocks_01.png"),
-        Texture("texture_diffuse", "textures/blocks_01.png")
-    };
+    std::vector<Chunk> chunks;
+    chunks.push_back(Chunk(0, 0, 0));
 
 	Shader shader = Shader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -109,17 +100,27 @@ int main(){
         glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        player.updatePlayer(window, cubes);
+        player.updatePlayer(window, chunks);
 
         shader.setMat4("projection", player.getMatrixProjection(float(windowWidth)/windowHeight));
         shader.setMat4("view", player.getMatrixView());
 
-        for(int i=0; i<cubes.size(); i++){
+        std::cout << "AAAAAAAAAAA\n";
+        for(Chunk chunk : chunks){
 
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), cubes[i].position);
-            shader.setMat4("model", model);
+            for(int i = 0; i < chunkwidth; i++){
+                for(int j = 0; j < chunkheight; j++){
+                    for(int k = 0; k < chunkdepth; k++){
+                        Block block = chunk.block[i][j][k];
+                        if(block.ID == 0) continue;
 
-            mesh.draw(shader);
+                        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(i, j, k));
+                        shader.setMat4("model", model);
+
+                        mesh.draw(shader);
+                    }
+                }
+            }
         }
 
 		glfwSwapBuffers(window);

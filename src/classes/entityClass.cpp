@@ -54,15 +54,26 @@ bool Entity::colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize, glm::
 }
 
 #include <stdio.h>
-bool Entity::update(std::vector<Block> blocks){
+bool Entity::update(std::vector<Chunk> chunks){
     glm::vec3 friction = glm::vec3(0.4, 0.1, 0.4);
     glm::vec3 correction = glm::vec3(0.0);
 
-    for(Block block : blocks){
-        colisionContinuous(block.position, glm::vec3(1.0), correction);
-        printf("correction: %G %G %G\n", correction.x, correction.y, correction.z);
+    for(Chunk chunk : chunks){
+
+        for(int i=0; i<abs(velocity.x) && i < 16; velocity.x>0?i++:i--){
+            for(int j=0; j<abs(velocity.y) && j < 16; velocity.y>0?j++:j--){
+                for(int k=0; k<abs(velocity.z) && k < 16; velocity.z>0?k++:k--){
+                    if(!chunk.block[(int)position.x+i][(int)position.y+j][(int)position.z+k].solid)
+                        continue;
+
+                    colisionContinuous(glm::vec3((int)position.x+i, (int)position.y+j, (int)position.z+k), glm::vec3(1.0), correction);
+                }
+            }
+        }
+
     }
 
+    printf("correction: %G %G %G\n", correction.x, correction.y, correction.z);
     position += velocity + correction * glm::vec3(1.001);
 
     velocity.y -= gravity;

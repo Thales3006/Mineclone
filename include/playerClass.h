@@ -24,7 +24,7 @@ class Player: public Camera, public Entity {
 
         void setKeys(int forward, int back, int left, int right, int upward, int downward);
 
-        void updatePlayer(GLFWwindow* window, std::vector<Block> blocks);
+        void updatePlayer(GLFWwindow* window, std::vector<Chunk> chunks);
 
         void processKeyMovement(GLFWwindow* window);
         void processMouseMovement(double xoffset, double yoffset);
