@@ -1,5 +1,7 @@
 #include "opengl.h"
 
+#include <iostream>
+
 GLFWwindow* openGLInit(int windowWidth, int windowHeight){
 	if (!glfwInit()){
 		std::cout << "Failed to initialize GLFW.\n";

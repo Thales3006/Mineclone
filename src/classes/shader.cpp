@@ -1,4 +1,10 @@
-#include "shaderClass.h"
+#include "shader.h"
+
+#include <glad/glad.h>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 std::string Shader::readFile(const char* filePath){
     std::string Code;

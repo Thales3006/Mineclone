@@ -1,4 +1,4 @@
-#include "blockClass.h"
+#include "block.h"
 
 Block::Block(glm::vec3 pos, unsigned int newID, bool isSolid){
     position = pos;

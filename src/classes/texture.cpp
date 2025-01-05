@@ -1,4 +1,7 @@
-#include "textureClass.h"
+#include "texture.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
 
 Texture::Texture(std::string tipo, const char* imagePath){
     glGenTextures(1, &ID);

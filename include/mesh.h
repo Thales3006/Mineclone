@@ -7,8 +7,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "textureClass.h"
-#include "shaderClass.h"
+#include "texture.h"
+#include "shader.h"
 
 
 struct Vertex {

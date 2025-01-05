@@ -1,24 +1,23 @@
 #ifndef PLAYER_CLASS_H
 #define PLAYER_CLASS_H
 
-#include "cameraClass.h"
-#include "entityClass.h"
+#include "camera.h"
+#include "entity.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 #include <vector>
 
-class Player: public Camera, public Entity {
+class Player: public Entity {
     public:
+        Camera camera;
 
-        int forward_key = GLFW_KEY_UP;
-        int back_key = GLFW_KEY_DOWN;
-        int left_key = GLFW_KEY_LEFT;
-        int right_key = GLFW_KEY_RIGHT;
-        int up_key = GLFW_KEY_RIGHT_SHIFT;
-        int down_key = GLFW_KEY_RIGHT_CONTROL;
-
-        bool onGround = true;
+        int forward_key;
+        int back_key;
+        int left_key;
+        int right_key;
+        int up_key;
+        int down_key;
 
         Player(glm::vec3 pos, glm::vec3 siz);
 
