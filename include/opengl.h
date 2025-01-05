@@ -3,7 +3,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 
 GLFWwindow* openGLInit(int windowWidth, int windowHeight);
 

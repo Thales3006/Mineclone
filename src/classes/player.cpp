@@ -1,4 +1,4 @@
-#include "playerClass.h"
+#include "player.h"
 
 Player::Player(glm::vec3 pos, glm::vec3 siz): Camera(pos+glm::vec3(siz.x/2, siz.y*0.9, siz.z/2), 0.0f, 0.0f), Entity(pos, siz) {
 

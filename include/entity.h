@@ -1,7 +1,7 @@
 #ifndef ENTITY_CLASS_H
 #define ENTITY_CLASS_H
 
-#include "blockClass.h"
+#include "block.h"
 
 #include "glm/glm.hpp"
 #include <vector>

@@ -1,8 +1,8 @@
 #ifndef PLAYER_CLASS_H
 #define PLAYER_CLASS_H
 
-#include "cameraClass.h"
-#include "entityClass.h"
+#include "camera.h"
+#include "entity.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 

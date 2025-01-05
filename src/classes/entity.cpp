@@ -1,4 +1,4 @@
-#include "entityClass.h"
+#include "entity.h"
 
 Entity::Entity(glm::vec3 pos, glm::vec3 siz){
     position = pos;
