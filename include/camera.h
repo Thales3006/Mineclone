@@ -1,31 +1,25 @@
 #ifndef CAMERA_CLASS_H
 #define CAMERA_CLASS_H
 
-#include <cmath>
-
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "entity.h"
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 class Camera {
-    private:
-        float sensitivity = 0.005f;
-        float FOV = M_PI/4;
+    private:  
+        glm::vec3 direction;
+        glm::vec3 up;
+
+        float sensitivity;
+        float FOV;
 
     public:
         glm::vec3 position;
-        glm::vec3 direction;
-        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
         //angles
-        float yaw = 0;
-        float pitch = 0;
+        float yaw;
+        float pitch;
 
         Camera(glm::vec3 pos, float newYaw, float newPitch);
 
@@ -37,6 +31,8 @@ class Camera {
         void setFOV(float newFOV);
 
         glm::vec3 getDirection();
+        glm::vec3 getUp();
+        
         float getSensitivity();
         float getFOV();
 };

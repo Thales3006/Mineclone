@@ -88,12 +88,11 @@ void Game::run() {
 
         player.updatePlayer(window, blocks);
 
-        shaders[0].setMat4("projection", player.getMatrixProjection(float(windowSize[0])/windowSize[1]));
-        shaders[0].setMat4("view", player.getMatrixView());
+        shaders[0].setMat4("projection", player.camera.getMatrixProjection(float(windowSize[0])/windowSize[1]));
+        shaders[0].setMat4("view", player.camera.getMatrixView());
 
-        for(int i=0; i<blocks.size(); i++){
-
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), blocks[i].position);
+        for(auto& block : blocks){
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), block.position);
             shaders[0].setMat4("model", model);
 
             meshes[0].draw(shaders[0]);

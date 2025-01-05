@@ -30,7 +30,6 @@ private:
 
     std::vector<Texture> textures;
     std::vector<Mesh> meshes;
-
     std::vector<Shader> shaders;
 
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);

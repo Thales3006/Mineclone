@@ -1,7 +1,17 @@
 #include "camera.h"
 
+#include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 Camera::Camera(glm::vec3 pos, float newYaw, float newPitch) {
+    up = glm::vec3(0.0f, 1.0f, 0.0f);
     position = pos;
+
+    sensitivity = 0.005f;
+    FOV = M_PI/4;
+    
     setDirection(newYaw, newPitch);
 }
 
@@ -29,6 +39,10 @@ void Camera::setFOV(float newFOV){
 
 glm::vec3 Camera::getDirection(){
     return direction;
+}
+
+glm::vec3 Camera::getUp(){
+    return up;
 }
 
 float Camera::getSensitivity(){
