@@ -4,7 +4,7 @@
 #include "block.h"
 
 #define CHUNK_WIDTH 16
-#define CHUNK_HEIGHT 256
+#define CHUNK_HEIGHT 32
 
 class Chunk {
     public:
@@ -14,6 +14,8 @@ class Chunk {
         Chunk();
         Chunk(int x, int y);
         Chunk(int x, int y, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH]);
+ 
+        static Chunk generateChunk(int x, int y);
 }; 
 
 #endif

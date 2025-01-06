@@ -26,7 +26,6 @@ private:
     GLFWwindow* window;
     int windowSize[2];
 
-    std::vector<Block> blocks;
     ChunkManager chunkManager;
     Player player;
 

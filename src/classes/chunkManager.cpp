@@ -20,15 +20,3 @@ void ChunkManager::unloadChunk(int x, int y) {
             return;
         }
 }
-
-Chunk ChunkManager::generateChunk(int x, int y) {
-    Chunk chunk = Chunk(x, y);
-    for (int i = 0; i < CHUNK_WIDTH; ++i) {
-        for (int j = 0; j < CHUNK_HEIGHT; ++j) {
-            for (int k = 0; k < CHUNK_WIDTH; ++k) {
-                chunk.blocks[i][j][k] = j<CHUNK_HEIGHT/2? Block(glm::vec3(i,j,k), 1, true) : Block(glm::vec3(i,j,k), 0, false);
-            }
-        }
-    }
-    return chunk;
-}

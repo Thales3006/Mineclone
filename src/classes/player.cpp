@@ -51,11 +51,11 @@ void Player::processKeyMovement(GLFWwindow* window){
         velocity -= side * acceleration;  
     }
     if (/*onGround && */glfwGetKey(window, up_key)){
-        velocity = up * acceleration;
+        velocity += up * acceleration;
         //onGround= false;
     }
     if (glfwGetKey(window, down_key)){
-        velocity = -up * acceleration;
+        velocity -= up * acceleration;
     }
 }
 
@@ -73,8 +73,8 @@ void Player::processMouseMovement(double xoffset, double yoffset){
     camera.setDirection(camera.yaw, camera.pitch);
 }
 
-void Player::updatePlayer(GLFWwindow* window, std::vector<Block> blocks){
+void Player::updatePlayer(GLFWwindow* window, const std::vector<Chunk>& chunks){
     processKeyMovement(window);
-    update(blocks);
+    update(chunks);
     camera.position = position + glm::vec3(size.x/2, size.y*0.9, size.z/2);
 }

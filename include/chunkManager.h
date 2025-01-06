@@ -5,15 +5,13 @@
 #include <vector>
 
 class ChunkManager {
-    std::vector<Chunk> chunks;
+    public:
+        std::vector<Chunk> chunks;
 
-    ChunkManager();
+        ChunkManager();
 
-    void loadChunk(Chunk chunk);
-    void unloadChunk(int x, int y);
-
-    Chunk generateChunk(int x, int y);
-
+        void loadChunk(Chunk chunk);
+        void unloadChunk(int x, int y);
 };
 
 #endif

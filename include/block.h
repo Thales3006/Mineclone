@@ -5,12 +5,11 @@
 
 class Block {
     public:
-        glm::vec3 position;
         unsigned int ID;
         bool solid;
         
         Block();
-        Block(glm::vec3 pos, unsigned int ID, bool isSolid);
+        Block(unsigned int ID, bool isSolid);
 };
 
 #endif
