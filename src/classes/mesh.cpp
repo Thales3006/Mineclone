@@ -27,6 +27,9 @@ void Mesh::setupMesh(){
     if(!vertices.data()) 
         return;
 
+    if(!vertices.data()) 
+        return;
+
     glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
     if(indices.data()) glGenBuffers(1, &EBO);
