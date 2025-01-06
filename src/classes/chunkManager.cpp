@@ -1,47 +1,63 @@
 #include "chunkManager.h"
 
 #include <cmath>
-
-ChunkManager::ChunkManager() {
-    chunks = std::vector<Chunk>();
-}
+#include <iostream>
+ChunkManager::ChunkManager() {}
 
 void ChunkManager::loadChunk(Chunk chunk) {
-    for(const auto& oldChunk : chunks)
-        if(chunk.position[0] == oldChunk.position[0] && chunk.position[1] == oldChunk.position[1])
-            return;
-    chunks.push_back(chunk);
+    if(chunks.find({chunk.x, chunk.z}) != chunks.end())
+        return;
+    chunks[{chunk.x, chunk.z}] = chunk;
     updateFaces();
 }
 
-void ChunkManager::unloadChunk(int x, int y) {
-    for (auto it = chunks.begin(); it != chunks.end(); ++it)
-        if (x == it->position[0] && y == it->position[1]) {
-            chunks.erase(it);
-            return;
-        }
+void ChunkManager::unloadChunk(int x, int z) {
+    if(chunks.find({x, z}) == chunks.end())
+        return;
+    chunks.erase({x, z});
 }
 
 void ChunkManager::updateFaces(){
-    for(auto& chunk : chunks)
+    for (auto& [coords, chunk] : chunks)
         for (int x = 0; x < CHUNK_WIDTH; x++)
             for (int y = 0; y < CHUNK_HEIGHT; y++)
                 for (int z = 0; z < CHUNK_WIDTH; z++)
                     chunk.updateBlock(x,y,z);
 }
 
-void ChunkManager::setBlock(int cx, int cy, int x, int y, int z, Block block){
-    if((x >= 0 && x < CHUNK_WIDTH) || (y >= 0 && y < CHUNK_HEIGHT) || (z >= 0 && z < CHUNK_WIDTH))
+void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block block){
+    if((chunks.find({chunkx, chunkz}) == chunks.end()) || (x < 0 || x >= CHUNK_WIDTH) || (y < 0 || y >= CHUNK_HEIGHT) || (z < 0 || z >= CHUNK_WIDTH))
         return;
 
-    for(auto& chunk : chunks)
-        if(cx == chunk.position[0] && cy == chunk.position[1]){
-            chunk.setBlock(x,y,z, block);
-            chunk.updateBlock(x+1,y,z);
-            chunk.updateBlock(x-1,y,z);
-            chunk.updateBlock(x,y+1,z);
-            chunk.updateBlock(x,y-1,z);
-            chunk.updateBlock(x,y,z+1);
-            chunk.updateBlock(x,y,z-1);
-        }
+    Chunk& chunk = chunks[{chunk.x, chunk.z}];
+    chunk.setBlock(x,y,z, block);
+    chunk.updateBlock(x+1,y,z);
+    chunk.updateBlock(x-1,y,z);
+    chunk.updateBlock(x,y+1,z);
+    chunk.updateBlock(x,y-1,z);
+    chunk.updateBlock(x,y,z+1);
+    chunk.updateBlock(x,y,z-1);
 }
+/*
+void ChunkManager::updateCorner(Chunk& chunk,int x, int y, int z){
+    if(blocks[x][y][z].ID==0){
+        blocks[x][y][z].faces = 0;
+        return;
+    }
+
+    unsigned char newFaces = ALL_FACE;
+    if(x != CHUNK_WIDTH-1 && blocks[x+1][y][z].ID!=0)
+        newFaces &= ~RIGHT_FACE;
+    if(x != 0 && blocks[x-1][y][z].ID!=0)
+        newFaces &= ~LEFT_FACE;
+    if(y != CHUNK_HEIGHT-1 && blocks[x][y+1][z].ID!=0)
+        newFaces &= ~UP_FACE;
+    if(y != 0 && blocks[x][y-1][z].ID!=0)
+        newFaces &= ~DOWN_FACE;
+    if(z != CHUNK_WIDTH-1 && blocks[x][y][z+1].ID!=0)
+        newFaces &= ~FRONT_FACE;
+    if(z != 0 && blocks[x][y][z-1].ID!=0)
+        newFaces &= ~BACK_FACE;
+
+    blocks[x][y][z].faces = newFaces;
+}*/
