@@ -31,7 +31,7 @@ void Entity::update(const std::vector<Chunk>& chunks){
         for (int x = 0; x < CHUNK_WIDTH; x++)
             for (int y = 0; y < CHUNK_HEIGHT; y++)
                 for (int z = 0; z < CHUNK_WIDTH; z++) {
-                    if(chunk.blocks[x][y][z].ID == 0 || chunk.blocks[x][y][z].faces == NO_FACE)
+                    if(chunk.blocks[x][y][z].solid == false || chunk.blocks[x][y][z].faces == NO_FACE)
                             continue;
                     newCorrection = colisionContinuous(glm::vec3(x,y,z) + glm::vec3(chunk.position[0],0,chunk.position[1])*glm::vec3(CHUNK_WIDTH), glm::vec3(1.0));
                     correction.x = std::abs(correction.x) > std::abs(newCorrection.x)? correction.x : newCorrection.x;
