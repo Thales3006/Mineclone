@@ -19,11 +19,12 @@ class Player: public Entity {
         int up_key;
         int down_key;
 
+        Player();
         Player(glm::vec3 pos, glm::vec3 siz);
 
         void setKeys(int forward, int back, int left, int right, int upward, int downward);
 
-        void updatePlayer(GLFWwindow* window, std::vector<Block> blocks);
+        void updatePlayer(GLFWwindow* window, const std::vector<Chunk>& chunks);
 
         void processKeyMovement(GLFWwindow* window);
         void processMouseMovement(double xoffset, double yoffset);

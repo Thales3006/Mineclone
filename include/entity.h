@@ -1,7 +1,7 @@
 #ifndef ENTITY_CLASS_H
 #define ENTITY_CLASS_H
 
-#include "block.h"
+#include "chunk.h"
 
 #include "glm/glm.hpp"
 #include <vector>
@@ -17,8 +17,10 @@ class Entity {
         float gravity;
         bool onGround;
     
+        Entity();
         Entity(glm::vec3 pos, glm::vec3 size);
-        void update(std::vector<Block> blocks);
+
+        void update(const std::vector<Chunk>& chunks);
         glm::vec3 colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize);
         
 };

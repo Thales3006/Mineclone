@@ -1,5 +1,16 @@
 #include "entity.h"
 
+Entity::Entity(){
+    this->velocity = glm::vec3(0.0);
+    this->acceleration = glm::vec3(0.0);
+
+    this->position = glm::vec3(0.0);
+    this->size = glm::vec3(0.0);
+    
+    this->gravity = 0.02;
+    this->onGround = false;
+}
+
 Entity::Entity(glm::vec3 pos, glm::vec3 size){
     this->velocity = glm::vec3(0.0);
     this->acceleration = glm::vec3(0.04, 0.04, 0.04);
@@ -11,18 +22,23 @@ Entity::Entity(glm::vec3 pos, glm::vec3 size){
     this->onGround = false;
 }
 
-void Entity::update(std::vector<Block> blocks){
+void Entity::update(const std::vector<Chunk>& chunks){
     glm::vec3 friction = glm::vec3(0.4, 0.1, 0.4);
     glm::vec3 correction = glm::vec3(0.0);
     glm::vec3 newCorrection = glm::vec3(0.0);
-
-    for(auto& block : blocks){
-        newCorrection = colisionContinuous(block.position, glm::vec3(1.0));
-        correction.x = std::abs(correction.x) > std::abs(newCorrection.x)? correction.x : newCorrection.x;
-        correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
-        correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
-    }
-
+    /*
+    for(const auto& chunk : chunks)
+        for (int x = 0; x < CHUNK_WIDTH; x++)
+            for (int y = 0; y < CHUNK_HEIGHT; y++)
+                for (int z = 0; z < CHUNK_WIDTH; z++) {
+                    if(!chunk.blocks[x][y][z].ID)
+                        continue;
+                    newCorrection = colisionContinuous(glm::vec3(x,y,z) + glm::vec3(chunk.position[0],0,chunk.position[1])*glm::vec3(CHUNK_WIDTH), glm::vec3(1.0));
+                    correction.x = std::abs(correction.x) > std::abs(newCorrection.x)? correction.x : newCorrection.x;
+                    correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
+                    correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
+                }
+    */
     position += velocity + correction * glm::vec3(1.001); // glm::vec3(1.001) only here because of bad colision
 
     //velocity.y -= gravity;

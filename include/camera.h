@@ -21,6 +21,7 @@ class Camera {
         float yaw;
         float pitch;
 
+        Camera();
         Camera(glm::vec3 pos, float newYaw, float newPitch);
 
         glm::mat4 getMatrixView();
