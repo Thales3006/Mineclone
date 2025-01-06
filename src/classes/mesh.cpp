@@ -1,9 +1,9 @@
 #include "mesh.h"
 
 Mesh::Mesh() {
-    this->vertices = std::vector<unsigned int>();
+    this->vertices = std::vector<Vertex>();
     this->indices = std::vector<unsigned int>();
-    this->textures = std::vector<unsigned int>();
+    this->textures = std::vector<Texture>();
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures){

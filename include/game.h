@@ -14,7 +14,7 @@
 #include "mesh.h"
 #include "block.h"
 #include "player.h"
-#include "chunk.h"
+#include "chunkManager.h"
 #include "opengl.h"
 
 #include <glm/glm.hpp>
@@ -27,6 +27,7 @@ private:
     int windowSize[2];
 
     std::vector<Block> blocks;
+    ChunkManager chunkManager;
     Player player;
 
     std::vector<Texture> textures;
