@@ -29,8 +29,9 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block b
     if((chunks.find({chunkx, chunkz}) == chunks.end()) || (x < 0 || x >= CHUNK_WIDTH) || (y < 0 || y >= CHUNK_HEIGHT) || (z < 0 || z >= CHUNK_WIDTH))
         return;
 
-    Chunk& chunk = chunks[{chunk.x, chunk.z}];
+    Chunk& chunk = chunks[{chunkx, chunkz}];
     chunk.setBlock(x,y,z, block);
+    
     chunk.updateBlock(x+1,y,z);
     chunk.updateBlock(x-1,y,z);
     chunk.updateBlock(x,y+1,z);
