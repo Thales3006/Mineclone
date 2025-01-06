@@ -11,6 +11,9 @@ class Entity {
         glm::vec3 size;
         glm::vec3 position;
 
+        int chunkx;
+        int chunkz;
+
         glm::vec3 velocity;
         glm::vec3 acceleration;
 

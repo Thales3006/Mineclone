@@ -28,6 +28,7 @@ Camera::Camera(glm::vec3 pos, float newYaw, float newPitch) {
 glm::mat4 Camera::getMatrixView(){
     return glm::lookAt(position, position+direction, up);
 }
+
 glm::mat4 Camera::getMatrixProjection(float aspect){
     return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
 }

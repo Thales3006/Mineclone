@@ -6,6 +6,9 @@ Entity::Entity(){
 
     this->position = glm::vec3(0.0);
     this->size = glm::vec3(0.0);
+
+    this->chunkx = 0;
+    this->chunkz = 0;
     
     this->gravity = 0.02;
     this->onGround = false;
@@ -21,7 +24,7 @@ Entity::Entity(glm::vec3 pos, glm::vec3 size){
     this->gravity = 0.02;
     this->onGround = false;
 }
-
+#include <iostream>
 void Entity::update(const std::vector<Chunk>& chunks){
     glm::vec3 friction = glm::vec3(0.4, 0.1, 0.4);
     glm::vec3 correction = glm::vec3(0.0);
@@ -33,13 +36,34 @@ void Entity::update(const std::vector<Chunk>& chunks){
                 for (int z = 0; z < CHUNK_WIDTH; z++) {
                     if(chunk.blocks[x][y][z].solid == false || chunk.blocks[x][y][z].faces == NO_FACE)
                             continue;
-                    newCorrection = colisionContinuous(glm::vec3(x,y,z) + glm::vec3(chunk.position[0],0,chunk.position[1])*glm::vec3(CHUNK_WIDTH), glm::vec3(1.0));
+                    newCorrection = colisionContinuous(glm::vec3(x,y,z) + glm::vec3(chunk.position[0]-chunkx,0,chunk.position[1]-chunkz)*glm::vec3(CHUNK_WIDTH), glm::vec3(1.0));
                     correction.x = std::abs(correction.x) > std::abs(newCorrection.x)? correction.x : newCorrection.x;
                     correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
                     correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
                 }
     
     position += velocity + correction * glm::vec3(1.001); // glm::vec3(1.001) only here because of bad colision
+
+    while(position.x < 0){
+        position =  glm::vec3(position.x + CHUNK_WIDTH, position.y, position.z);
+        chunkx--;
+        std::cout << chunkx << " " << chunkz << "\n";
+    }
+    while(position.x >= CHUNK_WIDTH){
+        position =  glm::vec3(position.x - CHUNK_WIDTH, position.y, position.z);
+        chunkx++;
+        std::cout << chunkx << " " << chunkz << "\n";
+    }
+    while(position.z < 0){
+        position =  glm::vec3(position.x, position.y, position.z + CHUNK_WIDTH);
+        chunkz--;
+        std::cout << chunkx << " " << chunkz << "\n";
+    }
+    while(position.z >= CHUNK_WIDTH){
+        position =  glm::vec3(position.x, position.y, position.z - CHUNK_WIDTH);
+        chunkz++;
+        std::cout << chunkx << " " << chunkz << "\n";
+    }
 
     //velocity.y -= gravity;
     velocity -= velocity * glm::vec3(friction);

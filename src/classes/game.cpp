@@ -6,7 +6,8 @@ Game::Game() {
     if(window == NULL) exit(-1);
 
     glfwSetWindowUserPointer(window, this);
-    glfwSetCursorPosCallback(window, Game::mouseCallback);
+    glfwSetCursorPosCallback(window, Game::mouseMoveCallback);
+    glfwSetMouseButtonCallback(window, Game::mouseClickCallback);
     
     glfwSetCursorPos(window, windowSize[0]/2, windowSize[1]/2);
     
@@ -14,51 +15,64 @@ Game::Game() {
         Texture("texture_diffuse", "textures/container.jpg"),
         Texture("texture_diffuse", "textures/blocks_01.png")
     };
-    std::vector<Vertex> vertices = {
-            //face 1
+
+    std::vector<Vertex> faceFront = {
+        //face FRONT
         Vertex{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)}, //0
-        Vertex{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},  //1
-        Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},   //5
-        Vertex{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)}, //0
-        Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},   //5
-        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)}, //4
-        //face 2
-        Vertex{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},  //1
-        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)}, //2
-        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},  //6
-        Vertex{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},  //1
-        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},  //6
-        Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},   //5
-        //face 3
-        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f)}, //2
-        Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f)},//3
-        Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f)},  //7
-        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f)}, //2
-        Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f)},  //7
-        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f)},  //6
-        //face 4
-        Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},//3
-        Vertex{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)}, //0
-        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //4
-        Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},//3
-        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //4
-        Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},  //7
-        //face 5
-        Vertex{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //0
-        Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f)},//3
-        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //2
-        Vertex{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //0
-        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //2
-        Vertex{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},  //1
-        //face 6
-        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //4
-        Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)},   //5
-        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},  //6
-        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //4
-        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},  //6
-        Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)}  //7
+        Vertex{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)}, //1
+        Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)}, //2
+        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)}, //3
     };
-    meshes.push_back(Mesh(vertices, textures));
+
+    std::vector<Vertex> faceBack = {
+        //face BACK
+        Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f)}, //0
+        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f)}, //1
+        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f)}, //2
+        Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f)}, //3
+    };
+
+    std::vector<Vertex> faceRight = {
+        //face RIGHT
+        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)}, //0
+        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //1
+        Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)}, //2
+        Vertex{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //3
+    };
+
+    std::vector<Vertex> faceLeft = {
+        //face LEFT
+        Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //0
+        Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)}, //1
+        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //2
+        Vertex{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)}, //3
+    };
+
+    std::vector<Vertex> faceUp = {
+        //face UP
+        Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //0
+        Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)}, //1
+        Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //2
+        Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)}  //3
+    };
+
+    std::vector<Vertex> faceDown = {
+        //face DOWN
+        Vertex{glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)}, //0
+        Vertex{glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f)}, //1
+        Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f)}, //2
+        Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f)}, //3
+    };
+
+    std::vector<unsigned int> indices = {0,2,1, 0,3,2};
+
+    meshes.push_back(Mesh(faceFront, std::vector<unsigned int>({0,1,3, 1,2,3}), textures));
+    meshes.push_back(Mesh(faceBack,  std::vector<unsigned int>({0,3,2, 0,2,1}), textures));
+    meshes.push_back(Mesh(faceRight, std::vector<unsigned int>({0,1,3, 1,2,3}), textures));
+    meshes.push_back(Mesh(faceLeft,  std::vector<unsigned int>({0,3,2, 0,2,1}), textures));
+    meshes.push_back(Mesh(faceUp,    std::vector<unsigned int>({0,1,3, 1,2,3}), textures));
+    meshes.push_back(Mesh(faceDown,  std::vector<unsigned int>({0,3,2, 0,2,1}), textures));
+
     shaders.push_back(Shader("shaders/shader.vert", "shaders/shader.frag"));
 
     chunkManager.loadChunk(Chunk::generateChunk(0,0));
@@ -88,12 +102,24 @@ void Game::run() {
             for (int x = 0; x < CHUNK_WIDTH; x++)
                 for (int y = 0; y < CHUNK_HEIGHT; y++)
                     for (int z = 0; z < CHUNK_WIDTH; z++) {
-                        if(chunk.blocks[x][y][z].ID == 0 || chunk.blocks[x][y][z].faces == NO_FACE)
+                        const Block& block = chunk.blocks[x][y][z];
+                        if(block.ID == 0 || block.faces == NO_FACE)
                             continue;
-                        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z) + glm::vec3(chunk.position[0],0,chunk.position[1])*glm::vec3(CHUNK_WIDTH));
+                        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z) + glm::vec3(chunk.position[0]-player.chunkx,0,chunk.position[1]-player.chunkz)*glm::vec3(CHUNK_WIDTH));
                         shaders[0].setMat4("model", model);
 
-                        meshes[0].draw(shaders[0]);
+                        if(block.faces & FRONT_FACE)
+                            meshes[0].draw(shaders[0]);
+                        if(block.faces & BACK_FACE)
+                            meshes[1].draw(shaders[0]);
+                        if(block.faces & RIGHT_FACE)
+                            meshes[2].draw(shaders[0]);
+                        if(block.faces & LEFT_FACE)
+                            meshes[3].draw(shaders[0]);
+                        if(block.faces & UP_FACE)
+                            meshes[4].draw(shaders[0]);
+                        if(block.faces & DOWN_FACE)
+                            meshes[5].draw(shaders[0]);
                     }
 
 		glfwSwapBuffers(window);
@@ -101,12 +127,20 @@ void Game::run() {
 	}
 
 	glfwTerminate();
-    
 }
 
-void Game::mouseCallback(GLFWwindow* window, double xpos, double ypos) {
+void Game::mouseMoveCallback(GLFWwindow* window, double xpos, double ypos) {
     Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
 	static double xlast = game->windowSize[0]/2, ylast = game->windowSize[1]/2;
 	game->player.processMouseMovement(xpos-xlast, ylast-ypos);
 	xlast = xpos; ylast = ypos;
+}
+
+void Game::mouseClickCallback(GLFWwindow* window, int button, int action, int mods){
+    Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+        std::cout << "Mouse Clicked\n";
+        game->chunkManager.setBlock(game->player.chunkx, game->player.chunkz, int(game->player.position.x), int(game->player.position.y), int(game->player.position.z), Block());
+    }
 }
