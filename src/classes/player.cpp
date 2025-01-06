@@ -66,10 +66,10 @@ void Player::processMouseMovement(double xoffset, double yoffset){
     camera.yaw   += xoffset;
     camera.pitch += yoffset;
 
-    if (camera.pitch > M_PI/2-0.000001)
-        camera.pitch = M_PI/2-0.000001;
-    else if (camera.pitch < -M_PI/2+0.000001)
-        camera.pitch = -M_PI/2+0.000001;
+    if (camera.pitch > M_PI/2-0.00001)
+        camera.pitch = M_PI/2-0.00001;
+    else if (camera.pitch < -M_PI/2+0.00001)
+        camera.pitch = -M_PI/2+0.00001;
     camera.setDirection(camera.yaw, camera.pitch);
 }
 
