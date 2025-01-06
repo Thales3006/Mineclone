@@ -1,8 +1,6 @@
 #include "game.h"
 
-Game::Game() :
-    player(glm::vec3(0.0f, 4.0f, 0.0f), glm::vec3(0.5, 1.75, 0.5))
-{
+Game::Game() {
     windowSize[0] = 1200; windowSize[1] = 600;
     window = openGLInit(windowSize[0], windowSize[1]);
     if(window == NULL) exit(-1);
@@ -76,6 +74,7 @@ Game::Game() :
         Block{glm::vec3(2.0f, 0.0f, 2.0f), 1, true},
     };
     
+    player = Player(glm::vec3(0.0f, 4.0f, 0.0f), glm::vec3(0.5, 1.75, 0.5));
     player.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
 }
 

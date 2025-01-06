@@ -6,22 +6,7 @@
 #include <sstream>
 #include <iostream>
 
-std::string Shader::readFile(const char* filePath){
-    std::string Code;
-    std::ifstream file;
-    file.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-    try {
-        file.open(filePath);
-        std::stringstream stream;
-        stream << file.rdbuf();		
-        file.close();
-        return stream.str();		
-    }
-    catch(std::ifstream::failure e){
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-    }
-    return NULL;
-}
+Shader::Shader() {}
 
 Shader::Shader(const char* vertexFilePath, const char* fragmentFilePath){
     int success;
@@ -93,3 +78,19 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type){
     }
 }
 
+std::string Shader::readFile(const char* filePath){
+    std::string Code;
+    std::ifstream file;
+    file.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    try {
+        file.open(filePath);
+        std::stringstream stream;
+        stream << file.rdbuf();		
+        file.close();
+        return stream.str();		
+    }
+    catch(std::ifstream::failure e){
+        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+    }
+    return NULL;
+}

@@ -17,6 +17,7 @@ class Entity {
         float gravity;
         bool onGround;
     
+        Entity();
         Entity(glm::vec3 pos, glm::vec3 size);
         void update(std::vector<Block> blocks);
         glm::vec3 colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize);

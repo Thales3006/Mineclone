@@ -4,10 +4,18 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-Player::Player(glm::vec3 pos, glm::vec3 siz) : 
-    Entity(pos, siz), 
-    camera(pos+glm::vec3(siz.x/2, siz.y*0.9, siz.z/2), 0.0f, 0.0f)
-{
+Player::Player() {
+    forward_key = GLFW_KEY_UP;
+    back_key = GLFW_KEY_DOWN;
+    left_key = GLFW_KEY_LEFT;
+    right_key = GLFW_KEY_RIGHT;
+    up_key = GLFW_KEY_RIGHT_SHIFT;
+    down_key = GLFW_KEY_RIGHT_CONTROL;
+}
+
+Player::Player(glm::vec3 pos, glm::vec3 siz) : Entity(pos, siz) {
+    camera = Camera(pos+glm::vec3(siz.x/2, siz.y*0.9, siz.z/2), 0.0f, 0.0f);
+
     forward_key = GLFW_KEY_UP;
     back_key = GLFW_KEY_DOWN;
     left_key = GLFW_KEY_LEFT;

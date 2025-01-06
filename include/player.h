@@ -19,6 +19,7 @@ class Player: public Entity {
         int up_key;
         int down_key;
 
+        Player();
         Player(glm::vec3 pos, glm::vec3 siz);
 
         void setKeys(int forward, int back, int left, int right, int upward, int downward);

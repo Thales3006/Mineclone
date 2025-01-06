@@ -1,5 +1,16 @@
 #include "entity.h"
 
+Entity::Entity(){
+    this->velocity = glm::vec3(0.0);
+    this->acceleration = glm::vec3(0.0);
+
+    this->position = glm::vec3(0.0);
+    this->size = glm::vec3(0.0);
+    
+    this->gravity = 0.02;
+    this->onGround = false;
+}
+
 Entity::Entity(glm::vec3 pos, glm::vec3 size){
     this->velocity = glm::vec3(0.0);
     this->acceleration = glm::vec3(0.04, 0.04, 0.04);
