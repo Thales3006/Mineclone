@@ -30,7 +30,7 @@ Chunk Chunk::generateChunk(int x, int y) {
     for (int i = 0; i < CHUNK_WIDTH; ++i) {
         for (int j = 0; j < CHUNK_HEIGHT; ++j) {
             for (int k = 0; k < CHUNK_WIDTH; ++k) {
-                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3+2*(cos((i+k*sin(x+y))/4)+cos((k-i*sin(y+x))/3))? Block(1, true) : Block();
+                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3+2*(cos((i+k*sin(x+y))/4*cos(((y+x)*CHUNK_WIDTH+k+j)/10))+cos((k-i*sin(y+x))/3))? Block(1, true) : Block();
             }
         }
     }

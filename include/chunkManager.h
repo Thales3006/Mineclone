@@ -12,6 +12,10 @@ class ChunkManager {
 
         void loadChunk(Chunk chunk);
         void unloadChunk(int x, int y);
+
+        void updateFaces();
+
+        void setBlock(int cx, int cy, int x, int y, int z, Block block);
 };
 
 #endif

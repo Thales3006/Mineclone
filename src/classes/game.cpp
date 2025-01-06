@@ -63,6 +63,9 @@ Game::Game() {
 
     chunkManager.loadChunk(Chunk::generateChunk(0,0));
     chunkManager.loadChunk(Chunk::generateChunk(0,1));
+    chunkManager.loadChunk(Chunk::generateChunk(1,0));
+    chunkManager.loadChunk(Chunk::generateChunk(1,1));
+    chunkManager.loadChunk(Chunk::generateChunk(2,0));
     
     player = Player(glm::vec3(0.0f, 4.0f, 0.0f), glm::vec3(0.5, 1.75, 0.5));
     player.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
@@ -87,18 +90,13 @@ void Game::run() {
                     for (int z = 0; z < CHUNK_WIDTH; z++) {
                         if(!chunk.blocks[x][y][z].ID)
                             continue;
+                        if(chunk.blocks[x][y][z].faces == NO_FACE)
+                            continue;
                         glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z) + glm::vec3(chunk.position[0],0,chunk.position[1])*glm::vec3(CHUNK_WIDTH));
                         shaders[0].setMat4("model", model);
 
                         meshes[0].draw(shaders[0]);
                     }
-        /*
-        for(auto& block : blocks){
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), block.position);
-            shaders[0].setMat4("model", model);
-
-            meshes[0].draw(shaders[0]);
-        }*/
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -26,7 +26,7 @@ void Entity::update(const std::vector<Chunk>& chunks){
     glm::vec3 friction = glm::vec3(0.4, 0.1, 0.4);
     glm::vec3 correction = glm::vec3(0.0);
     glm::vec3 newCorrection = glm::vec3(0.0);
-
+    /*
     for(const auto& chunk : chunks)
         for (int x = 0; x < CHUNK_WIDTH; x++)
             for (int y = 0; y < CHUNK_HEIGHT; y++)
@@ -38,7 +38,7 @@ void Entity::update(const std::vector<Chunk>& chunks){
                     correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
                     correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
                 }
-
+    */
     position += velocity + correction * glm::vec3(1.001); // glm::vec3(1.001) only here because of bad colision
 
     //velocity.y -= gravity;
