@@ -1,0 +1,6 @@
+#ifndef CHUNK_MANAGER_CLASS_H
+#define CHUNK_MANAGER_CLASS_H
+
+
+
+#endif
