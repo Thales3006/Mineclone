@@ -24,33 +24,24 @@ void ChunkManager::unloadChunk(int x, int y) {
 
 void ChunkManager::updateFaces(){
     for(auto& chunk : chunks)
-        for (int x = 1; x < CHUNK_WIDTH-1; x++)
-            for (int y = 1; y < CHUNK_HEIGHT-1; y++)
-                for (int z = 1; z < CHUNK_WIDTH-1; z++) {
-                    unsigned char newFaces = ALL_FACE;
-                    if(chunk.blocks[x+1][y][z].ID!=0)newFaces &= ~RIGHT_FACE;
-                    if(chunk.blocks[x-1][y][z].ID!=0)newFaces &= ~LEFT_FACE;
-                    if(chunk.blocks[x][y+1][z].ID!=0)newFaces &= ~UP_FACE;
-                    if(chunk.blocks[x][y-1][z].ID!=0)newFaces &= ~DOWN_FACE;
-                    if(chunk.blocks[x][y][z+1].ID!=0)newFaces &= ~FRONT_FACE;
-                    if(chunk.blocks[x][y][z-1].ID!=0)newFaces &= ~BACK_FACE;
-                    chunk.blocks[x][y][z].faces = newFaces;
-                }
+        for (int x = 0; x < CHUNK_WIDTH; x++)
+            for (int y = 0; y < CHUNK_HEIGHT; y++)
+                for (int z = 0; z < CHUNK_WIDTH; z++)
+                    chunk.updateBlock(x,y,z);
 }
 
 void ChunkManager::setBlock(int cx, int cy, int x, int y, int z, Block block){
+    if((x >= 0 && x < CHUNK_WIDTH) || (y >= 0 && y < CHUNK_HEIGHT) || (z >= 0 && z < CHUNK_WIDTH))
+        return;
+
     for(auto& chunk : chunks)
         if(cx == chunk.position[0] && cy == chunk.position[1]){
-            unsigned char newFaces = ALL_FACE;
-            if(chunk.blocks[x+1][y][z].ID!=0)newFaces &= ~RIGHT_FACE;
-            if(chunk.blocks[x-1][y][z].ID!=0)newFaces &= ~LEFT_FACE;
-            if(chunk.blocks[x][y+1][z].ID!=0)newFaces &= ~UP_FACE;
-            if(chunk.blocks[x][y-1][z].ID!=0)newFaces &= ~DOWN_FACE;
-            if(chunk.blocks[x][y][z+1].ID!=0)newFaces &= ~FRONT_FACE;
-            if(chunk.blocks[x][y][z-1].ID!=0)newFaces &= ~BACK_FACE;
-
-            block.faces = newFaces;
-            chunk.blocks[x][y][z] = block;
-            return;
+            chunk.setBlock(x,y,z, block);
+            chunk.updateBlock(x+1,y,z);
+            chunk.updateBlock(x-1,y,z);
+            chunk.updateBlock(x,y+1,z);
+            chunk.updateBlock(x,y-1,z);
+            chunk.updateBlock(x,y,z+1);
+            chunk.updateBlock(x,y,z-1);
         }
 }

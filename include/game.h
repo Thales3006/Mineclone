@@ -33,7 +33,8 @@ private:
     std::vector<Mesh> meshes;
     std::vector<Shader> shaders;
 
-    static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+    static void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos);
+    static void mouseClickCallback(GLFWwindow* window, int button, int action, int mods);
 public:
     Game();
 
