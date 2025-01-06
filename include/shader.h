@@ -10,6 +10,7 @@ class Shader{
     private:
         unsigned int ID;
     public:
+        Shader();
         Shader(const char* vertexFilePath, const char* fragmentFilePath);
 
         void use();

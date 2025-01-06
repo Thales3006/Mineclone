@@ -5,6 +5,16 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+Camera::Camera() {
+    up = glm::vec3(0.0f, 1.0f, 0.0f);
+    position = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    sensitivity = 0.005f;
+    FOV = M_PI/4;
+    
+    setDirection(0, 0);
+}
+
 Camera::Camera(glm::vec3 pos, float newYaw, float newPitch) {
     up = glm::vec3(0.0f, 1.0f, 0.0f);
     position = pos;

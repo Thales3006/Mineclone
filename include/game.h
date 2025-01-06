@@ -14,6 +14,7 @@
 #include "mesh.h"
 #include "block.h"
 #include "player.h"
+#include "chunk.h"
 #include "opengl.h"
 
 #include <glm/glm.hpp>

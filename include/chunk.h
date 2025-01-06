@@ -11,6 +11,7 @@ class Chunk {
         int position[2];
         Block blocks[CHUNK_HEIGHT][CHUNK_WIDTH][CHUNK_WIDTH];
 
+        Chunk();
         Chunk(int x, int y);
 }; 
 

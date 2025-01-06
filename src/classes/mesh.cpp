@@ -1,5 +1,11 @@
 #include "mesh.h"
-        
+
+Mesh::Mesh() {
+    this->vertices = std::vector<unsigned int>();
+    this->indices = std::vector<unsigned int>();
+    this->textures = std::vector<unsigned int>();
+}
+
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures){
     this->vertices = vertices;
     this->indices = indices;
@@ -18,6 +24,9 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures){
 
 void Mesh::setupMesh(){
     //criando VAO VBO EBO
+    if(!vertices.data()) 
+        return;
+
     glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
     if(indices.data()) glGenBuffers(1, &EBO);

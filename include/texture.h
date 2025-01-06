@@ -12,6 +12,7 @@ class Texture{
         std::string path;
         int width, height, nrChannels;
     public:
+        Texture();
         Texture(std::string tipo, const char* imagePath);
 
         void bind();
