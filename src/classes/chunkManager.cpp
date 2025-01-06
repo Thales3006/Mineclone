@@ -41,14 +41,15 @@ void ChunkManager::updateFaces(){
 void ChunkManager::setBlock(int cx, int cy, int x, int y, int z, Block block){
     for(auto& chunk : chunks)
         if(cx == chunk.position[0] && cy == chunk.position[1]){
+            unsigned char newFaces = ALL_FACE;
+            if(chunk.blocks[x+1][y][z].ID!=0)newFaces &= ~RIGHT_FACE;
+            if(chunk.blocks[x-1][y][z].ID!=0)newFaces &= ~LEFT_FACE;
+            if(chunk.blocks[x][y+1][z].ID!=0)newFaces &= ~UP_FACE;
+            if(chunk.blocks[x][y-1][z].ID!=0)newFaces &= ~DOWN_FACE;
+            if(chunk.blocks[x][y][z+1].ID!=0)newFaces &= ~FRONT_FACE;
+            if(chunk.blocks[x][y][z-1].ID!=0)newFaces &= ~BACK_FACE;
 
-            if(!chunk.blocks[x+1][y][z].ID)block.faces &= !RIGHT_FACE;
-            if(!chunk.blocks[x-1][y][z].ID)block.faces &= !LEFT_FACE;
-            if(!chunk.blocks[x][y+1][z].ID)block.faces &= !UP_FACE;
-            if(!chunk.blocks[x][y-1][z].ID)block.faces &= !DOWN_FACE;
-            if(!chunk.blocks[x][y][z+1].ID)block.faces &= !FRONT_FACE;
-            if(!chunk.blocks[x][y][z-1].ID)block.faces &= !BACK_FACE;
-
+            block.faces = newFaces;
             chunk.blocks[x][y][z] = block;
             return;
         }
