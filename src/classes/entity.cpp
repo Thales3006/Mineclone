@@ -26,7 +26,7 @@ Entity::Entity(glm::vec3 pos, glm::vec3 size){
 }
 
 void Entity::update(const std::map<std::tuple<int,int>,Chunk>& chunks){
-    glm::vec3 friction = glm::vec3(0.4, 0.1, 0.4);
+    glm::vec3 friction = glm::vec3(0.4, 0.4, 0.4);
     glm::vec3 correction = glm::vec3(0.0);
     glm::vec3 newCorrection = glm::vec3(0.0);
     

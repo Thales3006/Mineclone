@@ -10,6 +10,8 @@ Game::Game() {
     glfwSetMouseButtonCallback(window, Game::mouseClickCallback);
     
     glfwSetCursorPos(window, windowSize[0]/2, windowSize[1]/2);
+
+    deltaTime = glfwGetTime();
     
     textures = {
         Texture("texture_diffuse", "textures/container.jpg"),
@@ -76,7 +78,7 @@ Game::Game() {
     shaders.push_back(Shader("shaders/shader.vert", "shaders/shader.frag"));
 
     for(int i=0;i<3;i++)
-        for(int j=0;j<2;j++)
+        for(int j=0;j<3;j++)
             chunkManager.loadChunk(Chunk::generateChunk(i,j));
 
     
@@ -120,6 +122,10 @@ void Game::run() {
                         if(block.faces & DOWN_FACE)
                             meshes[5].draw(shaders[0]);
                     }
+
+        deltaTime = glfwGetTime();
+        glfwSetTime(0);
+        std::cout << "FPS: "<< 1/deltaTime <<" \n";
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

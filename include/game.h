@@ -26,6 +26,8 @@ private:
     GLFWwindow* window;
     int windowSize[2];
 
+    double deltaTime;
+
     ChunkManager chunkManager;
     Player player;
 
