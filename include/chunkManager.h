@@ -18,7 +18,8 @@ class ChunkManager {
         void updateChunks();
 
         void setBlock(int chunkx, int chunkz, int x, int y, int z, Block block);
-        void updateBlock(Chunk* chunk, int x, int y, int z);
+        void updateBlock(Chunk& chunk, int x, int y, int z);
+        void updateRegion(Chunk& chunk, int x, int y, int z);
 };
 
 #endif
