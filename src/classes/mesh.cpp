@@ -1,37 +1,45 @@
 #include "mesh.h"
 
 Mesh::Mesh() {
+    VAO = 0;
+    VBO = 0;
+    EBO = 0;
     this->vertices = std::vector<Vertex>();
     this->indices = std::vector<unsigned int>();
     this->textures = std::vector<Texture>();
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures){
+    VAO = 0;
+    VBO = 0;
+    EBO = 0;
     this->vertices = vertices;
     this->indices = indices;
     this->textures = textures;
-
     setupMesh();
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures){
+    VAO = 0;
+    VBO = 0;
+    EBO = 0;
     this->vertices = vertices;
     this->indices = std::vector<unsigned int>();
     this->textures = textures;
-
     setupMesh();
 }
-
+#include <iostream>
 void Mesh::setupMesh(){
     //criando VAO VBO EBO
     if(!vertices.data()) 
         return;
-
-    if(!vertices.data()) 
+    if(VBO != 0 || VAO != 0){
+        resetMesh();
         return;
+    }
 
     glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+    glGenBuffers(1, &VBO);
     if(indices.data()) glGenBuffers(1, &EBO);
 
     //Setando os dados
@@ -49,13 +57,26 @@ void Mesh::setupMesh(){
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
     glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
     //zerando
 	glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Mesh::resetMesh(){
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
+
+    if (indices.data()) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), indices.data());
+    }
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
@@ -87,4 +108,10 @@ void Mesh::draw(Shader &shader){
 	glBindVertexArray(VAO);
     indices.data()? glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0) : glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     glBindVertexArray(0);
+}
+
+Mesh::~Mesh() {
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 }

@@ -4,6 +4,8 @@
 #include "chunk.h"
 #include <map>
 #include <tuple>
+#include <array>
+#include "mesh.h"
 
 class ChunkManager {
     public:
@@ -14,12 +16,14 @@ class ChunkManager {
         void loadChunk(Chunk chunk);
         void unloadChunk(int x, int z);
 
-        void updateChunks(Chunk& chunk);
+        void updateChunk(Chunk& chunk);
         void updateChunks();
 
         void setBlock(int chunkx, int chunkz, int x, int y, int z, Block block);
         void updateBlock(Chunk& chunk, int x, int y, int z);
         void updateRegion(Chunk& chunk, int x, int y, int z);
+
+        void renderChunks(Shader &shader, int chunkx, int chunkz);
 };
 
 #endif
