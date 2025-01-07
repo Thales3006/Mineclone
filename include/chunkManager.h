@@ -14,10 +14,11 @@ class ChunkManager {
         void loadChunk(Chunk chunk);
         void unloadChunk(int x, int z);
 
-        void updateFaces();
-        void updateCorner(Chunk& chunk,int x, int y, int z);
+        void updateChunks(Chunk& chunk);
+        void updateChunks();
 
         void setBlock(int chunkx, int chunkz, int x, int y, int z, Block block);
+        void updateBlock(Chunk* chunk, int x, int y, int z);
 };
 
 #endif
