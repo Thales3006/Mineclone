@@ -8,17 +8,19 @@
 
 class Chunk {
     public:
-        int position[2];
+        int x;
+        int z;
         Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH];
 
         Chunk();
-        Chunk(int x, int y);
-        Chunk(int x, int y, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH]);
+        Chunk(int x, int z);
+        Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH]);
 
         void setBlock(int x, int y, int z, Block block);
-        void updateBlock(int x, int y, int z);
+        void updateBlock(int x, int y, int z, const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk);
+        void updateBlocks(const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk);
  
-        static Chunk generateChunk(int x, int y);
+        static Chunk generateChunk(int x, int z);
 }; 
 
 #endif

@@ -4,7 +4,8 @@
 #include "chunk.h"
 
 #include "glm/glm.hpp"
-#include <vector>
+#include <map>
+#include <tuple>
 
 class Entity {
     public:
@@ -23,7 +24,7 @@ class Entity {
         Entity();
         Entity(glm::vec3 pos, glm::vec3 size);
 
-        void update(const std::vector<Chunk>& chunks);
+        void update(const std::map<std::tuple<int,int>,Chunk>& chunks);
         glm::vec3 colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize);
         
 };
