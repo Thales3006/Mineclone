@@ -73,8 +73,8 @@ void Player::processMouseMovement(double xoffset, double yoffset){
     camera.setDirection(camera.yaw, camera.pitch);
 }
 
-void Player::updatePlayer(GLFWwindow* window, const std::map<std::tuple<int,int>,Chunk>& chunks){
+void Player::updatePlayer(GLFWwindow* window, const std::map<std::tuple<int,int>,Chunk>& chunks, float deltaTime){
     processKeyMovement(window);
-    update(chunks);
+    update(chunks, deltaTime);
     camera.position = position + glm::vec3(size.x/2, size.y*0.9, size.z/2);
 }

@@ -12,9 +12,9 @@
 
 
 struct Vertex {
-    glm::vec3 Position;
-    glm::vec3 Normal;
-    glm::vec2 TexCoords;
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 texCoords;
 };
 
 class Mesh {
@@ -27,12 +27,18 @@ class Mesh {
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
         Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures);
 
+        ~Mesh();
+
         void draw(Shader &shader);
+
+        void setupMesh();
+
+        void newBuffer();
 
     private:
         unsigned int VAO, VBO, EBO;
 
-        void setupMesh();
+        void resetMesh();
 };  
 
 #endif
