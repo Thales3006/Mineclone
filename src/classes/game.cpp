@@ -35,7 +35,7 @@ void Game::run() {
         glClearColor(0.2f, 0.3f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        player.updatePlayer(window, chunkManager.chunks);
+        player.updatePlayer(window, chunkManager.chunks, deltaTime);
 
         shaders[0].setMat4("projection", player.camera.getMatrixProjection(float(windowSize[0])/windowSize[1]));
         shaders[0].setMat4("view", player.camera.getMatrixView());
@@ -56,23 +56,23 @@ void Game::run() {
 }
 
 void Game::mouseMoveCallback(GLFWwindow* window, double xpos, double ypos) {
-    Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
-	static double xlast = game->windowSize[0]/2, ylast = game->windowSize[1]/2;
-	game->player.processMouseMovement(xpos-xlast, ylast-ypos);
+    Game& game = *(static_cast<Game*>(glfwGetWindowUserPointer(window)));
+	static double xlast = game.windowSize[0]/2, ylast = game.windowSize[1]/2;
+	game.player.processMouseMovement(xpos-xlast, ylast-ypos);
 	xlast = xpos; ylast = ypos;
 }
 
 void Game::mouseClickCallback(GLFWwindow* window, int button, int action, int mods){
-    Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+    Game& game = *(static_cast<Game*>(glfwGetWindowUserPointer(window)));
+    Player& player = game.player;
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
-        std::cout << "Mouse Clicked\n";
-        game->chunkManager.setBlock(
-            game->player.chunkx, 
-            game->player.chunkz, 
-            int(game->player.camera.position.x), 
-            int(game->player.camera.position.y), 
-            int(game->player.camera.position.z), 
-            Block());
+        glm::vec3 dir = glm::normalize(player.camera.getDirection());
+        game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir, Block());
+    }
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        glm::vec3 dir = glm::normalize(player.camera.getDirection());
+        if(!Entity::colision(player.camera.position + dir, glm::vec3(0,0,0), glm::floor(player.position), glm::ceil(player.position+player.size)-glm::floor(player.position)))
+            game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir, Block(1, true));
     }
 }
