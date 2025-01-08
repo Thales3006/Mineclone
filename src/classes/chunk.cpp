@@ -1,6 +1,9 @@
 #include "chunk.h"
 
 #include <cmath>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 Chunk::Chunk() {
     x = 0;
@@ -224,15 +227,8 @@ void Chunk::setMeshes(){
 }
 
 void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz){
-    for(auto& [id, mesh] : meshes){
-        Mesh tempMesh = Mesh();
-        tempMesh.vertices = mesh.vertices;
-        tempMesh.indices = mesh.indices;
-        tempMesh.textures = mesh.textures;
-        
-        for (Vertex& vertex : tempMesh.vertices)
-            vertex.position += glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH);
-        tempMesh.setupMesh();
-        tempMesh.draw(shader);
-    }
+    shader.setMat4("model", glm::translate(glm::mat4(), glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH)));
+
+    for(auto& [id, mesh] : meshes)
+        mesh.draw(shader);
 }
