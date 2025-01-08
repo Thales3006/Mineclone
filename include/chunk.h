@@ -9,6 +9,13 @@
 #define CHUNK_WIDTH 16
 #define CHUNK_HEIGHT 32
 
+enum Side{
+    front,
+    back,
+    left,
+    right
+};
+
 class Chunk {
     public:
         int x;
@@ -26,6 +33,7 @@ class Chunk {
         void setBlock(int x, int y, int z, Block block);
         void updateBlock(int x, int y, int z, const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk);
         void updateBlocks(const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk);
+        void updateSide(const Side side, const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk);
  
         static Chunk generateChunk(int x, int z);
 

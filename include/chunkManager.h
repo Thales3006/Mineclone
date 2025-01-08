@@ -18,8 +18,10 @@ class ChunkManager {
 
         void updateChunk(Chunk& chunk);
         void updateChunks();
+        void updateSide(const Side side, Chunk& chunk);
 
         void setBlock(int chunkx, int chunkz, int x, int y, int z, Block block);
+        void setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block);
         void updateBlock(Chunk& chunk, int x, int y, int z);
         void updateRegion(Chunk& chunk, int x, int y, int z);
 

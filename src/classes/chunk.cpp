@@ -34,7 +34,7 @@ Chunk Chunk::generateChunk(int x, int z) {
     for (int i = 0; i < CHUNK_WIDTH; ++i) {
         for (int j = 0; j < CHUNK_HEIGHT; ++j) {
             for (int k = 0; k < CHUNK_WIDTH; ++k) {
-                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3+2*(cos((i+k*sin(x+z))/4*cos(((z+x)*CHUNK_WIDTH+k+j)/10))+cos((k-i*sin(z+x))/3))? Block(1, false) : Block();
+                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3 + 2*(cos((i+k*sin(x+z))/4*cos(((z+x)*CHUNK_WIDTH+k+j)/10))+cos((k-i*sin(z+x))/3))? Block(1, true) : Block();
             }
         }
     }
@@ -52,13 +52,13 @@ void Chunk::updateBlock(int x, int y, int z, const Chunk* leftChunk, const Chunk
     }
 
     unsigned char newFaces = ALL_FACE;
-    if(x != CHUNK_WIDTH-1? blocks[x+1][y][z].ID!=0 : rightChunk? rightChunk->blocks[0][y][z].ID!=0 : false)
+    if(x != CHUNK_WIDTH-1? blocks[x+1][y][z].ID!=0 : rightChunk? rightChunk->blocks[0][y][z].ID!=0 : true)
         newFaces &= ~RIGHT_FACE;
-    if(x != 0? blocks[x-1][y][z].ID!=0 : leftChunk? leftChunk->blocks[CHUNK_WIDTH-1][y][z].ID!=0 : false)
+    if(x != 0? blocks[x-1][y][z].ID!=0 : leftChunk? leftChunk->blocks[CHUNK_WIDTH-1][y][z].ID!=0 : true)
         newFaces &= ~LEFT_FACE;
-    if(z != CHUNK_WIDTH-1? blocks[x][y][z+1].ID!=0 : frontChunk? frontChunk->blocks[x][y][0].ID!=0 : false)
+    if(z != CHUNK_WIDTH-1? blocks[x][y][z+1].ID!=0 : frontChunk? frontChunk->blocks[x][y][0].ID!=0 : true)
         newFaces &= ~FRONT_FACE;
-    if(z != 0? blocks[x][y][z-1].ID!=0 : backChunk? backChunk->blocks[x][y][CHUNK_WIDTH-1].ID!=0 : false)
+    if(z != 0? blocks[x][y][z-1].ID!=0 : backChunk? backChunk->blocks[x][y][CHUNK_WIDTH-1].ID!=0 : true)
         newFaces &= ~BACK_FACE;
     if(y != CHUNK_HEIGHT-1 && blocks[x][y+1][z].ID!=0)
         newFaces &= ~UP_FACE;
@@ -80,14 +80,14 @@ void Chunk::updateBlocks(const Chunk* leftChunk, const Chunk* rightChunk, const 
                 }
                 unsigned char newFaces = ALL_FACE;
 
-                if(x != CHUNK_WIDTH-1? blocks[x+1][y][z].ID!=0 : rightChunk? rightChunk->blocks[0][y][z].ID!=0 : false)
+                if(x != CHUNK_WIDTH-1? blocks[x+1][y][z].ID!=0 : rightChunk? rightChunk->blocks[0][y][z].ID!=0 : true)
                     newFaces &= ~RIGHT_FACE;
-                if(x != 0? blocks[x-1][y][z].ID!=0 : leftChunk? leftChunk->blocks[CHUNK_WIDTH-1][y][z].ID!=0 : false)
+                if(x != 0? blocks[x-1][y][z].ID!=0 : leftChunk? leftChunk->blocks[CHUNK_WIDTH-1][y][z].ID!=0 : true)
                     newFaces &= ~LEFT_FACE;
 
-                if(z != CHUNK_WIDTH-1? blocks[x][y][z+1].ID!=0 : frontChunk? frontChunk->blocks[x][y][0].ID!=0 : false)
+                if(z != CHUNK_WIDTH-1? blocks[x][y][z+1].ID!=0 : frontChunk? frontChunk->blocks[x][y][0].ID!=0 : true)
                     newFaces &= ~FRONT_FACE;
-                if(z != 0? blocks[x][y][z-1].ID!=0 : backChunk? backChunk->blocks[x][y][CHUNK_WIDTH-1].ID!=0 : false)
+                if(z != 0? blocks[x][y][z-1].ID!=0 : backChunk? backChunk->blocks[x][y][CHUNK_WIDTH-1].ID!=0 : true)
                     newFaces &= ~BACK_FACE;
                     
                 if(y != CHUNK_HEIGHT-1 && blocks[x][y+1][z].ID!=0)
@@ -97,6 +97,46 @@ void Chunk::updateBlocks(const Chunk* leftChunk, const Chunk* rightChunk, const 
 
                 blocks[x][y][z].faces = newFaces;
             }
+    setMeshes();
+}
+
+void Chunk::updateSide(const Side side, const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk) {
+    bool isXVar = (side == front || side == back)? true : false; // checks if X or Z is the variable
+
+    int x = (side == right)? CHUNK_WIDTH-1 : 0;
+    int z = (side == front)? CHUNK_WIDTH-1 : 0;
+        
+    while (x < CHUNK_WIDTH && z < CHUNK_WIDTH) {
+        for (int y = 0; y < CHUNK_HEIGHT; y++) {
+
+            if(blocks[x][y][z].ID==0){
+                blocks[x][y][z].faces = 0;
+                continue;
+            }
+            unsigned char newFaces = ALL_FACE;
+
+            if(x != CHUNK_WIDTH-1? blocks[x+1][y][z].ID!=0 : rightChunk? rightChunk->blocks[0][y][z].ID!=0 : true)
+                newFaces &= ~RIGHT_FACE;
+            if(x != 0? blocks[x-1][y][z].ID!=0 : leftChunk? leftChunk->blocks[CHUNK_WIDTH-1][y][z].ID!=0 : true)
+                newFaces &= ~LEFT_FACE;
+
+            if(z != CHUNK_WIDTH-1? blocks[x][y][z+1].ID!=0 : frontChunk? frontChunk->blocks[x][y][0].ID!=0 : true)
+                newFaces &= ~FRONT_FACE;
+            if(z != 0? blocks[x][y][z-1].ID!=0 : backChunk? backChunk->blocks[x][y][CHUNK_WIDTH-1].ID!=0 : true)
+                newFaces &= ~BACK_FACE;
+                
+            if(y != CHUNK_HEIGHT-1 && blocks[x][y+1][z].ID!=0)
+                newFaces &= ~UP_FACE;
+            if(y != 0 && blocks[x][y-1][z].ID!=0)
+                newFaces &= ~DOWN_FACE;
+
+            blocks[x][y][z].faces = newFaces;
+        }
+        if(isXVar)
+            x++;
+        else
+            z++;
+    }
     setMeshes();
 }
 

@@ -8,38 +8,51 @@ ChunkManager::ChunkManager() {}
 void ChunkManager::loadChunk(Chunk chunk) {
     if(chunks.find({chunk.x, chunk.z}) != chunks.end())
         return;
+    
+    updateChunk(chunk);
     chunks[{chunk.x, chunk.z}] = chunk;
 
     if(chunks.find({chunk.x-1,chunk.z}) != chunks.end())
-        updateChunk(chunks[{chunk.x-1,chunk.z}]);
+        updateSide(right, chunks[{chunk.x-1,chunk.z}]);
     if(chunks.find({chunk.x+1,chunk.z}) != chunks.end())
-        updateChunk(chunks[{chunk.x+1,chunk.z}]);
+        updateSide(left, chunks[{chunk.x+1,chunk.z}]);
     if(chunks.find({chunk.x,chunk.z+1}) != chunks.end())
-        updateChunk(chunks[{chunk.x,chunk.z+1}]);
+        updateSide(back, chunks[{chunk.x,chunk.z+1}]);
     if(chunks.find({chunk.x,chunk.z-1}) != chunks.end())
-        updateChunk(chunks[{chunk.x,chunk.z-1}]);
-    updateChunk(chunks[{chunk.x,chunk.z}]);
+        updateSide(front, chunks[{chunk.x,chunk.z-1}]);
+
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
     if(chunks.find({x, z}) == chunks.end())
         return;
 
+    chunks.erase({x, z});
+
     if(chunks.find({x-1,z}) != chunks.end())
-        updateChunk(chunks[{x-1,z}]);
+        updateSide(right, chunks[{x-1,z}]);
     if(chunks.find({x+1,z}) != chunks.end())
-        updateChunk(chunks[{x+1,z}]);
+        updateSide(left, chunks[{x+1,z}]);
     if(chunks.find({x,z+1}) != chunks.end())
-        updateChunk(chunks[{x,z+1}]);
+        updateSide(back, chunks[{x,z+1}]);
     if(chunks.find({x,z-1}) != chunks.end())
-        updateChunk(chunks[{x,z-1}]);
+        updateSide(front, chunks[{x,z-1}]);
+}
+
+void ChunkManager::updateSide(const Side side, Chunk& chunk) {
+    Chunk* leftChunk =  (chunks.find({chunk.x-1,chunk.z}) != chunks.end())? &chunks[{chunk.x-1,chunk.z}] : NULL;
+    Chunk* rightChunk = (chunks.find({chunk.x+1,chunk.z}) != chunks.end())? &chunks[{chunk.x+1,chunk.z}] : NULL;
+    Chunk* frontChunk = (chunks.find({chunk.x,chunk.z+1}) != chunks.end())? &chunks[{chunk.x,chunk.z+1}] : NULL;
+    Chunk* backChunk =  (chunks.find({chunk.x,chunk.z-1}) != chunks.end())? &chunks[{chunk.x,chunk.z-1}] : NULL;
+
+    chunk.updateSide(side, leftChunk, rightChunk, frontChunk, backChunk);  
 }
 
 void ChunkManager::updateChunk(Chunk& chunk) {
-    auto* leftChunk =  chunks.find({chunk.x-1,chunk.z}) != chunks.end()? &chunks[{chunk.x-1,chunk.z}] : NULL;
-    auto* rightChunk = chunks.find({chunk.x+1,chunk.z}) != chunks.end()? &chunks[{chunk.x+1,chunk.z}] : NULL;
-    auto* frontChunk = chunks.find({chunk.x,chunk.z+1}) != chunks.end()? &chunks[{chunk.x,chunk.z+1}] : NULL;
-    auto* backChunk =  chunks.find({chunk.x,chunk.z-1}) != chunks.end()? &chunks[{chunk.x,chunk.z-1}] : NULL;
+    Chunk* leftChunk =  (chunks.find({chunk.x-1,chunk.z}) != chunks.end())? &chunks[{chunk.x-1,chunk.z}] : NULL;
+    Chunk* rightChunk = (chunks.find({chunk.x+1,chunk.z}) != chunks.end())? &chunks[{chunk.x+1,chunk.z}] : NULL;
+    Chunk* frontChunk = (chunks.find({chunk.x,chunk.z+1}) != chunks.end())? &chunks[{chunk.x,chunk.z+1}] : NULL;
+    Chunk* backChunk =  (chunks.find({chunk.x,chunk.z-1}) != chunks.end())? &chunks[{chunk.x,chunk.z-1}] : NULL;
     chunk.updateBlocks(leftChunk, rightChunk, frontChunk, backChunk);
     chunk.setMeshes();
 }
@@ -109,6 +122,33 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block b
     updateRegion(chunk, x,y,z);
 }
 
+void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block){
+    while(pos.x < 0){
+        pos +=  glm::vec3(CHUNK_WIDTH, 0, 0);
+        chunkx--;
+    }
+    while(pos.x >= CHUNK_WIDTH){
+        pos +=  glm::vec3(-CHUNK_WIDTH, 0, 0);
+        chunkx++;
+    }
+    while(pos.z < 0){
+        pos +=  glm::vec3(0, 0, CHUNK_WIDTH);
+        chunkz--;
+    }
+    while(pos.z >= CHUNK_WIDTH){
+        pos +=  glm::vec3(0, 0, -CHUNK_WIDTH);
+        chunkz++;
+    }
+
+    if((chunks.find({chunkx, chunkz}) == chunks.end()))
+        return;
+
+    Chunk& chunk = chunks[{chunkx, chunkz}];
+
+    chunk.setBlock(pos.x,pos.y,pos.z, block);
+    updateRegion(chunk, pos.x,pos.y,pos.z);
+}
+
 void ChunkManager::renderChunks(Shader &shader, int chunkx, int chunkz){
     for(auto& [coord, chunk] : chunks)
         chunk.renderChunk(shader, chunkx,chunkz);
@@ -123,13 +163,14 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz){
         if (x < -radius+chunkx || x > radius+chunkx || z < -radius+chunkz || z > radius+chunkz){
             it = chunks.erase(it);
             if(chunks.find({x-1,z}) != chunks.end())
-                updateChunk(chunks[{x-1,z}]);
+                updateSide(right, chunks[{x-1,z}]);
             if(chunks.find({x+1,z}) != chunks.end())
-                updateChunk(chunks[{x+1,z}]);
+                updateSide(left, chunks[{x+1,z}]);
             if(chunks.find({x,z+1}) != chunks.end())
-                updateChunk(chunks[{x,z+1}]);
+                updateSide(back, chunks[{x,z+1}]);
             if(chunks.find({x,z-1}) != chunks.end())
-                updateChunk(chunks[{x,z-1}]);
+                updateSide(front, chunks[{x,z-1}]);
+
         }
         else
             it++;
