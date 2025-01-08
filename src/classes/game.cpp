@@ -20,9 +20,7 @@ Game::Game() {
 
     shaders.push_back(Shader("shaders/shader.vert", "shaders/shader.frag"));
 
-    for(int i=0;i<3;i++)
-        for(int j=0;j<3;j++)
-            chunkManager.loadChunk(Chunk::generateChunk(i,j));
+    chunkManager.loadChunk(Chunk::generateChunk(0,0));
 
     
     player = Player(glm::vec3(5.0f, 16.0f, 5.0f), glm::vec3(0.5, 1.75, 0.5));
@@ -43,6 +41,7 @@ void Game::run() {
         shaders[0].setMat4("view", player.camera.getMatrixView());
         shaders[0].setMat4("model",glm::mat4());
 
+        chunkManager.fillChunkRadius(2, player.chunkx, player.chunkz);
         chunkManager.renderChunks(shaders[0], player.chunkx, player.chunkz);
 
         deltaTime = glfwGetTime();

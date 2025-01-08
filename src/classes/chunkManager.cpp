@@ -18,12 +18,12 @@ void ChunkManager::loadChunk(Chunk chunk) {
         updateChunk(chunks[{chunk.x,chunk.z+1}]);
     if(chunks.find({chunk.x,chunk.z-1}) != chunks.end())
         updateChunk(chunks[{chunk.x,chunk.z-1}]);
+    updateChunk(chunks[{chunk.x,chunk.z}]);
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
     if(chunks.find({x, z}) == chunks.end())
         return;
-    chunks.erase({x, z});
 
     if(chunks.find({x-1,z}) != chunks.end())
         updateChunk(chunks[{x-1,z}]);
@@ -111,5 +111,32 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block b
 
 void ChunkManager::renderChunks(Shader &shader, int chunkx, int chunkz){
     for(auto& [coord, chunk] : chunks)
-        chunk.renderChunk(shader,chunkx, chunkz);
+        chunk.renderChunk(shader, chunkx,chunkz);
+}
+
+void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz){
+    auto it = chunks.begin();
+    while(it != chunks.end()) {
+        const auto& [coord, chunk] = *it;
+        int x = std::get<0>(coord);
+        int z = std::get<1>(coord);
+        if (x < -radius+chunkx || x > radius+chunkx || z < -radius+chunkz || z > radius+chunkz){
+            it = chunks.erase(it);
+            if(chunks.find({x-1,z}) != chunks.end())
+                updateChunk(chunks[{x-1,z}]);
+            if(chunks.find({x+1,z}) != chunks.end())
+                updateChunk(chunks[{x+1,z}]);
+            if(chunks.find({x,z+1}) != chunks.end())
+                updateChunk(chunks[{x,z+1}]);
+            if(chunks.find({x,z-1}) != chunks.end())
+                updateChunk(chunks[{x,z-1}]);
+        }
+        else
+            it++;
+    }
+
+    for(int i = -radius + chunkx; i <= radius + chunkx; i++)
+        for(int j = -radius + chunkz; j <= radius + chunkz; j++)
+            if(chunks.find({i,j}) == chunks.end())
+                loadChunk(Chunk::generateChunk(i,j));
 }

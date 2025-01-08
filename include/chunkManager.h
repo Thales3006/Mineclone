@@ -24,6 +24,8 @@ class ChunkManager {
         void updateRegion(Chunk& chunk, int x, int y, int z);
 
         void renderChunks(Shader &shader, int chunkx, int chunkz);
+
+        void fillChunkRadius(int radius, int chunkx, int chunkz);
 };
 
 #endif

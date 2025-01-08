@@ -25,6 +25,10 @@ Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
     }
 }
 
+Chunk::~Chunk(){
+    meshes.clear();
+}
+
 Chunk Chunk::generateChunk(int x, int z) {
     Chunk chunk = Chunk(x, z);
     for (int i = 0; i < CHUNK_WIDTH; ++i) {
