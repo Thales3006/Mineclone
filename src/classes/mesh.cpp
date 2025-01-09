@@ -61,6 +61,9 @@ void Mesh::setupMesh(){
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, ID));
+
     //zerando    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -120,4 +123,7 @@ void Mesh::clearBuffers(){
         glDeleteBuffers(1, &VBO);
     if(EBO)
         glDeleteBuffers(1, &EBO);
+    VAO = 0;
+    VBO = 0;
+    EBO = 0;
 }

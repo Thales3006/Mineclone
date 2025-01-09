@@ -47,8 +47,8 @@ void Camera::setSensitivity(float newSensitivity){
 }
 
 void Camera::setFOV(float newFOV){
-    FOV = newFOV <= M_PI? newFOV : M_PI;
-    FOV = FOV > 0.1f? FOV : 0.1f;
+    FOV = newFOV <= M_PI-0.1? newFOV : M_PI-0.1;
+    FOV = FOV >= 0.1f? FOV : 0.1f;
 }
 
 glm::vec3 Camera::getDirection(){

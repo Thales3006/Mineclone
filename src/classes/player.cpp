@@ -57,6 +57,13 @@ void Player::processKeyMovement(GLFWwindow* window){
     if (glfwGetKey(window, down_key)){
         velocity -= up * acceleration;
     }
+
+    if (glfwGetKey(window, GLFW_KEY_Z)){
+        camera.setFOV(camera.getFOV() -glm::radians(1.0));
+    }
+    if (glfwGetKey(window, GLFW_KEY_X)){
+        camera.setFOV(camera.getFOV() +glm::radians(1.0));
+    }
 }
 
 void Player::processMouseMovement(double xoffset, double yoffset){
