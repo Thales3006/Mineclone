@@ -28,9 +28,7 @@ Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
     }
 }
 
-Chunk::~Chunk(){
-    meshes.clear();
-}
+Chunk::~Chunk(){}
 
 Chunk Chunk::generateChunk(int x, int z) {
     Chunk chunk = Chunk(x, z);
@@ -100,7 +98,7 @@ void Chunk::updateBlocks(const Chunk* leftChunk, const Chunk* rightChunk, const 
 
                 blocks[x][y][z].faces = newFaces;
             }
-    setMeshes();
+    setMesh();
 }
 
 void Chunk::updateSide(const Side side, const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk) {
@@ -140,10 +138,10 @@ void Chunk::updateSide(const Side side, const Chunk* leftChunk, const Chunk* rig
         else
             z++;
     }
-    setMeshes();
+    setMesh();
 }
 
-void Chunk::setMeshes(){
+void Chunk::setMesh(){
 
     std::vector<Texture> textures = {
         Texture("texture_diffuse", "textures/container.jpg"),
@@ -152,17 +150,13 @@ void Chunk::setMeshes(){
 
     std::vector<Vertex> drawableFaces;
     std::vector<unsigned int> indices;
-    int renderID = 1;
-
-    if(meshes.find(renderID) != meshes.end())
-        meshes.erase(renderID);
 
     unsigned int count = 0;
     for (int i = 0; i < CHUNK_WIDTH; i++)
         for (int j = 0; j < CHUNK_HEIGHT; j++)
             for (int k = 0; k < CHUNK_WIDTH; k++){
                 Block& block = blocks[i][j][k];
-                if(block.ID != renderID || block.faces == NO_FACE)
+                if(block.ID == 0 || block.faces == NO_FACE)
                     continue;
 
                 glm::vec3 pos = glm::vec3(i,j,k);
@@ -222,13 +216,12 @@ void Chunk::setMeshes(){
                     count++;
                 }
             }
-
-    meshes[renderID] = Mesh(drawableFaces, indices, textures);
+            
+    mesh.clearBuffers();
+    mesh = Mesh(drawableFaces, indices, textures);
 }
 
 void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz){
     shader.setMat4("model", glm::translate(glm::mat4(), glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH)));
-
-    for(auto& [id, mesh] : meshes)
-        mesh.draw(shader);
+    mesh.draw(shader);
 }

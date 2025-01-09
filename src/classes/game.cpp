@@ -41,12 +41,12 @@ void Game::run() {
         shaders[0].setMat4("projection", player.camera.getMatrixProjection(float(windowSize[0])/windowSize[1]));
         shaders[0].setMat4("view", player.camera.getMatrixView());
 
-        chunkManager.fillChunkRadius(2, player.chunkx, player.chunkz);
+        chunkManager.fillChunkRadius(1, player.chunkx, player.chunkz);
         chunkManager.renderChunks(shaders[0], player.chunkx, player.chunkz);
 
         deltaTime = glfwGetTime();
         glfwSetTime(0);
-        std::cout << "FPS: "<< 1/deltaTime <<" \n";
+        //std::cout << "FPS: "<< 1/deltaTime <<" \n";
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

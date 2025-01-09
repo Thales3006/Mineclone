@@ -28,16 +28,15 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures){
     this->textures = textures;
     setupMesh();
 }
-#include <iostream>
+
 void Mesh::setupMesh(){
-    //criando VAO VBO EBO
-    if(!vertices.data()) 
+    if(!vertices.data())
         return;
     if(VBO != 0 || VAO != 0){
         resetMesh();
         return;
     }
-
+    //criando VAO VBO EBO
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     if(indices.data()) glGenBuffers(1, &EBO);
@@ -62,23 +61,23 @@ void Mesh::setupMesh(){
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
-    //zerando
-	glBindVertexArray(0);
+    //zerando    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
 }
 
 void Mesh::resetMesh(){
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     if (indices.data()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.size() * sizeof(unsigned int), indices.data());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void Mesh::draw(Shader &shader){
@@ -97,7 +96,7 @@ void Mesh::draw(Shader &shader){
         else if(name == "texture_specular")
             number = std::to_string(specularNr++);
         else
-            std::cout << "tipo da textura não identificado!" << std::endl;
+            std::cout << "Texture not identified" << std::endl;
 
         shader.setInt((name + number).c_str(), i);
         textures[i].bind();
@@ -106,12 +105,19 @@ void Mesh::draw(Shader &shader){
 
     shader.use();
 	glBindVertexArray(VAO);
+    if(indices.data())
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     indices.data()? glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0) : glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     glBindVertexArray(0);
 }
 
-Mesh::~Mesh() {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+Mesh::~Mesh() {}
+
+void Mesh::clearBuffers(){
+    if(VAO)
+        glDeleteVertexArrays(1, &VAO);
+    if(VBO)
+        glDeleteBuffers(1, &VBO);
+    if(EBO)
+        glDeleteBuffers(1, &EBO);
 }

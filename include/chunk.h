@@ -22,7 +22,7 @@ class Chunk {
         int z;
         Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH];
 
-        std::map<unsigned int, Mesh> meshes;
+        Mesh mesh;
 
         Chunk();
         Chunk(int x, int z);
@@ -37,7 +37,7 @@ class Chunk {
  
         static Chunk generateChunk(int x, int z);
 
-        void setMeshes();
+        void setMesh();
         void renderChunk(Shader &shader, int chunkx, int chunkz);
 }; 
 

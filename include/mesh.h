@@ -32,13 +32,12 @@ class Mesh {
         void draw(Shader &shader);
 
         void setupMesh();
+        void clearBuffers();
 
-        void newBuffer();
+        private:
+            unsigned int VAO, VBO, EBO;
 
-    private:
-        unsigned int VAO, VBO, EBO;
-
-        void resetMesh();
+            void resetMesh();
 };  
 
 #endif

@@ -54,7 +54,7 @@ void ChunkManager::updateChunk(Chunk& chunk) {
     Chunk* frontChunk = (chunks.find({chunk.x,chunk.z+1}) != chunks.end())? &chunks[{chunk.x,chunk.z+1}] : NULL;
     Chunk* backChunk =  (chunks.find({chunk.x,chunk.z-1}) != chunks.end())? &chunks[{chunk.x,chunk.z-1}] : NULL;
     chunk.updateBlocks(leftChunk, rightChunk, frontChunk, backChunk);
-    chunk.setMeshes();
+    chunk.setMesh();
 }
 
 void ChunkManager::updateChunks() {
@@ -83,13 +83,13 @@ void ChunkManager::updateRegion(Chunk& chunk, int x, int y, int z){
         chunk.updateBlock(x+1,y,z, leftChunk, rightChunk, frontChunk, backChunk);
     else if(rightChunk){
         updateBlock(*rightChunk, 0,y,z);
-        rightChunk->setMeshes();
+        rightChunk->setMesh();
     }
     if(x-1 >= 0)
         chunk.updateBlock(x-1,y,z, leftChunk, rightChunk, frontChunk, backChunk);
     else if(leftChunk){
         updateBlock(*leftChunk, CHUNK_WIDTH-1,y,z);
-        leftChunk->setMeshes();
+        leftChunk->setMesh();
     }
 
     if(y+1 < CHUNK_WIDTH) 
@@ -101,15 +101,15 @@ void ChunkManager::updateRegion(Chunk& chunk, int x, int y, int z){
         chunk.updateBlock(x,y,z+1, leftChunk, rightChunk, frontChunk, backChunk);
     else if(frontChunk) {
         updateBlock(*frontChunk, x,y,0);
-        frontChunk->setMeshes();
+        frontChunk->setMesh();
     }
     if(z-1 >= 0) 
         chunk.updateBlock(x,y,z-1, leftChunk, rightChunk, frontChunk, backChunk);
     else if(backChunk){
         updateBlock(*backChunk, x,y, CHUNK_WIDTH-1);
-        backChunk->setMeshes();
+        backChunk->setMesh();
     }
-    chunk.setMeshes();
+    chunk.setMesh();
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block block){
