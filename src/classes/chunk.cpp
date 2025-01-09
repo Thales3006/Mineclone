@@ -32,12 +32,12 @@ Chunk::~Chunk(){}
 
 Chunk Chunk::generateChunk(int x, int z) {
     Chunk chunk = Chunk(x, z);
-    for (int i = 0; i < CHUNK_WIDTH; ++i) {
-        for (int j = 0; j < CHUNK_HEIGHT; ++j) {
-            for (int k = 0; k < CHUNK_WIDTH; ++k) {
-                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3 + 
-                2*(cos((i+k*sin(x+z))/4*cos(((z+x)*CHUNK_WIDTH+k+j)/10))+cos((k-i*sin(z+x))/3))? 
-                    Block(j < CHUNK_HEIGHT/3? 1 : 3, true) : Block();
+    for (int i = CHUNK_WIDTH-1; i >= 0; i--) {
+        for (int j = CHUNK_HEIGHT-1; j >= 0; j--) {
+            for (int k = CHUNK_WIDTH-1; k >= 0; k--) {
+                int f = 2*(cos((i+k*sin(x+z))/4*cos(((z+x)*CHUNK_WIDTH+k+j)/10))+cos((k-i*sin(z+x))/3));
+                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3 + f? 
+                    Block(j < CHUNK_HEIGHT/3? 1 : (j==CHUNK_WIDTH-1 || chunk.blocks[i][j+1][k].ID == 0)? 3 : 2 , true) : Block();
             }
         }
     }

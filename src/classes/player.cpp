@@ -33,30 +33,33 @@ void Player::setKeys(int forward, int back, int left, int right, int upward, int
     down_key = downward;
 }
 
-void Player::processKeyMovement(GLFWwindow* window){
+void Player::processKeyMovement(GLFWwindow* window, float deltaTime){
     glm::vec3 front = glm::normalize(glm::vec3(camera.getDirection().x, 0, camera.getDirection().z));
     glm::vec3 side = glm::normalize(glm::cross(camera.getUp(), camera.getDirection()));
     glm::vec3 up = glm::normalize(camera.getUp());
+    glm::vec3 newDir = glm::vec3(0.0f);
 
     if(glfwGetKey(window, forward_key)){
-        velocity += front * acceleration;
+        newDir += front;
     }
     if (glfwGetKey(window, back_key)){
-        velocity -= front * acceleration;
+        newDir -= front;
     }
     if (glfwGetKey(window, left_key)){
-        velocity += side * acceleration;
+        newDir += side;
     }
     if (glfwGetKey(window, right_key)){
-        velocity -= side * acceleration;  
+        newDir -= side;  
     }
-    if (/*onGround && */glfwGetKey(window, up_key)){
-        velocity += up * acceleration;
-        //onGround= false;
+    velocity += newDir * (acceleration * deltaTime);
+
+    if (onGround && glfwGetKey(window, up_key)){
+        velocity = up * glm::vec3(acceleration);
+        onGround= false;
     }
-    if (glfwGetKey(window, down_key)){
-        velocity -= up * acceleration;
-    }
+    //if (glfwGetKey(window, down_key)){
+    //    velocity -= up * (acceleration * deltaTime);
+    //}
 
     if (glfwGetKey(window, GLFW_KEY_Z)){
         camera.setFOV(camera.getFOV() -glm::radians(1.0));
@@ -81,7 +84,7 @@ void Player::processMouseMovement(double xoffset, double yoffset){
 }
 
 void Player::updatePlayer(GLFWwindow* window, const std::map<std::tuple<int,int>,Chunk>& chunks, float deltaTime){
-    processKeyMovement(window);
+    processKeyMovement(window, deltaTime);
     update(chunks, deltaTime);
     camera.position = position + glm::vec3(size.x/2, size.y*0.9, size.z/2);
 }

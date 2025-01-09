@@ -2,7 +2,7 @@
 
 Entity::Entity(){
     this->velocity = glm::vec3(0.0);
-    this->acceleration = glm::vec3(0.0);
+    this->acceleration = glm::vec3(32.0, 7.0, 32.0);
 
     this->position = glm::vec3(0.0);
     this->size = glm::vec3(0.0);
@@ -10,23 +10,23 @@ Entity::Entity(){
     this->chunkx = 0;
     this->chunkz = 0;
     
-    this->gravity = 0.02;
+    this->gravity = 20;
     this->onGround = false;
 }
 
 Entity::Entity(glm::vec3 pos, glm::vec3 size){
     this->velocity = glm::vec3(0.0);
-    this->acceleration = glm::vec3(1.0, 1.0, 1.0);
+    this->acceleration = glm::vec3(32.0, 7.0, 32.0);
 
     this->position = pos;
     this->size = size;
     
-    this->gravity = 0.02;
+    this->gravity = 20;
     this->onGround = false;
 }
 
 void Entity::update(const std::map<std::tuple<int,int>,Chunk>& chunks, float deltaTime){
-    glm::vec3 friction = glm::vec3(0.3, 0.3, 0.3);
+    glm::vec3 friction = glm::vec3(8.0, 0.1, 8.0);
     glm::vec3 correction = glm::vec3(0.0);
     glm::vec3 newCorrection = glm::vec3(0.0);
     
@@ -41,8 +41,7 @@ void Entity::update(const std::map<std::tuple<int,int>,Chunk>& chunks, float del
                     correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
                     correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
                 }
-    
-    position += velocity * deltaTime + correction * glm::vec3(1.001); // glm::vec3(1.001) only here because of bad colision
+    position += velocity * deltaTime + correction * glm::vec3(1.01); // glm::vec3(1.001) only here because of bad colision
 
     while(position.x < 0){
         position =  glm::vec3(position.x + CHUNK_WIDTH, position.y, position.z);
@@ -61,8 +60,8 @@ void Entity::update(const std::map<std::tuple<int,int>,Chunk>& chunks, float del
         chunkz++;
     }
 
-    //velocity.y -= gravity;
-    velocity -= velocity * glm::vec3(friction);
+    correction.y > 0? velocity.y = 0 : velocity.y -= gravity * deltaTime;
+    velocity -= velocity * friction * glm::vec3(deltaTime);
 
     onGround = correction.y > 0? true : false;
 }
