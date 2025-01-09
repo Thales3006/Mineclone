@@ -35,6 +35,18 @@ void Game::run() {
         glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        bool fullScreen = false;
+        if (glfwGetKey(window, GLFW_KEY_F11)){
+            if(!fullScreen){
+                glfwSetWindowMonitor(window, 0, 0, 0, 1920, 1080,60);
+                fullScreen = true;
+            }
+            else {
+                glfwSetWindowMonitor(window, 0, 400, 400, windowSize[0], windowSize[1],60);
+                fullScreen = false;
+            }
+        }
+
         player.updatePlayer(window, chunkManager.chunks, deltaTime);
 
         shaders[0].setMat4("projection", player.camera.getMatrixProjection(float(windowSize[0])/windowSize[1]));
@@ -67,11 +79,24 @@ void Game::mouseClickCallback(GLFWwindow* window, int button, int action, int mo
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
         glm::vec3 dir = glm::normalize(player.camera.getDirection());
-        game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir, Block());
+        glm::vec3 i = glm::vec3(0);
+        while(game.chunkManager.getBlock(player.chunkx, player.chunkz, player.camera.position + dir*i).ID == 0){
+            if(i.x>6)
+                return;
+            i += glm::vec3(1);
+        }
+        game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir*i, Block());
     }
     else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         glm::vec3 dir = glm::normalize(player.camera.getDirection());
-        if(!Entity::colision(player.camera.position + dir, glm::vec3(0,0,0), glm::floor(player.position), glm::ceil(player.position+player.size)-glm::floor(player.position)))
-            game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir, Block(1, true));
+        glm::vec3 i = glm::vec3(0);
+        while(game.chunkManager.getBlock(player.chunkx, player.chunkz, player.camera.position + dir*i).ID == 0){
+            if(i.x>6)
+                return;
+            i += glm::vec3(1);
+        }
+
+        if(!Entity::colision(player.camera.position + dir*i, glm::vec3(0,0,0), glm::floor(player.position), glm::ceil(player.position+player.size)-glm::floor(player.position)))
+            game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir*i, Block(1, true));
     }
 }

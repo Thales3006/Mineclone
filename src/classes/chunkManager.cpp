@@ -149,6 +149,30 @@ void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block){
     updateRegion(chunk, pos.x,pos.y,pos.z);
 }
 
+Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos){
+    while(pos.x < 0){
+        pos +=  glm::vec3(CHUNK_WIDTH, 0, 0);
+        chunkx--;
+    }
+    while(pos.x >= CHUNK_WIDTH){
+        pos +=  glm::vec3(-CHUNK_WIDTH, 0, 0);
+        chunkx++;
+    }
+    while(pos.z < 0){
+        pos +=  glm::vec3(0, 0, CHUNK_WIDTH);
+        chunkz--;
+    }
+    while(pos.z >= CHUNK_WIDTH){
+        pos +=  glm::vec3(0, 0, -CHUNK_WIDTH);
+        chunkz++;
+    }
+
+    if((chunks.find({chunkx, chunkz}) == chunks.end()))
+        return Block();
+
+    return chunks[{chunkx, chunkz}].blocks[int(pos.x)][int(pos.y)][int(pos.z)];
+}
+
 void ChunkManager::renderChunks(Shader &shader, int chunkx, int chunkz){
     for(auto& [coord, chunk] : chunks)
         chunk.renderChunk(shader, chunkx,chunkz);
