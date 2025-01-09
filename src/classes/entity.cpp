@@ -60,7 +60,12 @@ void Entity::update(const std::map<std::tuple<int,int>,Chunk>& chunks, float del
         chunkz++;
     }
 
-    correction.y > 0? velocity.y = 0 : velocity.y -= gravity * deltaTime;
+    if(correction.x != 0)
+        velocity.x = 0;
+    if(correction.z != 0)
+        velocity.z = 0;
+    correction.y != 0? velocity.y = 0 : velocity.y -= gravity * deltaTime;
+
     velocity -= velocity * friction * glm::vec3(deltaTime);
 
     onGround = correction.y > 0? true : false;
