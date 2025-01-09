@@ -35,7 +35,7 @@ void Game::run() {
         glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        bool fullScreen = false;
+        static bool fullScreen = false;
         if (glfwGetKey(window, GLFW_KEY_F11)){
             if(!fullScreen){
                 glfwSetWindowMonitor(window, 0, 0, 0, 1920, 1080,60);
