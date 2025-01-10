@@ -2,15 +2,9 @@
 
 Game::Game() {
     windowSize[0] = 1200; windowSize[1] = 600;
-    window = openGLInit(windowSize[0], windowSize[1]);
+    openGLInit(windowSize[0], windowSize[1]);
     if(window == NULL) exit(-1);
-
-    glfwSetWindowUserPointer(window, this);
-    glfwSetCursorPosCallback(window, Game::mouseMoveCallback);
-    glfwSetMouseButtonCallback(window, Game::mouseClickCallback);
     
-    glfwSetCursorPos(window, windowSize[0]/2, windowSize[1]/2);
-
     deltaTime = glfwGetTime();
     
     textures = {
