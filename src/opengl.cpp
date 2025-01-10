@@ -20,8 +20,17 @@ void Game::openGLInit(){
 		exit(-1);
 	}
 
+    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
 	window = glfwCreateWindow(windowSize[0], windowSize[1], "Mineclone", NULL, NULL);
-	glfwMakeContextCurrent(window);
+    if(!window){
+		std::cout << "Failed to create window.\n";
+		exit(-1);
+	}
+    glfwMakeContextCurrent(window);
     glfwSetWindowUserPointer(window, this);
 
 	if (!gladLoadGL()){
