@@ -4,9 +4,6 @@ Game::Game() {
     windowSize[0] = 1200; windowSize[1] = 600;
     openGLInit();
 
-    
-
-    
     textures = {
         Texture("texture_diffuse", "textures/container.jpg"),
         Texture("texture_diffuse", "textures/blocks_01.png")
@@ -45,7 +42,6 @@ void Game::run() {
         chunkManager.renderChunks(shaders[0], player.chunkx, player.chunkz);
 
         std::cout << "FPS: "<< 1/deltaTime <<" \n";
-
         
 		glfwSwapBuffers(window);
 		glfwPollEvents();
