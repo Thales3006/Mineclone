@@ -14,6 +14,9 @@ class Camera {
         float sensitivity;
         float FOV;
 
+        float minDist;
+        float maxDist;
+
     public:
         glm::vec3 position;
 
@@ -30,12 +33,15 @@ class Camera {
         void setDirection(float newYaw, float newPitch);
         void setSensitivity(float newSensitivity);
         void setFOV(float newFOV);
+        void setMinMax(float newMin, float newMax);
 
         glm::vec3 getDirection();
         glm::vec3 getUp();
         
         float getSensitivity();
         float getFOV();
+        float getMin();
+        float getMax();
 };
 
 #endif

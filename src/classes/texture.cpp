@@ -9,10 +9,10 @@ Texture::Texture(std::string tipo, const char* imagePath){
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     stbi_set_flip_vertically_on_load(true);  
     unsigned char* data = stbi_load(imagePath, &width, &height, &nrChannels, 0);
@@ -21,7 +21,7 @@ Texture::Texture(std::string tipo, const char* imagePath){
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else{
-        std::cout << "Erro ao carregar imagem." << std::endl; 
+        std::cout << "Image loading error" << std::endl; 
     }
 
     path = imagePath;
@@ -51,7 +51,7 @@ void Texture::changeTexture(std::string tipo, const char* imagePath){
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else{
-        std::cout << "Erro ao carregar imagem." << std::endl; 
+        std::cout << "Image loading error" << std::endl; 
     }
 
     path = imagePath;

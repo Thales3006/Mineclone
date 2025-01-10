@@ -11,6 +11,9 @@ Camera::Camera() {
 
     sensitivity = 0.005f;
     FOV = M_PI/4;
+
+    minDist = 0.1f;
+    maxDist = 100.0f;
     
     setDirection(0, 0);
 }
@@ -30,7 +33,7 @@ glm::mat4 Camera::getMatrixView(){
 }
 
 glm::mat4 Camera::getMatrixProjection(float aspect){
-    return glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
+    return glm::perspective(FOV, aspect, minDist, maxDist);
 }
 
 void Camera::setDirection(float newYaw, float newPitch){
@@ -44,8 +47,8 @@ void Camera::setSensitivity(float newSensitivity){
 }
 
 void Camera::setFOV(float newFOV){
-    FOV = newFOV <= M_PI? newFOV : M_PI;
-    FOV = FOV > 0.1f? FOV : 0.1f;
+    FOV = newFOV <= M_PI-0.1? newFOV : M_PI-0.1;
+    FOV = FOV >= 0.1f? FOV : 0.1f;
 }
 
 glm::vec3 Camera::getDirection(){
@@ -62,4 +65,19 @@ float Camera::getSensitivity(){
 
 float Camera::getFOV(){
     return FOV;
+}
+
+float Camera::getMin(){
+    return minDist;
+}
+
+float Camera::getMax(){
+    return maxDist;
+}
+
+void Camera::setMinMax(float newMin,float newMax){
+    if(newMin <= 0 || newMax <= 0 || newMin >= newMax)
+        return;
+    minDist = newMin;
+    maxDist = newMax;
 }

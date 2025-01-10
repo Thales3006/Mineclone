@@ -23,9 +23,10 @@
 
 class Game {
 private:
+    GLFWmonitor* monitor;
     GLFWwindow* window;
     int windowSize[2];
-
+    
     double deltaTime;
 
     ChunkManager chunkManager;
@@ -35,8 +36,12 @@ private:
     std::vector<Mesh> meshes;
     std::vector<Shader> shaders;
 
+    void openGLInit();
+
     static void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos);
     static void mouseClickCallback(GLFWwindow* window, int button, int action, int mods);
+    static void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 public:
     Game();
 

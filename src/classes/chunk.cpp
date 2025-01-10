@@ -1,6 +1,9 @@
 #include "chunk.h"
 
 #include <cmath>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 Chunk::Chunk() {
     x = 0;
@@ -25,16 +28,16 @@ Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
     }
 }
 
-Chunk::~Chunk(){
-    meshes.clear();
-}
+Chunk::~Chunk(){}
 
 Chunk Chunk::generateChunk(int x, int z) {
     Chunk chunk = Chunk(x, z);
-    for (int i = 0; i < CHUNK_WIDTH; ++i) {
-        for (int j = 0; j < CHUNK_HEIGHT; ++j) {
-            for (int k = 0; k < CHUNK_WIDTH; ++k) {
-                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3 + 2*(cos((i+k*sin(x+z))/4*cos(((z+x)*CHUNK_WIDTH+k+j)/10))+cos((k-i*sin(z+x))/3))? Block(1, true) : Block();
+    for (int i = CHUNK_WIDTH-1; i >= 0; i--) {
+        for (int j = CHUNK_HEIGHT-1; j >= 0; j--) {
+            for (int k = CHUNK_WIDTH-1; k >= 0; k--) {
+                int f = 2*(cos((i+k*sin(x+z))/4*cos(((z+x)*CHUNK_WIDTH+k+j)/10))+cos((k-i*sin(z+x))/3));
+                chunk.blocks[i][j][k] = j < CHUNK_HEIGHT/3 + f? 
+                    Block(j < CHUNK_HEIGHT/3? 1 : (j==CHUNK_WIDTH-1 || chunk.blocks[i][j+1][k].ID == 0)? 3 : 2 , true) : Block();
             }
         }
     }
@@ -97,7 +100,7 @@ void Chunk::updateBlocks(const Chunk* leftChunk, const Chunk* rightChunk, const 
 
                 blocks[x][y][z].faces = newFaces;
             }
-    setMeshes();
+    setMesh();
 }
 
 void Chunk::updateSide(const Side side, const Chunk* leftChunk, const Chunk* rightChunk, const Chunk* frontChunk, const Chunk* backChunk) {
@@ -137,102 +140,90 @@ void Chunk::updateSide(const Side side, const Chunk* leftChunk, const Chunk* rig
         else
             z++;
     }
-    setMeshes();
+    setMesh();
 }
 
-void Chunk::setMeshes(){
+void Chunk::setMesh(){
 
     std::vector<Texture> textures = {
-        Texture("texture_diffuse", "textures/container.jpg"),
-        Texture("texture_diffuse", "textures/blocks_01.png")
+        Texture("texture_diffuse", "textures/blocks_opaque_01.png"),
+        Texture("texture_diffuse", "textures/container.jpg")
     };
 
     std::vector<Vertex> drawableFaces;
     std::vector<unsigned int> indices;
-    int renderID = 1;
-
-    if(meshes.find(renderID) != meshes.end())
-        meshes.erase(renderID);
 
     unsigned int count = 0;
     for (int i = 0; i < CHUNK_WIDTH; i++)
         for (int j = 0; j < CHUNK_HEIGHT; j++)
             for (int k = 0; k < CHUNK_WIDTH; k++){
                 Block& block = blocks[i][j][k];
-                if(block.ID != renderID || block.faces == NO_FACE)
+                if(block.ID == 0 || block.faces == NO_FACE)
                     continue;
 
                 glm::vec3 pos = glm::vec3(i,j,k);
 //{0,3,2, 0,2,1}
                 if(block.faces & FRONT_FACE) {
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f), float(block.ID)});
                     indices.push_back(0 + count*4); indices.push_back(1 + count*4); indices.push_back(3 + count*4); 
                     indices.push_back(1 + count*4); indices.push_back(2 + count*4); indices.push_back(3 + count*4);
                     count++;
                 } 
                 if(block.faces & BACK_FACE) {
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f), float(block.ID)});
                     indices.push_back(0 + count*4); indices.push_back(3 + count*4); indices.push_back(2 + count*4); 
                     indices.push_back(0 + count*4); indices.push_back(2 + count*4); indices.push_back(1 + count*4);
                     count++;
                 }
                 if(block.faces & RIGHT_FACE) {
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f), float(block.ID)});
                     indices.push_back(0 + count*4); indices.push_back(1 + count*4); indices.push_back(3 + count*4); 
                     indices.push_back(1 + count*4); indices.push_back(2 + count*4); indices.push_back(3 + count*4);
                     count++;
                 }
                 if(block.faces & LEFT_FACE) {
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f), float(block.ID)});
                     indices.push_back(0 + count*4); indices.push_back(3 + count*4); indices.push_back(2 + count*4); 
                     indices.push_back(0 + count*4); indices.push_back(2 + count*4); indices.push_back(1 + count*4);
                     count++;
                 }
                 if(block.faces & UP_FACE) {
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f), float(block.ID)});
                     indices.push_back(0 + count*4); indices.push_back(1 + count*4); indices.push_back(3 + count*4); 
                     indices.push_back(1 + count*4); indices.push_back(2 + count*4); indices.push_back(3 + count*4);
                     count++;
                 }
                 if(block.faces & DOWN_FACE) {
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f)});
-                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f), float(block.ID)});
+                    drawableFaces.push_back(Vertex{pos + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f), float(block.ID)});
                     indices.push_back(0 + count*4); indices.push_back(3 + count*4); indices.push_back(2 + count*4); 
                     indices.push_back(0 + count*4); indices.push_back(2 + count*4); indices.push_back(1 + count*4);
                     count++;
                 }
             }
-
-    meshes[renderID] = Mesh(drawableFaces, indices, textures);
+            
+    mesh.clearBuffers();
+    mesh = Mesh(drawableFaces, indices, textures);
 }
 
 void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz){
-    for(auto& [id, mesh] : meshes){
-        Mesh tempMesh = Mesh();
-        tempMesh.vertices = mesh.vertices;
-        tempMesh.indices = mesh.indices;
-        tempMesh.textures = mesh.textures;
-        
-        for (Vertex& vertex : tempMesh.vertices)
-            vertex.position += glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH);
-        tempMesh.setupMesh();
-        tempMesh.draw(shader);
-    }
+    shader.setMat4("model", glm::translate(glm::mat4(), glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH)));
+    mesh.draw(shader);
 }

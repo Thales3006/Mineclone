@@ -15,6 +15,7 @@ struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
+    float ID;
 };
 
 class Mesh {
@@ -32,13 +33,12 @@ class Mesh {
         void draw(Shader &shader);
 
         void setupMesh();
+        void clearBuffers();
 
-        void newBuffer();
+        private:
+            unsigned int VAO, VBO, EBO;
 
-    private:
-        unsigned int VAO, VBO, EBO;
-
-        void resetMesh();
+            void resetMesh();
 };  
 
 #endif

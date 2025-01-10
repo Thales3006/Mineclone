@@ -25,6 +25,8 @@ class ChunkManager {
         void updateBlock(Chunk& chunk, int x, int y, int z);
         void updateRegion(Chunk& chunk, int x, int y, int z);
 
+        Block getBlock(int chunkx, int chunkz, glm::vec3 pos);
+
         void renderChunks(Shader &shader, int chunkx, int chunkz);
 
         void fillChunkRadius(int radius, int chunkx, int chunkz);
