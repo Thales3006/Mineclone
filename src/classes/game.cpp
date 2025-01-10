@@ -2,7 +2,7 @@
 
 Game::Game() {
     windowSize[0] = 1200; windowSize[1] = 600;
-    openGLInit(windowSize[0], windowSize[1]);
+    openGLInit();
     if(window == NULL) exit(-1);
     
     deltaTime = glfwGetTime();

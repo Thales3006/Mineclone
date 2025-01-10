@@ -3,12 +3,12 @@
 #include "game.h"
 #include <iostream>
 
-void Game::openGLInit(int windowWidth, int windowHeight){
+void Game::openGLInit(){
 	if (!glfwInit()){
 		std::cout << "Failed to initialize GLFW.\n";
 		return;
 	}
-	window = glfwCreateWindow(windowWidth, windowHeight, "Mineclone", NULL, NULL);
+	window = glfwCreateWindow(windowSize[0], windowSize[1], "Mineclone", NULL, NULL);
 	glfwMakeContextCurrent(window);
     glfwSetWindowUserPointer(window, this);
 
@@ -16,7 +16,7 @@ void Game::openGLInit(int windowWidth, int windowHeight){
 		std::cout << "Failed to initialize Glad.\n";
 		return;
 	}
-	glViewport(0, 0, windowWidth, windowHeight);
+	glViewport(0, 0, windowSize[0], windowSize[1]);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable( GL_CULL_FACE);
