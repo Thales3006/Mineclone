@@ -26,8 +26,7 @@ private:
     GLFWmonitor* monitor;
     GLFWwindow* window;
     int windowSize[2];
-    //bool fullScreen;
-
+    
     double deltaTime;
 
     ChunkManager chunkManager;
