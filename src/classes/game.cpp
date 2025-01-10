@@ -3,7 +3,7 @@
 Game::Game() {
     windowSize[0] = 1200; windowSize[1] = 600;
     openGLInit();
-    if(window == NULL) exit(-1);
+
     
     deltaTime = glfwGetTime();
     
@@ -28,18 +28,6 @@ void Game::run() {
 		glViewport(0, 0, windowSize[0], windowSize[1]);
         glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        static bool fullScreen = false;
-        if (glfwGetKey(window, GLFW_KEY_F11)){
-            if(!fullScreen){
-                glfwSetWindowMonitor(window, 0, 0, 0, 1920, 1080,60);
-                fullScreen = true;
-            }
-            else {
-                glfwSetWindowMonitor(window, 0, 400, 400, windowSize[0], windowSize[1],60);
-                fullScreen = false;
-            }
-        }
 
         player.updatePlayer(window, chunkManager.chunks, deltaTime);
 
@@ -92,5 +80,24 @@ void Game::mouseClickCallback(GLFWwindow* window, int button, int action, int mo
 
         if(!Entity::colision(player.camera.position + dir*i, glm::vec3(0,0,0), glm::floor(player.position), glm::ceil(player.position+player.size)-glm::floor(player.position)))
             game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir*i, Block(1, true));
+    }
+}
+
+void Game::keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    Game& game = *(static_cast<Game*>(glfwGetWindowUserPointer(window)));
+    const GLFWvidmode* mode = glfwGetVideoMode(game.monitor);
+
+    static bool fullScreen = false;
+    if (key == GLFW_KEY_F11 && action == GLFW_PRESS){
+        if(!fullScreen){
+            glfwSetWindowMonitor(window, game.monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            glViewport(0, 0, mode->width, mode->height);
+            fullScreen = true;
+        }
+        else {
+            glfwSetWindowMonitor(window, 0, mode->width/2, mode->height/2, game.windowSize[0], game.windowSize[1], mode->refreshRate);
+            glViewport(0, 0, 1200, 600);
+            fullScreen = false;
+        }
     }
 }

@@ -47,4 +47,5 @@ void Game::openGLInit(){
         
     glfwSetCursorPosCallback(window, Game::mouseMoveCallback);
     glfwSetMouseButtonCallback(window, Game::mouseClickCallback);
+    glfwSetKeyCallback(window, Game::keyboardCallback);
 }
