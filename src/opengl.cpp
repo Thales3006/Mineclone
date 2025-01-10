@@ -8,6 +8,18 @@ void Game::openGLInit(){
 		std::cout << "Failed to initialize GLFW.\n";
 		return;
 	}
+
+    monitor = glfwGetPrimaryMonitor();
+    if (!monitor){
+		std::cout << "Failed to get monitor.\n";
+		exit(-1);
+	}
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    if (!mode){
+		std::cout << "Failed to get video mode.\n";
+		exit(-1);
+	}
+
 	window = glfwCreateWindow(windowSize[0], windowSize[1], "Mineclone", NULL, NULL);
 	glfwMakeContextCurrent(window);
     glfwSetWindowUserPointer(window, this);

@@ -23,6 +23,7 @@
 
 class Game {
 private:
+    GLFWmonitor* monitor;
     GLFWwindow* window;
     int windowSize[2];
 
