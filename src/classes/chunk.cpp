@@ -227,3 +227,26 @@ void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz){
     shader.setMat4("model", glm::translate(glm::mat4(), glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH)));
     mesh.draw(shader);
 }
+
+glm::vec3 Chunk::chunkOffSet(glm::vec3 position){
+    int chunkx = 0;
+    int chunkz = 0;
+
+    while(position.x < 0){
+        position = glm::vec3(position.x + CHUNK_WIDTH, position.y, position.z);
+        chunkx--;
+    }
+    while(position.x >= CHUNK_WIDTH){
+        position = glm::vec3(position.x - CHUNK_WIDTH, position.y, position.z);
+        chunkx++;
+    }
+    while(position.z < 0){
+        position = glm::vec3(position.x, position.y, position.z + CHUNK_WIDTH);
+        chunkz--;
+    }
+    while(position.z >= CHUNK_WIDTH){
+        position = glm::vec3(position.x, position.y, position.z - CHUNK_WIDTH);
+        chunkz++;
+    }
+    return glm::vec3(chunkx, 0, chunkz);
+}

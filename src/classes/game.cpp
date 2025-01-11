@@ -11,7 +11,7 @@ Game::Game() {
 
     shaders.push_back(Shader("shaders/shader.vert", "shaders/shader.frag"));
 
-    chunkManager.fillChunkRadius(2, player.chunkx, player.chunkz);
+    chunkManager.fillChunkRadius(1, player.chunkx, player.chunkz);
 
     player = Player(glm::vec3(5.0f, 20.0f, 5.0f), glm::vec3(0.5, 1.75, 0.5));
     player.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE, GLFW_KEY_LEFT_SHIFT);
@@ -34,7 +34,7 @@ void Game::run() {
 
         deltaTime = glfwGetTime();
         glfwSetTime(0);
-        player.updatePlayer(window, chunkManager.chunks, deltaTime);
+        player.updatePlayer(window, chunkManager, deltaTime);
 
         shaders[0].setMat4("projection", player.camera.getMatrixProjection(float(windowSize[0])/windowSize[1]));
         shaders[0].setMat4("view", player.camera.getMatrixView());

@@ -1,7 +1,7 @@
 #ifndef ENTITY_CLASS_H
 #define ENTITY_CLASS_H
 
-#include "chunk.h"
+#include "chunkManager.h"
 
 #include "glm/glm.hpp"
 #include <map>
@@ -24,7 +24,7 @@ class Entity {
         Entity();
         Entity(glm::vec3 pos, glm::vec3 size);
 
-        void update(const std::map<std::tuple<int,int>,Chunk>& chunks, float deltaTime);
+        void update(ChunkManager& chunkManager, float deltaTime);
         glm::vec3 colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize, float deltaTime);
         static bool colision(glm::vec3 entity1Pos, glm::vec3 entity1size, glm::vec3 entity2Pos, glm::vec3 entity2size);
         
