@@ -36,7 +36,6 @@ void Player::setKeys(int forward, int back, int left, int right, int upward, int
 void Player::processKeyMovement(GLFWwindow* window, float deltaTime){
     glm::vec3 front = glm::normalize(glm::vec3(camera.getDirection().x, 0, camera.getDirection().z));
     glm::vec3 side = glm::normalize(glm::cross(camera.getUp(), camera.getDirection()));
-    glm::vec3 up = glm::normalize(camera.getUp());
     glm::vec3 newDir = glm::vec3(0.0f);
 
     if(glfwGetKey(window, forward_key)){
@@ -51,10 +50,12 @@ void Player::processKeyMovement(GLFWwindow* window, float deltaTime){
     if (glfwGetKey(window, right_key)){
         newDir -= side;  
     }
-    velocity += newDir * (acceleration * deltaTime);
+    
+    if(newDir != glm::vec3(0.0f))
+        velocity += glm::normalize(newDir) * (acceleration * deltaTime);
 
     if (onGround && glfwGetKey(window, up_key)){
-        velocity = up * glm::vec3(acceleration);
+        velocity.y = acceleration.y;
         onGround= false;
     }
     //if (glfwGetKey(window, down_key)){
