@@ -26,61 +26,47 @@ Entity::Entity(glm::vec3 pos, glm::vec3 size){
 }
 
 void Entity::update(ChunkManager& chunkManager, float deltaTime){
-
     glm::vec3 friction = glm::vec3(8.0, 0.1, 8.0);
     glm::vec3 correction = glm::vec3(0.0);
     glm::vec3 newCorrection = glm::vec3(0.0);
 
-    if(velocity != glm::vec3(0.0f)){
-        glm::vec3 dV = velocity * glm::vec3(deltaTime);
-        glm::vec3 nV = glm::vec3(velocity.x >= 0? 1 : -1, velocity.y >= 0? 1 : -1, velocity.z >= 0? 1 : -1);
-        
-        for (        int x = 0; (dV.x == 0)? (x < 1) : ((dV.x > 0)? (x <= dV.x) : (x >= dV.x)); x += nV.x){
-            for (    int y = 0; (dV.y == 0)? (x < 1) : ((dV.y > 0)? (x <= dV.y) : (x >= dV.y)); y += nV.y){
-                for (int z = 0; (dV.z == 0)? (x < 1) : ((dV.z > 0)? (x <= dV.z) : (x >= dV.z)); z += nV.z){
-                    const glm::vec3 colisionPos = glm::vec3(x,y,z) + position;
-                    const glm::vec3 chunkOffSet = Chunk::chunkOffSet(colisionPos);
-                    const Block& block = chunkManager.getBlock(chunkx, chunkz, colisionPos); 
+    glm::vec3 nV = glm::vec3(velocity.x >= 0? 1 : -1, velocity.y >= 0? 1 : -1, velocity.z >= 0? 1 : -1);
+    glm::vec3 dV = velocity + nV;
+    
+    for (int x = 0; abs(x) <= abs(dV.x); x += nV.x){
+        for (int y = 0; abs(y) <= abs(dV.y); y += nV.y){
+            for (int z = 0; abs(z) <= abs(dV.z); z += nV.z){
+                const glm::vec3 colisionPos = glm::vec3(x,y,z) + glm::floor(position);
+                const glm::vec3 chunkOffSet = Chunk::chunkOffSet(colisionPos);
+                const Block& block = chunkManager.getBlock(chunkx, chunkz, colisionPos); 
 
-                    if(block.solid == false)
-                        continue;
-                    
-                    newCorrection = colisionContinuous(, glm::vec3(1.0f), deltaTime);
-                    correction.x = std::abs(correction.x) > std::abs(newCorrection.x)? correction.x : newCorrection.x;
-                    correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
-                    correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
-                }
+                if(block.solid == false)
+                    continue;
+                
+                newCorrection = colisionContinuous(colisionPos, glm::vec3(1.0f), deltaTime);
+                correction.x = std::abs(correction.x) > std::abs(newCorrection.x)? correction.x : newCorrection.x;
+                correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
+                correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
             }
         }
     }
 
-        position += velocity * deltaTime + correction * glm::vec3(1.01); // glm::vec3(1.001) only here because of bad colision
+    position += velocity * deltaTime + correction * glm::vec3(1.01); // glm::vec3(1.001) only here because of bad colision
 
-    while(position.x < 0){
-        position =  glm::vec3(position.x + CHUNK_WIDTH, position.y, position.z);
-        chunkx--;
-    }
-    while(position.x >= CHUNK_WIDTH){
-        position =  glm::vec3(position.x - CHUNK_WIDTH, position.y, position.z);
-        chunkx++;
-    }
-    while(position.z < 0){
-        position =  glm::vec3(position.x, position.y, position.z + CHUNK_WIDTH);
-        chunkz--;
-    }
-    while(position.z >= CHUNK_WIDTH){
-        position =  glm::vec3(position.x, position.y, position.z - CHUNK_WIDTH);
-        chunkz++;
-    }
+    glm::vec3 chunkOffset = Chunk::chunkOffSet(position);
+    position -= chunkOffset * float(CHUNK_WIDTH);
+    chunkx += chunkOffset.x;
+    chunkz += chunkOffset.z;
 
     if(correction.x != 0)
         velocity.x = 0;
-    if(correction.z != 0)
-        velocity.z = 0;
-    if(correction.z != 0)
+    if(correction.y != 0)
         velocity.y = 0;
     else 
         velocity.y -= gravity * deltaTime;
+    if(correction.z != 0)
+        velocity.z = 0;
+
 
     velocity -= velocity * friction * glm::vec3(deltaTime);
 

@@ -41,7 +41,8 @@ void Game::run() {
 
         chunkManager.renderChunks(shaders[0], player.chunkx, player.chunkz);
 
-        std::cout << "FPS: "<< 1/deltaTime <<" \n";
+        std::cout << player.velocity.x << " " << player.velocity.y << " " << player.velocity.z << " \n";
+        //std::cout << "FPS: "<< 1/deltaTime <<" \n";
         
 		glfwSwapBuffers(window);
 		glfwPollEvents();
