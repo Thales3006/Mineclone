@@ -29,14 +29,16 @@ void Entity::update(ChunkManager& chunkManager, float deltaTime){
     glm::vec3 friction = glm::vec3(8.0, 0.1, 8.0);
     glm::vec3 correction = glm::vec3(0.0);
     glm::vec3 newCorrection = glm::vec3(0.0);
+    
 
     glm::vec3 nV = glm::vec3(velocity.x >= 0? 1 : -1, velocity.y >= 0? 1 : -1, velocity.z >= 0? 1 : -1);
-    glm::vec3 dV = velocity + nV;
+    glm::vec3 nSize = glm::vec3(velocity.x >= 0? 0 : -ceil(size.x), velocity.y >= 0? 0 : -ceil(size.z), velocity.z >= 0? 0 : -ceil(size.y));
+    glm::vec3 dV = velocity * deltaTime + nSize;
     
-    for (int x = 0; abs(x) <= abs(dV.x); x += nV.x){
-        for (int y = 0; abs(y) <= abs(dV.y); y += nV.y){
-            for (int z = 0; abs(z) <= abs(dV.z); z += nV.z){
-                const glm::vec3 colisionPos = glm::vec3(x,y,z) + glm::floor(position);
+    for (int x = 0; abs(x) <= abs(dV.x) + 1; x += nV.x){
+        for (int y = 0; abs(y) <= abs(dV.y) + 1; y += nV.y){
+            for (int z = 0; abs(z) <= abs(dV.z) + 1; z += nV.z){
+                const glm::vec3 colisionPos =  glm::floor(position) + glm::vec3(x,y,z) - nSize;
                 const glm::vec3 chunkOffSet = Chunk::chunkOffSet(colisionPos);
                 const Block& block = chunkManager.getBlock(chunkx, chunkz, colisionPos); 
 
@@ -51,7 +53,7 @@ void Entity::update(ChunkManager& chunkManager, float deltaTime){
         }
     }
 
-    position += velocity * deltaTime + correction * glm::vec3(1.01); // glm::vec3(1.001) only here because of bad colision
+    position += velocity * deltaTime + correction; //glm::vec3(1.01); // glm::vec3(1.001) only here because of bad colision
 
     glm::vec3 chunkOffset = Chunk::chunkOffSet(position);
     position -= chunkOffset * float(CHUNK_WIDTH);
