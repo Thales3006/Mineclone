@@ -87,5 +87,10 @@ void Player::processMouseMovement(double xoffset, double yoffset){
 void Player::updatePlayer(GLFWwindow* window, ChunkManager& chunkManager, float deltaTime){
     processKeyMovement(window, deltaTime);
     update(chunkManager, deltaTime);
+    if(position.y<-16){
+        position.y = 32;
+        velocity.y = 0;
+    }
+
     camera.position = position + glm::vec3(size.x/2, size.y*0.9, size.z/2);
 }

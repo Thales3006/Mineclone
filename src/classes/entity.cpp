@@ -90,7 +90,7 @@ void Entity::update(ChunkManager& chunkManager, float deltaTime){
         velocity.y -= gravity * deltaTime;
 
 
-    velocity -= velocity * friction * glm::vec3(deltaTime);
+    velocity -= velocity * friction * deltaTime;
 
     glm::vec3 chunkOffset = Chunk::chunkOffSet(position);
     position -= chunkOffset * float(CHUNK_WIDTH);
