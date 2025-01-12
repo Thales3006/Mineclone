@@ -39,6 +39,8 @@ class Chunk {
 
         void setMesh();
         void renderChunk(Shader &shader, int chunkx, int chunkz);
+
+        static glm::vec3 chunkOffSet(glm::vec3 position);
 }; 
 
 #endif

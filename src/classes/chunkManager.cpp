@@ -123,22 +123,10 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block b
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block){
-    while(pos.x < 0){
-        pos +=  glm::vec3(CHUNK_WIDTH, 0, 0);
-        chunkx--;
-    }
-    while(pos.x >= CHUNK_WIDTH){
-        pos +=  glm::vec3(-CHUNK_WIDTH, 0, 0);
-        chunkx++;
-    }
-    while(pos.z < 0){
-        pos +=  glm::vec3(0, 0, CHUNK_WIDTH);
-        chunkz--;
-    }
-    while(pos.z >= CHUNK_WIDTH){
-        pos +=  glm::vec3(0, 0, -CHUNK_WIDTH);
-        chunkz++;
-    }
+    glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
+    pos -= chunkOffset * float(CHUNK_WIDTH);
+    chunkx += chunkOffset.x;
+    chunkz += chunkOffset.z;
 
     if((chunks.find({chunkx, chunkz}) == chunks.end()))
         return;
@@ -150,22 +138,10 @@ void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block){
 }
 
 Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos){
-    while(pos.x < 0){
-        pos +=  glm::vec3(CHUNK_WIDTH, 0, 0);
-        chunkx--;
-    }
-    while(pos.x >= CHUNK_WIDTH){
-        pos +=  glm::vec3(-CHUNK_WIDTH, 0, 0);
-        chunkx++;
-    }
-    while(pos.z < 0){
-        pos +=  glm::vec3(0, 0, CHUNK_WIDTH);
-        chunkz--;
-    }
-    while(pos.z >= CHUNK_WIDTH){
-        pos +=  glm::vec3(0, 0, -CHUNK_WIDTH);
-        chunkz++;
-    }
+    glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
+    pos -= chunkOffset * float(CHUNK_WIDTH);
+    chunkx += chunkOffset.x;
+    chunkz += chunkOffset.z;
 
     if((chunks.find({chunkx, chunkz}) == chunks.end()))
         return Block();

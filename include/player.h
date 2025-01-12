@@ -24,7 +24,7 @@ class Player: public Entity {
 
         void setKeys(int forward, int back, int left, int right, int upward, int downward);
 
-        void updatePlayer(GLFWwindow* window, const std::map<std::tuple<int,int>,Chunk>& chunks, float deltaTime);
+        void updatePlayer(GLFWwindow* window, ChunkManager& chunkManager, float deltaTime);
 
         void processKeyMovement(GLFWwindow* window, float deltaTime);
         void processMouseMovement(double xoffset, double yoffset);

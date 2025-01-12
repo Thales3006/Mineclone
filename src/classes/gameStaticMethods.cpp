@@ -29,6 +29,7 @@ void Game::mouseClickCallback(GLFWwindow* window, int button, int action, int mo
                 return;
             i += glm::vec3(1);
         }
+        i -= glm::vec3(1);
 
         if(!Entity::colision(player.camera.position + dir*i, glm::vec3(0,0,0), glm::floor(player.position), glm::ceil(player.position+player.size)-glm::floor(player.position)))
             game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir*i, Block(1, true));

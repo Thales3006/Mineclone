@@ -1,4 +1,5 @@
 #include "entity.h"
+#include <bits/stdc++.h>
 
 Entity::Entity(){
     this->velocity = glm::vec3(0.0);
@@ -25,50 +26,76 @@ Entity::Entity(glm::vec3 pos, glm::vec3 size){
     this->onGround = false;
 }
 
-void Entity::update(const std::map<std::tuple<int,int>,Chunk>& chunks, float deltaTime){
+typedef struct {
+    Block block;
+    float dist;
+    glm::vec3 pos;
+} blockDist;
+
+
+void Entity::update(ChunkManager& chunkManager, float deltaTime){
     glm::vec3 friction = glm::vec3(8.0, 0.1, 8.0);
     glm::vec3 correction = glm::vec3(0.0);
-    glm::vec3 newCorrection = glm::vec3(0.0);
-    
-    for (const auto& [coords, chunk] : chunks)
-        for (int x = 0; x < CHUNK_WIDTH; x++)
-            for (int y = 0; y < CHUNK_HEIGHT; y++)
-                for (int z = 0; z < CHUNK_WIDTH; z++) {
-                    if(chunk.blocks[x][y][z].solid == false || chunk.blocks[x][y][z].faces == NO_FACE)
-                            continue;
-                    newCorrection = colisionContinuous(glm::vec3(x,y,z) + glm::vec3(chunk.x-chunkx,0,chunk.z-chunkz)*glm::vec3(CHUNK_WIDTH), glm::vec3(1.0), deltaTime);
-                    correction.x = std::abs(correction.x) > std::abs(newCorrection.x)? correction.x : newCorrection.x;
-                    correction.y = std::abs(correction.y) > std::abs(newCorrection.y)? correction.y : newCorrection.y;
-                    correction.z = std::abs(correction.z) > std::abs(newCorrection.z)? correction.z : newCorrection.z;
-                }
-    position += velocity * deltaTime + correction * glm::vec3(1.01); // glm::vec3(1.001) only here because of bad colision
+    std::vector<blockDist> blocks;
 
-    while(position.x < 0){
-        position =  glm::vec3(position.x + CHUNK_WIDTH, position.y, position.z);
-        chunkx--;
-    }
-    while(position.x >= CHUNK_WIDTH){
-        position =  glm::vec3(position.x - CHUNK_WIDTH, position.y, position.z);
-        chunkx++;
-    }
-    while(position.z < 0){
-        position =  glm::vec3(position.x, position.y, position.z + CHUNK_WIDTH);
-        chunkz--;
-    }
-    while(position.z >= CHUNK_WIDTH){
-        position =  glm::vec3(position.x, position.y, position.z - CHUNK_WIDTH);
-        chunkz++;
+    glm::vec3 nV = glm::vec3(velocity.x >= 0? 1 : -1, velocity.y >= 0? 1 : -1, velocity.z >= 0? 1 : -1);
+    glm::vec3 nSize = glm::vec3(velocity.x >= 0? 0 : -ceil(size.x), velocity.y >= 0? 0 : -ceil(size.z), velocity.z >= 0? 0 : -ceil(size.y));
+    glm::vec3 dV = velocity * deltaTime + nSize;
+
+    for (int x = 0; abs(x) <= abs(dV.x) + 1; x += nV.x){
+        for (int y = 0; abs(y) <= abs(dV.y) + 1; y += nV.y){
+            for (int z = 0; abs(z) <= abs(dV.z) + 1; z += nV.z){
+                const glm::vec3 colisionPos =  glm::floor(position) + glm::vec3(x,y,z) - nSize;
+                const Block& block = chunkManager.getBlock(chunkx, chunkz, colisionPos); 
+
+                if(block.solid == false)
+                    continue;
+                blocks.push_back(blockDist{block, glm::length((colisionPos + glm::vec3(0.5f))-(position + size * 0.5f)), colisionPos});
+            }
+        }
     }
 
-    if(correction.x != 0)
-        velocity.x = 0;
-    if(correction.z != 0)
-        velocity.z = 0;
-    correction.y != 0? velocity.y = 0 : velocity.y -= gravity * deltaTime;
+    sort(blocks.begin(), blocks.end(), [](const blockDist& b1, const blockDist& b2){
+        return b1.dist <= b2.dist;
+    });
+
+    for (const blockDist& block : blocks)
+    {
+        glm::vec3 newCorrection = colisionContinuous(block.pos, glm::vec3(1.0f), deltaTime);
+        if(newCorrection.x != 0 && correction.x == 0){
+            correction.x = newCorrection.x;
+            position.x += velocity.x * deltaTime + correction.x * 1.001f;
+            velocity.x = 0;
+        }
+        else if(newCorrection.y != 0 && correction.y == 0){
+            correction.y = newCorrection.y;
+            position.y += velocity.y * deltaTime + correction.y * 1.001f;
+            velocity.y = 0;
+        }
+        else if(newCorrection.z != 0 && correction.z == 0){
+            correction.z = newCorrection.z;
+            position.z += velocity.z * deltaTime + correction.z * 1.001f;
+            velocity.z = 0;
+        }
+    }
+    if(correction.x == 0)
+        position.x += velocity.x * deltaTime;
+    if(correction.y == 0)
+        position.y += velocity.y * deltaTime;
+    if(correction.z == 0)
+        position.z += velocity.z * deltaTime;
+
+    onGround = correction.y > 0? true : false;
+    if(!onGround)
+        velocity.y -= gravity * deltaTime;
+
 
     velocity -= velocity * friction * glm::vec3(deltaTime);
 
-    onGround = correction.y > 0? true : false;
+    glm::vec3 chunkOffset = Chunk::chunkOffSet(position);
+    position -= chunkOffset * float(CHUNK_WIDTH);
+    chunkx += chunkOffset.x;
+    chunkz += chunkOffset.z;
 }
 
 glm::vec3 Entity::colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize, float deltaTime){
