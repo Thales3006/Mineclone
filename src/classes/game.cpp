@@ -40,7 +40,7 @@ void Game::run() {
         shaders[0].setMat4("view", player.camera.getMatrixView());
 
         chunkManager.renderChunks(shaders[0], player.chunkx, player.chunkz);
-        std::cout << "FPS: "<< 1/deltaTime <<" \n";
+        //std::cout << "FPS: "<< 1/deltaTime <<" \n";
         
 		glfwSwapBuffers(window);
 		glfwPollEvents();
