@@ -6,20 +6,27 @@
 #include <string>
 
 class Texture{
-    private:
+    public:
         unsigned int ID;
         std::string type;
         std::string path;
         int width, height, nrChannels;
+
+        void loadTex();
     public:
         Texture();
         Texture(std::string tipo, const char* imagePath);
+        Texture(const Texture& other);
+
+        ~Texture();
 
         void bind();
+        void unbind();
 
         void changeTexture(std::string tipo, const char* imagePath);
 
-        unsigned int getID();
+        Texture& operator=(const Texture& other);
+        
         std::string getType();
         std::string getPath();
 };

@@ -219,7 +219,7 @@ void Chunk::setMesh(){
                 }
             }
             
-    mesh.clearBuffers();
+    //mesh.clearBuffers();
     mesh = Mesh(drawableFaces, indices, textures);
 }
 

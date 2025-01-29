@@ -27,6 +27,7 @@ class Mesh {
         Mesh();
         Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
         Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures);
+        Mesh(const Mesh& other);
 
         ~Mesh();
 
@@ -35,7 +36,9 @@ class Mesh {
         void setupMesh();
         void clearBuffers();
 
-        private:
+        Mesh& operator=(const Mesh& other);
+
+        public:
             unsigned int VAO, VBO, EBO;
 
             void resetMesh();
