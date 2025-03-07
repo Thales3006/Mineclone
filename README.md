@@ -1,5 +1,5 @@
 # Mineclone
-A simple minecraft clone in C++
+A simple [minecraft](https://pt.wikipedia.org/wiki/Minecraft) clone in C++
 
 This little project was made to understand in depth the inner mechanics of the pure openGL API in C++ and computer graphics in general (vectors, matrices and etc).
 
@@ -9,6 +9,8 @@ The openGL function loader used was [GLAD](https://www.khronos.org/opengl/wiki/O
 this library is available [here](https://glad.dav1d.de).
 
 As the shading language to comunicate with the GPU, the [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) language was used, as it is simple and resembles C/C++ language style.
+
+Collisions were also added and simple physics to imitate minecraft's survival mode.
 
 ## Example
 
