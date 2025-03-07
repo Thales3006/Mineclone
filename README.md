@@ -14,7 +14,7 @@ Collisions were also added and simple physics to imitate minecraft's survival mo
 
 ## Example
 
-![Screenshoot example](./imgs/example.png)
+![Screenshot example](./imgs/example.png)
 
 This image shows the program functioning as expected.
 
