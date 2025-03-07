@@ -147,7 +147,6 @@ void Chunk::setMesh(){
 
     std::vector<Texture> textures = {
         Texture("texture_diffuse", "textures/blocks_opaque_01.png"),
-        Texture("texture_diffuse", "textures/container.jpg")
     };
 
     std::vector<Vertex> drawableFaces;
