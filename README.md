@@ -21,24 +21,72 @@ This image shows the program functioning as expected.
 It is possible to see the textures and illumination working properly, even though it could be improved to resemble the original game, 
 the main objective of understanding computer graphics and openGL was accomplished.
 
-## Install
+## Dependencies
 
-If you wish to test it in your machine you can run these commands to see it.
+The project only requires [nix](https://nixos.org/download/) packet manager using flakes.
+It can be installed in any Linux distro and in WSL (Windows Subsystem for Linux).
 
-1. Clone the repo:
+## Run
+
+You can run the project without installing it permanently using the following command: 
+
+```sh
+nix run github:Thales3006/Mineclone
+```
+
+It should take care of all dependencies automatically.
+
+You can also clone the repository and run it from local sources:
+
 ```sh
 git clone https://github.com/Thales3006/Mineclone
+cd Mineclone
+
+nix run
 ```
 
-2. Build the application:
+## Build
+
+To build, the same logic as to installing is applied:
+
 ```sh
-# make linux/window (depending of your OS)
-make linux
+nix build github:Thales3006/Mineclone
 ```
 
-3. Run the game:
+Or, you could also:
+
 ```sh
-./mineclone
+git clone https://github.com/Thales3006/Mineclone
+cd Mineclone
+
+nix run
+```
+
+This will create a symlink `results/bin` to the build.
+
+Then, to run the game:
+```sh
+./results/bin/mineclone
+```
+
+### Windows
+
+Because nix can only be used with WSL, in windows. It needs to build the app instead of just running it.
+There is a windows build that can be built using:
+
+```sh
+nix build github:Thales3006/Mineclone#windows
+
+# or
+
+git clone https://github.com/Thales3006/Mineclone
+cd Mineclone
+
+nix build .#windows
+```
+
+But it is still a work in progress with some texture rendering bugs.
+```
 ```
 
 ## Considerations
