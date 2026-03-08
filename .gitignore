@@ -1,5 +1,8 @@
 *.zip
 *.exe
 .vscode
-.exe
+
+*.exe
 mineclone
+result*
+build/
