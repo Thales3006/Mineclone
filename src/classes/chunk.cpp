@@ -224,7 +224,8 @@ void Chunk::setMesh(){
 }
 
 void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz){
-    shader.setMat4("model", glm::translate(glm::mat4(), glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH)));
+
+    shader.setMat4("model", glm::translate(glm::mat4(1.0f), glm::vec3( (x-chunkx) * CHUNK_WIDTH, 0, (z-chunkz) * CHUNK_WIDTH)));
     mesh.draw(shader);
 }
 

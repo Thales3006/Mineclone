@@ -31,6 +31,7 @@
             libX11
             libXrandr
 
+            glm
             stb
           ];
         };

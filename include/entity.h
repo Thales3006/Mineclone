@@ -2,8 +2,7 @@
 #define ENTITY_CLASS_H
 
 #include "chunkManager.h"
-
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 #include <map>
 #include <tuple>
 
