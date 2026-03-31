@@ -35,9 +35,9 @@ Chunk Chunk::generateChunk(int x, int z) {
     for (int i = CHUNK_WIDTH - 1; i >= 0; i--) {
         for (int j = CHUNK_HEIGHT - 1; j >= 0; j--) {
             for (int k = CHUNK_WIDTH - 1; k >= 0; k--) {
-                int f =
-                    2 * (cos((i + k * sin(x + z)) / 4 * cos(((z + x) * CHUNK_WIDTH + k + j) / 10)) +
-                         cos((k - i * sin(z + x)) / 3));
+                int f = 2 * (cos((i + k * sin(x + z)) / 4 *
+                                 cos(static_cast<float>((z + x) * CHUNK_WIDTH + k + j) / 10)) +
+                             cos((k - i * sin(z + x)) / 3));
                 chunk.blocks[i][j][k] =
                     j < CHUNK_HEIGHT / 3 + f
                         ? Block(j < CHUNK_HEIGHT / 3                                          ? 1

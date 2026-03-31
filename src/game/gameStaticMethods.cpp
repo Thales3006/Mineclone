@@ -2,7 +2,8 @@
 
 void Game::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
-    static double xlast = game.windowSize[0] / 2, ylast = game.windowSize[1] / 2;
+    static double xlast = xpos;
+    static double ylast = ypos;
     game.player.processMouseMovement(xpos - xlast, ylast - ypos);
     xlast = xpos;
     ylast = ypos;

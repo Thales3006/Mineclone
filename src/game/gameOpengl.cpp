@@ -43,7 +43,8 @@ void Game::openGLInit() {
     glEnable(GL_CULL_FACE);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPos(window, windowSize[0] / 2, windowSize[1] / 2);
+    glfwSetCursorPos(window, static_cast<double>(windowSize[0]) / 2,
+                     static_cast<double>(windowSize[1]) / 2);
 
     glfwSetCursorPosCallback(window, Game::mouseMoveCallback);
     glfwSetMouseButtonCallback(window, Game::mouseClickCallback);
