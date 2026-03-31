@@ -1,24 +1,22 @@
 #ifndef GAME_CLASS_H
 #define GAME_CLASS_H
 
-#include <cmath>
-#include <iostream>
-#include <vector>
+#include "opengl.h"
+#include "render/mesh.h"
+#include "render/shader.h"
+#include "render/texture.h"
+#include "world/chunkManager.h"
+#include "world/entities/player.h"
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
-
-#include "block.h"
-#include "chunkManager.h"
-#include "mesh.h"
-#include "opengl.h"
-#include "player.h"
-#include "shader.h"
-#include "texture.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <cmath>
+#include <iostream>
+#include <vector>
 
 class Game {
   private:

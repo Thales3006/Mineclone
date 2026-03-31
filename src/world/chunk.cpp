@@ -1,4 +1,4 @@
-#include "chunk.h"
+#include "world/chunk.h"
 
 #include <cmath>
 #include <glm/glm.hpp>

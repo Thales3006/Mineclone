@@ -1,14 +1,14 @@
 #ifndef MESH_CLASS_H
 #define MESH_CLASS_H
 
-#include <vector>
+#include "shader.h"
+#include "texture.h"
 
 #include "glad/glad.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shader.h"
-#include "texture.h"
+#include <vector>
 
 struct Vertex {
     glm::vec3 position;

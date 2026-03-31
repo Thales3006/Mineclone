@@ -1,4 +1,4 @@
-#include "game.h"
+#include "game/game.h"
 
 void Game::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));

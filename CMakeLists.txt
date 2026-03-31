@@ -10,7 +10,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 
 add_executable(mineclone ${SOURCES})
 
-target_include_directories(mineclone PRIVATE include)
+target_include_directories(mineclone PRIVATE src)
 
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)

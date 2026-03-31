@@ -1,4 +1,4 @@
-#include "game.h"
+#include "game/game.h"
 
 Game::Game() {
     windowSize[0] = 1200;

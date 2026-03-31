@@ -1,4 +1,4 @@
-#include "chunkManager.h"
+#include "world/chunkManager.h"
 
 ChunkManager::ChunkManager() {}
 

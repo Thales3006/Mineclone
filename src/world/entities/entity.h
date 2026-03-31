@@ -1,8 +1,10 @@
 #ifndef ENTITY_CLASS_H
 #define ENTITY_CLASS_H
 
-#include "chunkManager.h"
+#include "world/chunkManager.h"
+
 #include <glm/glm.hpp>
+
 #include <map>
 #include <tuple>
 

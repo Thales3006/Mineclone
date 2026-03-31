@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "render/camera.h"
 
 #include <cmath>
 #ifndef M_PI

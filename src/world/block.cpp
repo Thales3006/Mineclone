@@ -1,4 +1,4 @@
-#include "block.h"
+#include "world/block.h"
 
 Block::Block(unsigned int newID, bool isSolid) {
     ID = newID;

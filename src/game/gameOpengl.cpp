@@ -1,6 +1,6 @@
-#include "opengl.h"
+#include "game/game.h"
+#include "game/opengl.h"
 
-#include "game.h"
 #include <iostream>
 
 void Game::openGLInit() {

@@ -1,4 +1,4 @@
-#include "mesh.h"
+#include "render/mesh.h"
 
 Mesh::Mesh() {
     VAO = 0;

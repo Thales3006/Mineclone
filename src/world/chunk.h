@@ -2,8 +2,8 @@
 #define CHUNK_CLASS_H
 
 #include "block.h"
+#include "render/mesh.h"
 
-#include "mesh.h"
 #include <map>
 
 #define CHUNK_WIDTH 16

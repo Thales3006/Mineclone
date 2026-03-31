@@ -37,7 +37,7 @@
             Compiler: clang++
             Add:
               - -std=c++17
-              - -I$PWD/include
+              - -I$PWD/src
               - -I${pkgs.libglvnd.dev}/include
               - -I${pkgs.glfw}/include
               - -I${pkgs.glm}/include

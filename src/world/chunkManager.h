@@ -1,8 +1,8 @@
 #ifndef CHUNK_MANAGER_CLASS_H
 #define CHUNK_MANAGER_CLASS_H
 
-#include "chunk.h"
-#include "mesh.h"
+#include "world/chunk.h"
+
 #include <array>
 #include <map>
 #include <tuple>

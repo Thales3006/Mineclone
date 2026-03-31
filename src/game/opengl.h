@@ -2,6 +2,7 @@
 #define OPENGL_H
 
 #include "glad/glad.h"
+
 #include <GLFW/glfw3.h>
 
 GLFWwindow *openGLInit(int windowWidth, int windowHeight);

@@ -1,4 +1,5 @@
-#include "entity.h"
+#include "world/entities/entity.h"
+
 #include <bits/stdc++.h>
 
 Entity::Entity() {
