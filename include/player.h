@@ -8,26 +8,26 @@
 
 #include <vector>
 
-class Player: public Entity {
-    public:
-        Camera camera;
+class Player : public Entity {
+  public:
+    Camera camera;
 
-        int forward_key;
-        int back_key;
-        int left_key;
-        int right_key;
-        int up_key;
-        int down_key;
+    int forward_key;
+    int back_key;
+    int left_key;
+    int right_key;
+    int up_key;
+    int down_key;
 
-        Player();
-        Player(glm::vec3 pos, glm::vec3 siz);
+    Player();
+    Player(glm::vec3 pos, glm::vec3 siz);
 
-        void setKeys(int forward, int back, int left, int right, int upward, int downward);
+    void setKeys(int forward, int back, int left, int right, int upward, int downward);
 
-        void updatePlayer(GLFWwindow* window, ChunkManager& chunkManager, float deltaTime);
+    void updatePlayer(GLFWwindow *window, ChunkManager &chunkManager, float deltaTime);
 
-        void processKeyMovement(GLFWwindow* window, float deltaTime);
-        void processMouseMovement(double xoffset, double yoffset);
+    void processKeyMovement(GLFWwindow *window, float deltaTime);
+    void processMouseMovement(double xoffset, double yoffset);
 };
 
 #endif

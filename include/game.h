@@ -21,32 +21,30 @@
 #include <glm/gtc/type_ptr.hpp>
 
 class Game {
-private:
-  GLFWmonitor *monitor;
-  GLFWwindow *window;
-  int windowSize[2];
+  private:
+    GLFWmonitor *monitor;
+    GLFWwindow *window;
+    int windowSize[2];
 
-  double deltaTime;
+    double deltaTime;
 
-  ChunkManager chunkManager;
-  Player player;
+    ChunkManager chunkManager;
+    Player player;
 
-  std::vector<Texture> textures;
-  std::vector<Mesh> meshes;
-  std::vector<Shader> shaders;
+    std::vector<Texture> textures;
+    std::vector<Mesh> meshes;
+    std::vector<Shader> shaders;
 
-  void openGLInit();
+    void openGLInit();
 
-  static void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
-  static void mouseClickCallback(GLFWwindow *window, int button, int action,
-                                 int mods);
-  static void keyboardCallback(GLFWwindow *window, int key, int scancode,
-                               int action, int mods);
+    static void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
+    static void mouseClickCallback(GLFWwindow *window, int button, int action, int mods);
+    static void keyboardCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-public:
-  Game();
+  public:
+    Game();
 
-  void run();
+    void run();
 };
 
 #endif // GAME_CLASS_H

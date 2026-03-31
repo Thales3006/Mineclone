@@ -7,26 +7,26 @@
 #include <tuple>
 
 class Entity {
-    public:
-        glm::vec3 size;
-        glm::vec3 position;
+  public:
+    glm::vec3 size;
+    glm::vec3 position;
 
-        int chunkx;
-        int chunkz;
+    int chunkx;
+    int chunkz;
 
-        glm::vec3 velocity;
-        glm::vec3 acceleration;
+    glm::vec3 velocity;
+    glm::vec3 acceleration;
 
-        float gravity;
-        bool onGround;
-    
-        Entity();
-        Entity(glm::vec3 pos, glm::vec3 size);
+    float gravity;
+    bool onGround;
 
-        void update(ChunkManager& chunkManager, float deltaTime);
-        glm::vec3 colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize, float deltaTime);
-        static bool colision(glm::vec3 entity1Pos, glm::vec3 entity1size, glm::vec3 entity2Pos, glm::vec3 entity2size);
-        
+    Entity();
+    Entity(glm::vec3 pos, glm::vec3 size);
+
+    void update(ChunkManager &chunkManager, float deltaTime);
+    glm::vec3 colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize, float deltaTime);
+    static bool colision(glm::vec3 entity1Pos, glm::vec3 entity1size, glm::vec3 entity2Pos,
+                         glm::vec3 entity2size);
 };
 
 #endif

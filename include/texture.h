@@ -6,23 +6,23 @@
 #include <string>
 
 class Texture {
-private:
-  unsigned int ID;
-  std::string type;
-  std::string path;
-  int width, height, nrChannels;
+  private:
+    unsigned int ID;
+    std::string type;
+    std::string path;
+    int width, height, nrChannels;
 
-public:
-  Texture();
-  Texture(std::string tipo, const char *imagePath);
+  public:
+    Texture();
+    Texture(std::string tipo, const char *imagePath);
 
-  void bind();
+    void bind();
 
-  void changeTexture(std::string tipo, const char *imagePath);
+    void changeTexture(std::string tipo, const char *imagePath);
 
-  unsigned int getID();
-  std::string getType();
-  std::string getPath();
+    unsigned int getID();
+    std::string getType();
+    std::string getPath();
 };
 
 #endif

@@ -6,24 +6,24 @@
 
 #include <string>
 
-class Shader{
-    private:
-        unsigned int ID;
-    public:
-        Shader();
-        Shader(const char* vertexFilePath, const char* fragmentFilePath);
+class Shader {
+  private:
+    unsigned int ID;
 
-        void use();
+  public:
+    Shader();
+    Shader(const char *vertexFilePath, const char *fragmentFilePath);
 
-        void setBool(const std::string &name, bool value);  
-        void setInt(const std::string &name, int value);   
-        void setFloat(const std::string &name, float value);
-        void setMat4(const std::string &name, glm::mat4 value);
+    void use();
 
+    void setBool(const std::string &name, bool value);
+    void setInt(const std::string &name, int value);
+    void setFloat(const std::string &name, float value);
+    void setMat4(const std::string &name, glm::mat4 value);
 
-    private:
-        std::string readFile(const char* filePath);
-        void checkCompileErrors(unsigned int shader, std::string type);
+  private:
+    std::string readFile(const char *filePath);
+    void checkCompileErrors(unsigned int shader, std::string type);
 };
 
 #endif

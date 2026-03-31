@@ -7,41 +7,41 @@
 #include "entity.h"
 
 class Camera {
-    private:  
-        glm::vec3 direction;
-        glm::vec3 up;
+  private:
+    glm::vec3 direction;
+    glm::vec3 up;
 
-        float sensitivity;
-        float FOV;
+    float sensitivity;
+    float FOV;
 
-        float minDist;
-        float maxDist;
+    float minDist;
+    float maxDist;
 
-    public:
-        glm::vec3 position;
+  public:
+    glm::vec3 position;
 
-        //angles
-        float yaw;
-        float pitch;
+    // angles
+    float yaw;
+    float pitch;
 
-        Camera();
-        Camera(glm::vec3 pos, float newYaw, float newPitch);
+    Camera();
+    Camera(glm::vec3 pos, float newYaw, float newPitch);
 
-        glm::mat4 getMatrixView();
-        glm::mat4 getMatrixProjection(float aspect);
+    glm::mat4 getMatrixView();
+    glm::mat4 getMatrixProjection(float aspect);
 
-        void setDirection(float newYaw, float newPitch);
-        void setSensitivity(float newSensitivity);
-        void setFOV(float newFOV);
-        void setMinMax(float newMin, float newMax);
+    void setDirection(float newYaw, float newPitch);
+    void setSensitivity(float newSensitivity);
+    void setFOV(float newFOV);
+    void setMinMax(float newMin, float newMax);
 
-        glm::vec3 getDirection();
-        glm::vec3 getUp();
-        
-        float getSensitivity();
-        float getFOV();
-        float getMin();
-        float getMax();
+    glm::vec3 getDirection();
+    glm::vec3 getUp();
+
+    float getSensitivity();
+    float getFOV();
+    float getMin();
+    float getMax();
 };
 
 #endif
