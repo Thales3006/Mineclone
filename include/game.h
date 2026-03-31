@@ -1,21 +1,20 @@
 #ifndef GAME_CLASS_H
 #define GAME_CLASS_H
 
+#include <cmath>
 #include <iostream>
 #include <vector>
-#include <cmath>
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
+#include "block.h"
+#include "chunkManager.h"
+#include "mesh.h"
+#include "opengl.h"
+#include "player.h"
 #include "shader.h"
 #include "texture.h"
-#include "player.h"
-#include "mesh.h"
-#include "block.h"
-#include "player.h"
-#include "chunkManager.h"
-#include "opengl.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,29 +22,31 @@
 
 class Game {
 private:
-    GLFWmonitor* monitor;
-    GLFWwindow* window;
-    int windowSize[2];
-    
-    double deltaTime;
+  GLFWmonitor *monitor;
+  GLFWwindow *window;
+  int windowSize[2];
 
-    ChunkManager chunkManager;
-    Player player;
+  double deltaTime;
 
-    std::vector<Texture> textures;
-    std::vector<Mesh> meshes;
-    std::vector<Shader> shaders;
+  ChunkManager chunkManager;
+  Player player;
 
-    void openGLInit();
+  std::vector<Texture> textures;
+  std::vector<Mesh> meshes;
+  std::vector<Shader> shaders;
 
-    static void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos);
-    static void mouseClickCallback(GLFWwindow* window, int button, int action, int mods);
-    static void keyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+  void openGLInit();
+
+  static void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
+  static void mouseClickCallback(GLFWwindow *window, int button, int action,
+                                 int mods);
+  static void keyboardCallback(GLFWwindow *window, int key, int scancode,
+                               int action, int mods);
 
 public:
-    Game();
+  Game();
 
-    void run();
+  void run();
 };
 
 #endif // GAME_CLASS_H

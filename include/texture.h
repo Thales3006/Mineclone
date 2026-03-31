@@ -1,27 +1,28 @@
 #ifndef TEXTURE_CLASS_H
 #define TEXTURE_CLASS_H
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <iostream>
 #include <string>
 
-class Texture{
-    private:
-        unsigned int ID;
-        std::string type;
-        std::string path;
-        int width, height, nrChannels;
-    public:
-        Texture();
-        Texture(std::string tipo, const char* imagePath);
+class Texture {
+private:
+  unsigned int ID;
+  std::string type;
+  std::string path;
+  int width, height, nrChannels;
 
-        void bind();
+public:
+  Texture();
+  Texture(std::string tipo, const char *imagePath);
 
-        void changeTexture(std::string tipo, const char* imagePath);
+  void bind();
 
-        unsigned int getID();
-        std::string getType();
-        std::string getPath();
+  void changeTexture(std::string tipo, const char *imagePath);
+
+  unsigned int getID();
+  std::string getType();
+  std::string getPath();
 };
 
 #endif

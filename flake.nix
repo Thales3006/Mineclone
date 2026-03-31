@@ -17,6 +17,36 @@
       pkgsWin = pkgs.pkgsCross.mingwW64;
     in
     {
+      # Shell for LSP config - clangd
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          cmake
+          pkg-config
+          clang-tools
+          glfw
+          libGL
+          libX11
+          libXrandr
+          glm
+          stb
+        ];
+
+        shellHook = ''
+          cat > .clangd <<EOF
+          CompileFlags:
+            Compiler: clang++
+            Add:
+              - -std=c++17
+              - -I$PWD/include
+              - -I${pkgs.libglvnd.dev}/include
+              - -I${pkgs.glfw}/include
+              - -I${pkgs.glm}/include
+              - -I${pkgs.stdenv.cc.cc.lib}/include
+          EOF
+          echo "ambiente pronto"
+        '';
+      };
+
       packages.${system} = {
 
         default = pkgs.stdenv.mkDerivation {
