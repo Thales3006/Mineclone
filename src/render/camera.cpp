@@ -5,7 +5,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-Casdasamera::Camera() {
+Camera::Camera() {
     up = glm::vec3(0.0f, 1.0f, 0.0f);
     position = glm::vec3(0.0f, 1.0f, 0.0f);
 
