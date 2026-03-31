@@ -30,6 +30,8 @@
             libGL
             libX11
             libXrandr
+
+            stb
           ];
         };
 
