@@ -3,9 +3,13 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    glm-src = {
+      url = "github:g-truc/glm/1.0.2";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, glm-src }:
     let
       system = "x86_64-linux";
 
@@ -41,8 +45,15 @@
           version = "1.1.0";
           src = self;
 
+          preConfigure = ''
+            cp -r ${glm-src}/glm include/glm
+          '';
+
           nativeBuildInputs = [ pkgsWin.cmake ];
-          buildInputs = [ pkgsWin.glfw ];
+          buildInputs = with pkgsWin; [
+            glfw
+            stb
+          ];
 
           cmakeFlags = [
             "-DCMAKE_SYSTEM_NAME=Windows"
