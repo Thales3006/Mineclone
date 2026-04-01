@@ -30,19 +30,19 @@ Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
 
 Chunk::~Chunk() {}
 
-Chunk Chunk::generateChunk(int x, int z) {
-    Chunk chunk = Chunk(x, z);
+std::unique_ptr<Chunk> Chunk::generateChunk(int x, int z) {
+    std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>(x, z);
     for (int i = CHUNK_WIDTH - 1; i >= 0; i--) {
         for (int j = CHUNK_HEIGHT - 1; j >= 0; j--) {
             for (int k = CHUNK_WIDTH - 1; k >= 0; k--) {
                 int f = 2 * (cos((i + k * sin(x + z)) / 4 *
                                  cos(static_cast<float>((z + x) * CHUNK_WIDTH + k + j) / 10)) +
                              cos((k - i * sin(z + x)) / 3));
-                chunk.blocks[i][j][k] =
+                chunk->blocks[i][j][k] =
                     j < CHUNK_HEIGHT / 3 + f
-                        ? Block(j < CHUNK_HEIGHT / 3                                          ? 1
-                                : (j == CHUNK_WIDTH - 1 || chunk.blocks[i][j + 1][k].ID == 0) ? 3
-                                                                                              : 2,
+                        ? Block(j < CHUNK_HEIGHT / 3                                           ? 1
+                                : (j == CHUNK_WIDTH - 1 || chunk->blocks[i][j + 1][k].ID == 0) ? 3
+                                                                                               : 2,
                                 true)
                         : Block();
             }

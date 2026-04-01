@@ -5,15 +5,18 @@
 
 #include <array>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <tuple>
 
 class ChunkManager {
   public:
-    std::map<std::tuple<int, int>, Chunk> chunks;
+    std::mutex chunks_mutex;
+    std::map<std::tuple<int, int>, std::unique_ptr<Chunk>> chunks;
 
     ChunkManager();
 
-    void loadChunk(Chunk chunk);
+    void loadChunk(std::unique_ptr<Chunk> chunk);
     void unloadChunk(int x, int z);
 
     void updateChunk(Chunk &chunk);
@@ -30,6 +33,9 @@ class ChunkManager {
     void renderChunks(Shader &shader, int chunkx, int chunkz);
 
     void fillChunkRadius(int radius, int chunkx, int chunkz);
+
+  private:
+    Chunk *getChunkPtr(int x, int z);
 };
 
 #endif

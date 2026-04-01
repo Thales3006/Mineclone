@@ -35,6 +35,9 @@ class Mesh {
     void setupMesh();
     void clearBuffers();
 
+    Mesh(const Mesh &other) = delete;
+    Mesh &operator=(const Mesh &other) = delete;
+
   private:
     unsigned int VAO, VBO, EBO;
 

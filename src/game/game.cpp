@@ -30,7 +30,7 @@ void Game::run() {
         glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // chunkManager.fillChunkRadius(2, player.chunkx, player.chunkz);
+        chunkManager.fillChunkRadius(2, player.chunkx, player.chunkz);
 
         deltaTime = glfwGetTime();
         glfwSetTime(0);

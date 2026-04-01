@@ -5,6 +5,7 @@
 #include "render/mesh.h"
 
 #include <map>
+#include <memory>
 
 #define CHUNK_WIDTH 16
 #define CHUNK_HEIGHT 32
@@ -33,7 +34,7 @@ class Chunk {
     void updateSide(const Side side, const Chunk *leftChunk, const Chunk *rightChunk,
                     const Chunk *frontChunk, const Chunk *backChunk);
 
-    static Chunk generateChunk(int x, int z);
+    static std::unique_ptr<Chunk> generateChunk(int x, int z);
 
     void setMesh();
     void renderChunk(Shader &shader, int chunkx, int chunkz);
