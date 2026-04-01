@@ -18,7 +18,7 @@ class Chunk {
     int z;
     Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH];
 
-    Mesh mesh;
+    std::unique_ptr<Mesh> mesh;
 
     Chunk();
     Chunk(int x, int z);
@@ -34,10 +34,10 @@ class Chunk {
     void updateSide(const Side side, const Chunk *leftChunk, const Chunk *rightChunk,
                     const Chunk *frontChunk, const Chunk *backChunk);
 
-    static std::unique_ptr<Chunk> generateChunk(int x, int z);
-
     void setMesh();
     void renderChunk(Shader &shader, int chunkx, int chunkz);
+
+    static std::unique_ptr<Chunk> generateChunk(int x, int z);
 
     static glm::vec3 chunkOffSet(glm::vec3 position);
 };

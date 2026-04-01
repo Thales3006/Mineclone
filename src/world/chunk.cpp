@@ -321,36 +321,19 @@ void Chunk::setMesh() {
                 }
             }
 
-    mesh.clearBuffers();
-    mesh = Mesh(drawableFaces, indices, textures);
+    mesh = std::make_unique<Mesh>(drawableFaces, indices, textures);
 }
 
 void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz) {
 
     shader.setMat4("model", glm::translate(glm::mat4(1.0f), glm::vec3((x - chunkx) * CHUNK_WIDTH, 0,
                                                                       (z - chunkz) * CHUNK_WIDTH)));
-    mesh.draw(shader);
+    mesh->draw(shader);
 }
 
 glm::vec3 Chunk::chunkOffSet(glm::vec3 position) {
-    int chunkx = 0;
-    int chunkz = 0;
+    int offsetX = static_cast<int>(std::floor(position.x / static_cast<float>(CHUNK_WIDTH)));
+    int offsetZ = static_cast<int>(std::floor(position.z / static_cast<float>(CHUNK_WIDTH)));
 
-    while (position.x < 0) {
-        position = glm::vec3(position.x + CHUNK_WIDTH, position.y, position.z);
-        chunkx--;
-    }
-    while (position.x >= CHUNK_WIDTH) {
-        position = glm::vec3(position.x - CHUNK_WIDTH, position.y, position.z);
-        chunkx++;
-    }
-    while (position.z < 0) {
-        position = glm::vec3(position.x, position.y, position.z + CHUNK_WIDTH);
-        chunkz--;
-    }
-    while (position.z >= CHUNK_WIDTH) {
-        position = glm::vec3(position.x, position.y, position.z - CHUNK_WIDTH);
-        chunkz++;
-    }
-    return glm::vec3(chunkx, 0, chunkz);
+    return glm::vec3(offsetX, 0, offsetZ);
 }

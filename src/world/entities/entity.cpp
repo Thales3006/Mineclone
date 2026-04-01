@@ -20,6 +20,9 @@ Entity::Entity(glm::vec3 pos, glm::vec3 size) {
     this->velocity = glm::vec3(0.0);
     this->acceleration = glm::vec3(32.0, 7.0, 32.0);
 
+    this->chunkx = 0;
+    this->chunkz = 0;
+
     this->position = pos;
     this->size = size;
 
@@ -93,9 +96,11 @@ void Entity::update(ChunkManager &chunkManager, float deltaTime) {
     velocity -= velocity * friction * glm::vec3(deltaTime);
 
     glm::vec3 chunkOffset = Chunk::chunkOffSet(position);
-    position -= chunkOffset * float(CHUNK_WIDTH);
+
     chunkx += chunkOffset.x;
     chunkz += chunkOffset.z;
+
+    position -= chunkOffset * float(CHUNK_WIDTH);
 }
 
 glm::vec3 Entity::colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize, float deltaTime) {

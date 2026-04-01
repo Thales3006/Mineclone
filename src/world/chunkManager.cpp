@@ -65,6 +65,8 @@ void ChunkManager::updateChunk(Chunk &chunk) {
 }
 
 void ChunkManager::updateChunks() {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
     for (auto &[coords, chunk] : chunks)
         updateChunk(*chunk);
 }
@@ -120,6 +122,8 @@ void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block block) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
     if ((chunks.find({chunkx, chunkz}) == chunks.end()) || (x < 0 || x >= CHUNK_WIDTH) ||
         (y < 0 || y >= CHUNK_HEIGHT) || (z < 0 || z >= CHUNK_WIDTH))
         return;
@@ -131,6 +135,8 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block b
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
     glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
     pos -= chunkOffset * float(CHUNK_WIDTH);
     chunkx += chunkOffset.x;
@@ -146,6 +152,8 @@ void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block) 
 }
 
 Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
     glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
     pos -= chunkOffset * float(CHUNK_WIDTH);
     chunkx += chunkOffset.x;
@@ -158,11 +166,15 @@ Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos) {
 }
 
 void ChunkManager::renderChunks(Shader &shader, int chunkx, int chunkz) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
     for (auto &[coord, chunk] : chunks)
         chunk->renderChunk(shader, chunkx, chunkz);
 }
 
 void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
     auto it = chunks.begin();
     while (it != chunks.end()) {
         const auto &[coord, chunk] = *it;
