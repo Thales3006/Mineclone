@@ -4,7 +4,6 @@
 #include "shader.h"
 #include "texture.h"
 
-#include "glad/glad.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -23,24 +22,23 @@ class Mesh {
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
 
-    Mesh();
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
          std::vector<Texture> textures);
     Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 
     ~Mesh();
 
     void draw(Shader &shader);
 
     void setupMesh();
+    bool isSetup = false; // temporary fix for big threading problem
 
     Mesh(const Mesh &other) = delete;
     Mesh &operator=(const Mesh &other) = delete;
 
   private:
     unsigned int VAO, VBO, EBO;
-
-    void resetMesh();
 };
 
 #endif

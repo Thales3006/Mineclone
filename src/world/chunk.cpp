@@ -177,9 +177,6 @@ void Chunk::updateSide(const Side side, const Chunk *leftChunk, const Chunk *rig
 
 void Chunk::setMesh() {
 
-    std::vector<Texture> textures = {Texture("texture_diffuse", "textures/blocks_opaque_01.png"),
-                                     Texture("texture_diffuse", "textures/container.jpg")};
-
     std::vector<Vertex> drawableFaces;
     std::vector<unsigned int> indices;
 
@@ -321,13 +318,17 @@ void Chunk::setMesh() {
                 }
             }
 
-    mesh = std::make_unique<Mesh>(drawableFaces, indices, textures);
+    mesh = std::make_unique<Mesh>(drawableFaces, indices);
 }
 
-void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz) {
+void Chunk::renderChunk(Shader &shader, int chunkx, int chunkz, std::vector<Texture> textures) {
 
     shader.setMat4("model", glm::translate(glm::mat4(1.0f), glm::vec3((x - chunkx) * CHUNK_WIDTH, 0,
                                                                       (z - chunkz) * CHUNK_WIDTH)));
+    if (!mesh->isSetup) {
+        mesh->textures = {textures[1]};
+        mesh->setupMesh();
+    }
     mesh->draw(shader);
 }
 

@@ -165,24 +165,57 @@ Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos) {
     return chunks[{chunkx, chunkz}]->blocks[int(pos.x)][int(pos.y)][int(pos.z)];
 }
 
-void ChunkManager::renderChunks(Shader &shader, int chunkx, int chunkz) {
+void ChunkManager::renderChunks(Shader &shader, int chunkx, int chunkz,
+                                std::vector<Texture> textures) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
-    for (auto &[coord, chunk] : chunks)
-        chunk->renderChunk(shader, chunkx, chunkz);
+    for (auto &[coord, chunk] : chunks) {
+        chunk->renderChunk(shader, chunkx, chunkz, textures);
+    }
 }
 
 void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
-    std::lock_guard<std::mutex> lock(chunks_mutex);
+    std::vector<std::tuple<int, int>> to_delete{};
+    std::vector<std::tuple<int, int>> to_add{};
 
-    auto it = chunks.begin();
-    while (it != chunks.end()) {
-        const auto &[coord, chunk] = *it;
+    {
+        std::lock_guard<std::mutex> lock(chunks_mutex);
+
+        for (auto &[coord, chunk] : chunks) {
+            int x = std::get<0>(coord);
+            int z = std::get<1>(coord);
+
+            if (x < -radius + chunkx || x > radius + chunkx || z < -radius + chunkz ||
+                z > radius + chunkz) {
+                to_delete.push_back(coord);
+            }
+        }
+
+        for (int i = -radius + chunkx; i <= radius + chunkx; i++) {
+            for (int j = -radius + chunkz; j <= radius + chunkz; j++) {
+                if (chunks.find({i, j}) == chunks.end()) {
+                    to_add.push_back({i, j});
+                }
+            }
+        }
+    }
+
+    std::vector<std::unique_ptr<Chunk>> to_add_chunks{};
+    for (auto &coord : to_add) {
         int x = std::get<0>(coord);
         int z = std::get<1>(coord);
-        if (x < -radius + chunkx || x > radius + chunkx || z < -radius + chunkz ||
-            z > radius + chunkz) {
-            it = chunks.erase(it);
+        to_add_chunks.push_back(std::move(Chunk::generateChunk(x, z)));
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(chunks_mutex);
+
+        for (auto &coord : to_delete) {
+            int x = std::get<0>(coord);
+            int z = std::get<1>(coord);
+
+            chunks.erase(coord);
+
             if (chunks.find({x - 1, z}) != chunks.end())
                 updateSide(right, *chunks[{x - 1, z}]);
             if (chunks.find({x + 1, z}) != chunks.end())
@@ -191,13 +224,10 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
                 updateSide(back, *chunks[{x, z + 1}]);
             if (chunks.find({x, z - 1}) != chunks.end())
                 updateSide(front, *chunks[{x, z - 1}]);
+        }
 
-        } else
-            it++;
+        for (auto &chunk : to_add_chunks) {
+            loadChunk(std::move(chunk));
+        }
     }
-
-    for (int i = -radius + chunkx; i <= radius + chunkx; i++)
-        for (int j = -radius + chunkz; j <= radius + chunkz; j++)
-            if (chunks.find({i, j}) == chunks.end())
-                loadChunk(Chunk::generateChunk(i, j));
 }

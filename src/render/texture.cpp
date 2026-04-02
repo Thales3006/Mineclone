@@ -1,6 +1,8 @@
 #include "render/texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
+#include "render/renderLib.h"
+#include <iostream>
 #include <stb/stb_image.h>
 
 Texture::Texture() {}

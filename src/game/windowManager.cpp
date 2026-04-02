@@ -1,9 +1,10 @@
+#include "game/windowManager.h"
+
 #include "game/game.h"
-#include "game/opengl.h"
 
 #include <iostream>
 
-void Game::openGLInit() {
+void WindowManager::createWindow(void *game) {
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW.\n";
         return;
@@ -25,28 +26,28 @@ void Game::openGLInit() {
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-    window = glfwCreateWindow(windowSize[0], windowSize[1], "Mineclone", NULL, NULL);
+    window = glfwCreateWindow(defaultWidth, defaultHeight, "Mineclone", NULL, NULL);
     if (!window) {
         std::cout << "Failed to create window.\n";
         exit(-1);
     }
     glfwMakeContextCurrent(window);
-    glfwSetWindowUserPointer(window, this);
-
-    if (!gladLoadGL()) {
-        std::cout << "Failed to initialize Glad.\n";
-        return;
-    }
-    glViewport(0, 0, windowSize[0], windowSize[1]);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
+    glfwSetWindowUserPointer(window, game);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPos(window, static_cast<double>(windowSize[0]) / 2,
-                     static_cast<double>(windowSize[1]) / 2);
+    glfwSetCursorPos(window, static_cast<double>(defaultWidth) / 2,
+                     static_cast<double>(defaultHeight) / 2);
 
     glfwSetCursorPosCallback(window, Game::mouseMoveCallback);
     glfwSetMouseButtonCallback(window, Game::mouseClickCallback);
     glfwSetKeyCallback(window, Game::keyboardCallback);
+}
+
+GLFWwindow *WindowManager::getWindow() { return window; }
+GLFWmonitor *WindowManager::getMonitor() { return monitor; }
+
+glm::uvec2 WindowManager::getWindowSize() {
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+    return glm::ivec2(windowWidth, windowHeight);
 }

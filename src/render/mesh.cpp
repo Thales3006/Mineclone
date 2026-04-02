@@ -1,34 +1,17 @@
 #include "render/mesh.h"
 
-Mesh::Mesh() {
-    VAO = 0;
-    VBO = 0;
-    EBO = 0;
-    this->vertices = std::vector<Vertex>();
-    this->indices = std::vector<unsigned int>();
-    this->textures = std::vector<Texture>();
-}
+#include "glad/glad.h"
+#include <iostream>
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-           std::vector<Texture> textures) {
-    VAO = 0;
-    VBO = 0;
-    EBO = 0;
-    this->vertices = vertices;
-    this->indices = indices;
-    this->textures = textures;
-    setupMesh();
-}
+           std::vector<Texture> textures)
+    : VAO(0), VBO(0), EBO(0), vertices(vertices), indices(indices), textures(textures) {}
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures) {
-    VAO = 0;
-    VBO = 0;
-    EBO = 0;
-    this->vertices = vertices;
-    this->indices = std::vector<unsigned int>();
-    this->textures = textures;
-    setupMesh();
-}
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures)
+    : Mesh(vertices, std::vector<unsigned int>(), textures) {}
+
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
+    : Mesh(vertices, indices, std::vector<Texture>()) {}
 
 void Mesh::setupMesh() {
     if (vertices.empty())
@@ -37,7 +20,7 @@ void Mesh::setupMesh() {
     // criando VAO VBO EBO
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    if (indices.data())
+    if (!indices.empty())
         glGenBuffers(1, &EBO);
 
     // Setando os dados
@@ -47,7 +30,7 @@ void Mesh::setupMesh() {
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(),
                  GL_STATIC_DRAW);
 
-    if (indices.data()) {
+    if (!indices.empty()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(),
                      GL_STATIC_DRAW);
@@ -71,10 +54,10 @@ void Mesh::setupMesh() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    isSetup = true;
 }
 
 void Mesh::draw(Shader &shader) {
-
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
 
@@ -98,10 +81,12 @@ void Mesh::draw(Shader &shader) {
 
     shader.use();
     glBindVertexArray(VAO);
-    if (indices.data())
+    if (!indices.empty()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    indices.data() ? glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0)
-                   : glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    }
+    !indices.empty() ? glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0)
+                     : glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
     glBindVertexArray(0);
 }
 

@@ -20,7 +20,7 @@ class ChunkManager {
     void setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block);
     Block getBlock(int chunkx, int chunkz, glm::vec3 pos);
 
-    void renderChunks(Shader &shader, int chunkx, int chunkz);
+    void renderChunks(Shader &shader, int chunkx, int chunkz, std::vector<Texture> textures);
 
     void fillChunkRadius(int radius, int chunkx, int chunkz);
 

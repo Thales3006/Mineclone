@@ -47,13 +47,13 @@ void Game::mouseClickCallback(GLFWwindow *window, int button, int action, int mo
 
 void Game::keyboardCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
-    const GLFWvidmode *mode = glfwGetVideoMode(game.monitor);
+    const GLFWvidmode *mode = glfwGetVideoMode(game.windowManager.getMonitor());
 
     static bool fullScreen = false;
     if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
         if (!fullScreen) {
-            glfwSetWindowMonitor(window, game.monitor, 0, 0, mode->width, mode->height,
-                                 mode->refreshRate);
+            glfwSetWindowMonitor(window, game.windowManager.getMonitor(), 0, 0, mode->width,
+                                 mode->height, mode->refreshRate);
             glViewport(0, 0, mode->width, mode->height);
             fullScreen = true;
         } else {

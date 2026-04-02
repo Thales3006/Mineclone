@@ -35,7 +35,7 @@ class Chunk {
                     const Chunk *frontChunk, const Chunk *backChunk);
 
     void setMesh();
-    void renderChunk(Shader &shader, int chunkx, int chunkz);
+    void renderChunk(Shader &shader, int chunkx, int chunkz, std::vector<Texture> textures);
 
     static std::unique_ptr<Chunk> generateChunk(int x, int z);
 
