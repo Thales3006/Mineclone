@@ -24,7 +24,7 @@ class Entity {
     bool onGround;
 
     Entity();
-    Entity(glm::vec3 pos, glm::vec3 size);
+    Entity(glm::vec3 position, glm::vec3 size, glm::vec3 direction);
 
     void update(ChunkManager &chunkManager, float deltaTime);
     glm::vec3 colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize, float deltaTime);

@@ -2,33 +2,13 @@
 
 #include <bits/stdc++.h>
 
-Entity::Entity() {
-    this->velocity = glm::vec3(0.0);
-    this->acceleration = glm::vec3(32.0, 7.0, 32.0);
+Entity::Entity()
+    : Entity(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f),
+             glm::vec3(0.0f, 0.0f, 1.0f)) {}
 
-    this->position = glm::vec3(0.0);
-    this->size = glm::vec3(0.0);
-
-    this->chunkx = 0;
-    this->chunkz = 0;
-
-    this->gravity = 20;
-    this->onGround = false;
-}
-
-Entity::Entity(glm::vec3 pos, glm::vec3 size) {
-    this->velocity = glm::vec3(0.0);
-    this->acceleration = glm::vec3(32.0, 7.0, 32.0);
-
-    this->chunkx = 0;
-    this->chunkz = 0;
-
-    this->position = pos;
-    this->size = size;
-
-    this->gravity = 20;
-    this->onGround = false;
-}
+Entity::Entity(glm::vec3 position, glm::vec3 size, glm::vec3 direction)
+    : position(position), size(size), direction(direction), chunkx(0), chunkz(0), velocity(0.0f),
+      acceleration(32.0, 7.0, 32.0), gravity(20), onGround(false) {}
 
 typedef struct {
     Block block;
