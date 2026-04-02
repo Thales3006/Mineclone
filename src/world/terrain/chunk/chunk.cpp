@@ -38,20 +38,25 @@ std::unique_ptr<Chunk> Chunk::generateChunk(int x, int z) {
     FastNoiseLite noise;
     noise.SetSeed(42);
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    noise.SetFrequency(0.05f);
+    noise.SetFrequency(0.1f);
 
     for (int i = CHUNK_WIDTH - 1; i >= 0; i--) {
         for (int j = CHUNK_HEIGHT - 1; j >= 0; j--) {
             for (int k = CHUNK_WIDTH - 1; k >= 0; k--) {
 
-                float val = noise.GetNoise(x, z); // -1 a 1
-                chunk->blocks[i][j][k] =
-                    j < static_cast<float>(CHUNK_HEIGHT) / 3 + val
-                        ? Block(j < CHUNK_HEIGHT / 3                                           ? 1
-                                : (j == CHUNK_WIDTH - 1 || chunk->blocks[i][j + 1][k].ID == 0) ? 3
-                                                                                               : 2,
-                                true)
-                        : Block();
+                float val = 5 * noise.GetNoise(static_cast<float>(x * CHUNK_WIDTH + i),
+                                               static_cast<float>(z * CHUNK_WIDTH + k));
+                Block block{};
+                if (j < static_cast<float>(CHUNK_HEIGHT) / 3 + val) {
+                    unsigned char id = 1;
+                    // stone or dirt
+                    if (j > CHUNK_HEIGHT / 3) {
+                        // grass or dirt
+                        id = (j == CHUNK_WIDTH - 1 || chunk->blocks[i][j + 1][k].ID == 0) ? 3 : 2;
+                    }
+                    block = Block(id, true);
+                }
+                chunk->blocks[i][j][k] = block;
             }
         }
     }
