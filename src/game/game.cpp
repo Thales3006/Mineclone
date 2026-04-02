@@ -11,9 +11,9 @@ Game::Game() : world(42) {
 }
 
 void Game::autoLoadChunks() {
+    Player *player = &world.getEntityManager()->player;
     while (isRunning) {
-        world.getChunkManager()->fillChunkRadius(6, world.getEntityManager()->player.chunkx,
-                                                 world.getEntityManager()->player.chunkz);
+        world.getChunkManager()->fillChunkRadius(6, player->chunkx, player->chunkz);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
