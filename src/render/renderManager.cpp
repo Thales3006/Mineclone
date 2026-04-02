@@ -6,9 +6,8 @@
 
 RenderManager::RenderManager() {}
 
-RenderManager::RenderManager(WindowManager *windowManager, ChunkManager *chunkManager,
-                             Player *player)
-    : windowManager(windowManager), chunkManager(chunkManager), player(player) {
+RenderManager::RenderManager(WindowManager *windowManager, World *world)
+    : windowManager(windowManager), world(world) {
     initOpenGL();
 
     textures = {Texture("texture_diffuse", "textures/container.jpg"),
@@ -38,9 +37,10 @@ void RenderManager::renderFrame() {
     glm::uvec2 windowSize = windowManager->getWindowSize();
     glViewport(0, 0, windowSize.x, windowSize.y);
 
+    Player *player = &world->getEntityManager()->player;
     float ratio = static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
     shaders[0].setMat4("projection", player->camera.getMatrixProjection(ratio));
     shaders[0].setMat4("view", player->camera.getMatrixView());
 
-    chunkManager->renderChunks(shaders[0], player->chunkx, player->chunkz, textures);
+    world->getChunkManager()->renderChunks(shaders[0], player->chunkx, player->chunkz, textures);
 }

@@ -5,13 +5,12 @@
 #include "render/camera.h"
 #include "render/shader.h"
 #include "render/texture.h"
-#include "world/entity/player.h"
-#include "world/terrain/chunk/chunkManager.h"
+#include "world/world.h"
 
 class RenderManager {
   public:
     RenderManager();
-    RenderManager(WindowManager *windowManager, ChunkManager *chunkManager, Player *player);
+    RenderManager(WindowManager *WindowManager, World *world);
 
     void initOpenGL();
     void renderFrame();
@@ -21,8 +20,7 @@ class RenderManager {
     std::vector<Shader> shaders;
 
     WindowManager *windowManager;
-    ChunkManager *chunkManager;
-    Player *player;
+    World *world;
 };
 
 #endif

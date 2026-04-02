@@ -5,8 +5,7 @@
 Game::Game() : world(42) {
     windowManager.createWindow(this);
 
-    renderManager =
-        RenderManager(&windowManager, world.getChunkManager(), &world.getEntityManager()->player);
+    renderManager = RenderManager(&windowManager, &world);
     deltaTime = 0;
     glfwSetTime(0);
 }
