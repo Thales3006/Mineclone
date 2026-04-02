@@ -6,6 +6,7 @@
 #include "world/chunkManager.h"
 #include "world/entities/player.h"
 
+#include <atomic>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -22,6 +23,8 @@ class Game {
 
   private:
     double deltaTime;
+    std::atomic<bool> isRunning;
+
     WindowManager windowManager;
     RenderManager renderManager;
 

@@ -17,9 +17,9 @@ Game::Game() {
 }
 
 void Game::autoLoadChunks() {
-    while (true) {
+    while (isRunning) {
         chunkManager.fillChunkRadius(6, player.chunkx, player.chunkz);
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
@@ -39,6 +39,9 @@ void Game::run() {
         glfwSwapBuffers(windowManager.getWindow());
         glfwPollEvents();
     }
+
+    isRunning = false;
+    chunkLoader.join();
 
     glfwTerminate();
 }
