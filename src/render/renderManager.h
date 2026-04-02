@@ -5,8 +5,8 @@
 #include "render/camera.h"
 #include "render/shader.h"
 #include "render/texture.h"
-#include "world/chunkManager.h"
 #include "world/entity/player.h"
+#include "world/terrain/chunk/chunkManager.h"
 
 class RenderManager {
   public:

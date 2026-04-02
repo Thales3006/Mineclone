@@ -3,8 +3,8 @@
 
 #include "game/windowManager.h"
 #include "render/renderManager.h"
-#include "world/chunkManager.h"
 #include "world/entity/player.h"
+#include "world/terrain/chunk/chunk.h"
 
 #include <atomic>
 #include <cmath>

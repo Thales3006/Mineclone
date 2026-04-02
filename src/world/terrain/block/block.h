@@ -19,7 +19,7 @@ class Block {
     unsigned char faces;
 
     Block();
-    Block(unsigned int ID, bool isSolid);
+    Block(unsigned int ID, bool solid);
 };
 
 #endif

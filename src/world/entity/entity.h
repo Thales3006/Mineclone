@@ -1,7 +1,7 @@
 #ifndef ENTITY_CLASS_H
 #define ENTITY_CLASS_H
 
-#include "world/chunkManager.h"
+#include "world/terrain/chunk/chunkManager.h"
 
 #include <glm/glm.hpp>
 
