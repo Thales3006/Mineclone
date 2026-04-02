@@ -16,6 +16,8 @@ class ChunkManager {
 
     ChunkManager();
 
+    bool isEmpty(int x, int z);
+
     void setBlock(int chunkx, int chunkz, int x, int y, int z, Block block);
     void setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block);
     Block getBlock(int chunkx, int chunkz, glm::vec3 pos);

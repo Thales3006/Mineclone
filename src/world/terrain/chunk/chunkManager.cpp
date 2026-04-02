@@ -231,3 +231,9 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
         }
     }
 }
+
+bool ChunkManager::isEmpty(int x, int z) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
+    return getChunkPtr(x, z) == nullptr;
+}

@@ -37,6 +37,10 @@ typedef struct {
 } blockDist;
 
 void Entity::update(ChunkManager &chunkManager, float deltaTime) {
+    if (chunkManager.isEmpty(chunkx, chunkz)) {
+        return;
+    }
+
     glm::vec3 friction = glm::vec3(8.0, 0.1, 8.0);
     glm::vec3 correction = glm::vec3(0.0);
     std::vector<blockDist> blocks;

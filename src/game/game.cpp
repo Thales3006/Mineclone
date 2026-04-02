@@ -19,7 +19,7 @@ Game::Game() {
 void Game::autoLoadChunks() {
     while (isRunning) {
         chunkManager.fillChunkRadius(6, player.chunkx, player.chunkz);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
 
