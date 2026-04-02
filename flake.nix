@@ -77,7 +77,9 @@
           src = self;
 
           preConfigure = ''
+            mkdir -p include
             cp -r ${glm-src}/glm include/glm
+            export CXXFLAGS="-I$PWD/include"
           '';
 
           nativeBuildInputs = [ pkgsWin.cmake ];
