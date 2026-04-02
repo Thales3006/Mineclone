@@ -1,4 +1,4 @@
-#include "world/entities/entity.h"
+#include "world/entity/entity.h"
 
 #include <bits/stdc++.h>
 

@@ -6,7 +6,7 @@
 #include "render/shader.h"
 #include "render/texture.h"
 #include "world/chunkManager.h"
-#include "world/entities/player.h"
+#include "world/entity/player.h"
 
 class RenderManager {
   public:

@@ -1,4 +1,4 @@
-#include "world/entities/player.h"
+#include "world/entity/player.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846

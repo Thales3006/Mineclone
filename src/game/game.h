@@ -4,7 +4,7 @@
 #include "game/windowManager.h"
 #include "render/renderManager.h"
 #include "world/chunkManager.h"
-#include "world/entities/player.h"
+#include "world/entity/player.h"
 
 #include <atomic>
 #include <cmath>
