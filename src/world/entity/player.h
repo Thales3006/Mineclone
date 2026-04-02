@@ -4,7 +4,7 @@
 #include "render/camera.h"
 #include "world/entity/entity.h"
 
-#include <GLFW/glfw3.h>
+#include "render/renderLib.h"
 #include <glm/glm.hpp>
 
 #include <vector>

@@ -3,8 +3,7 @@
 
 #include "game/windowManager.h"
 #include "render/renderManager.h"
-#include "world/entity/player.h"
-#include "world/terrain/chunk/chunk.h"
+#include "world/world.h"
 
 #include <atomic>
 #include <cmath>
@@ -28,9 +27,7 @@ class Game {
     WindowManager windowManager;
     RenderManager renderManager;
 
-    ChunkManager chunkManager;
-    Player player;
-
+    World world;
     void autoLoadChunks();
 };
 

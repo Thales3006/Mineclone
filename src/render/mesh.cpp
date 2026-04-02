@@ -1,6 +1,6 @@
 #include "render/mesh.h"
 
-#include "glad/glad.h"
+#include "render/renderLib.h"
 #include <iostream>
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,

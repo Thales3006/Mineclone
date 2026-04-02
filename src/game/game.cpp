@@ -2,23 +2,19 @@
 
 #include <thread>
 
-Game::Game() {
+Game::Game() : world(42) {
     windowManager.createWindow(this);
 
-    player = Player(glm::vec3(5.0f, 20.0f, 5.0f), glm::vec3(0.5, 1.75, 0.5));
-    player.setKeys(GLFW_KEY_W, GLFW_KEY_S, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE,
-                   GLFW_KEY_LEFT_SHIFT);
-    player.camera.setMinMax(0.01f, 400.0f);
-    player.camera.setFOV(glm::radians(90.0f));
-
-    renderManager = RenderManager(&windowManager, &chunkManager, &player);
+    renderManager =
+        RenderManager(&windowManager, world.getChunkManager(), &world.getEntityManager()->player);
     deltaTime = 0;
     glfwSetTime(0);
 }
 
 void Game::autoLoadChunks() {
     while (isRunning) {
-        chunkManager.fillChunkRadius(6, player.chunkx, player.chunkz);
+        world.getChunkManager()->fillChunkRadius(6, world.getEntityManager()->player.chunkx,
+                                                 world.getEntityManager()->player.chunkz);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
@@ -30,7 +26,7 @@ void Game::run() {
         deltaTime = glfwGetTime();
         glfwSetTime(0);
 
-        player.updatePlayer(windowManager.getWindow(), chunkManager, deltaTime);
+        world.getEntityManager()->update(windowManager, *world.getChunkManager(), deltaTime);
 
         renderManager.renderFrame();
 

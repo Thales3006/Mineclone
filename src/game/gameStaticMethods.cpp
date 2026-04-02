@@ -4,32 +4,32 @@ void Game::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
     static double xlast = xpos;
     static double ylast = ypos;
-    game.player.processMouseMovement(xpos - xlast, ylast - ypos);
+    game.world.getEntityManager()->player.processMouseMovement(xpos - xlast, ylast - ypos);
     xlast = xpos;
     ylast = ypos;
 }
 
 void Game::mouseClickCallback(GLFWwindow *window, int button, int action, int mods) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
-    Player &player = game.player;
+    Player &player = game.world.getEntityManager()->player;
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         glm::vec3 dir = glm::normalize(player.camera.getDirection());
         glm::vec3 i = glm::vec3(0);
-        while (game.chunkManager
-                   .getBlock(player.chunkx, player.chunkz, player.camera.position + dir * i)
+        while (game.world.getChunkManager()
+                   ->getBlock(player.chunkx, player.chunkz, player.camera.position + dir * i)
                    .ID == 0) {
             if (i.x > 6)
                 return;
             i += glm::vec3(1);
         }
-        game.chunkManager.setBlock(player.chunkx, player.chunkz, player.camera.position + dir * i,
-                                   Block());
+        game.world.getChunkManager()->setBlock(player.chunkx, player.chunkz,
+                                               player.camera.position + dir * i, Block());
     } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         glm::vec3 dir = glm::normalize(player.camera.getDirection());
         glm::vec3 i = glm::vec3(0);
-        while (game.chunkManager
-                   .getBlock(player.chunkx, player.chunkz, player.camera.position + dir * i)
+        while (game.world.getChunkManager()
+                   ->getBlock(player.chunkx, player.chunkz, player.camera.position + dir * i)
                    .ID == 0) {
             if (i.x > 6)
                 return;
@@ -40,8 +40,8 @@ void Game::mouseClickCallback(GLFWwindow *window, int button, int action, int mo
         if (!Entity::colision(
                 player.camera.position + dir * i, glm::vec3(0, 0, 0), glm::floor(player.position),
                 glm::ceil(player.position + player.size) - glm::floor(player.position)))
-            game.chunkManager.setBlock(player.chunkx, player.chunkz,
-                                       player.camera.position + dir * i, Block(1, true));
+            game.world.getChunkManager()->setBlock(
+                player.chunkx, player.chunkz, player.camera.position + dir * i, Block(1, true));
     }
 }
 
