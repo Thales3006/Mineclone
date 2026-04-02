@@ -25,8 +25,7 @@ void Game::run() {
         deltaTime = glfwGetTime();
         glfwSetTime(0);
 
-        world.getEntityManager()->update(windowManager, *world.getChunkManager(), deltaTime);
-
+        world.updateTick(windowManager, deltaTime);
         renderManager.renderFrame();
 
         // std::cout << "FPS: "<< 1/deltaTime <<" \n";
