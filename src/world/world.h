@@ -10,7 +10,7 @@ class World {
     ChunkManager *getChunkManager();
     EntityManager *getEntityManager();
 
-    void updateTick(WindowManager &windowManager, float deltaTime);
+    void updateTick(float deltaTime);
 
   private:
     int seed;

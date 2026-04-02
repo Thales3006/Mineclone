@@ -15,7 +15,11 @@ class RenderManager {
     void initOpenGL();
     void renderFrame();
 
+    void handleMouseMovement(double xoffset, double yoffset);
+
   private:
+    Camera camera;
+
     std::vector<Texture> textures;
     std::vector<Shader> shaders;
 

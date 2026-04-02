@@ -12,6 +12,7 @@ class Entity {
   public:
     glm::vec3 size;
     glm::vec3 position;
+    glm::vec3 direction;
 
     int chunkx;
     int chunkz;

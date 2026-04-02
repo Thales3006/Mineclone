@@ -6,6 +6,4 @@ ChunkManager *World::getChunkManager() { return &chunkManager; }
 
 EntityManager *World::getEntityManager() { return &entityManager; }
 
-void World::updateTick(WindowManager &windowManager, float deltaTime) {
-    entityManager.update(windowManager, chunkManager, deltaTime);
-}
+void World::updateTick(float deltaTime) { entityManager.update(chunkManager, deltaTime); }

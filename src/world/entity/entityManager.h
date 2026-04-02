@@ -12,7 +12,7 @@ class EntityManager {
 
     Player player;
 
-    void update(WindowManager &windowManager, ChunkManager &chunkManager, float deltaTime);
+    void update(ChunkManager &chunkManager, float deltaTime);
 
   private:
     // std::vector<Entity> entities;

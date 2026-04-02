@@ -6,10 +6,7 @@
 
 class Camera {
   private:
-    glm::vec3 direction;
     glm::vec3 up;
-
-    float sensitivity;
     float FOV;
 
     float minDist;
@@ -17,19 +14,14 @@ class Camera {
 
   public:
     glm::vec3 position;
-
-    // angles
-    float yaw;
-    float pitch;
+    glm::vec3 direction;
 
     Camera();
-    Camera(glm::vec3 pos, float newYaw, float newPitch);
+    Camera(glm::vec3 position, glm::vec3 direction);
 
     glm::mat4 getMatrixView();
     glm::mat4 getMatrixProjection(float aspect);
 
-    void setDirection(float newYaw, float newPitch);
-    void setSensitivity(float newSensitivity);
     void setFOV(float newFOV);
     void setMinMax(float newMin, float newMax);
 
