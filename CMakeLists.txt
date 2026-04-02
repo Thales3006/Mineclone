@@ -6,11 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
     src/*.c
+    include/*.c
 )
 
 add_executable(mineclone ${SOURCES})
 
-target_include_directories(mineclone PRIVATE src)
+target_include_directories(mineclone PRIVATE include src)
 
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)

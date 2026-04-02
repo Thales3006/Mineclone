@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <FastNoiseLite.h>
+
 Chunk::Chunk() {
     x = 0;
     z = 0;
@@ -32,14 +34,19 @@ Chunk::~Chunk() {}
 
 std::unique_ptr<Chunk> Chunk::generateChunk(int x, int z) {
     std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>(x, z);
+
+    FastNoiseLite noise;
+    noise.SetSeed(42);
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    noise.SetFrequency(0.05f);
+
     for (int i = CHUNK_WIDTH - 1; i >= 0; i--) {
         for (int j = CHUNK_HEIGHT - 1; j >= 0; j--) {
             for (int k = CHUNK_WIDTH - 1; k >= 0; k--) {
-                int f = 2 * (cos((i + k * sin(x + z)) / 4 *
-                                 cos(static_cast<float>((z + x) * CHUNK_WIDTH + k + j) / 10)) +
-                             cos((k - i * sin(z + x)) / 3));
+
+                float val = noise.GetNoise(x, z); // -1 a 1
                 chunk->blocks[i][j][k] =
-                    j < CHUNK_HEIGHT / 3 + f
+                    j < static_cast<float>(CHUNK_HEIGHT) / 3 + val
                         ? Block(j < CHUNK_HEIGHT / 3                                           ? 1
                                 : (j == CHUNK_WIDTH - 1 || chunk->blocks[i][j + 1][k].ID == 0) ? 3
                                                                                                : 2,

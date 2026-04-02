@@ -38,6 +38,7 @@
             Add:
               - -std=c++17
               - -I$PWD/src
+              - -I$PWD/include
               - -I${pkgs.libglvnd.dev}/include
               - -I${pkgs.glfw}/include
               - -I${pkgs.glm}/include

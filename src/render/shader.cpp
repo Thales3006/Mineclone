@@ -1,7 +1,8 @@
 #include "render/shader.h"
 
+#include <render/renderLib.h>
+
 #include <fstream>
-#include <glad/glad.h>
 #include <iostream>
 #include <sstream>
 #include <string>
