@@ -17,7 +17,8 @@ Chunk::Chunk(int x, int z) {
     this->z = z;
 }
 
-Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH]) {
+Chunk::Chunk(int x, int z,
+             Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH]) {
     this->x = x;
     this->z = z;
 
@@ -38,21 +39,37 @@ std::unique_ptr<Chunk> Chunk::generateChunk(int x, int z) {
     FastNoiseLite noise;
     noise.SetSeed(42);
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    noise.SetFrequency(0.1f);
+    noise.SetFrequency(0.05f);
+
+    FastNoiseLite cave_noise;
+    cave_noise.SetSeed(42);
+    cave_noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    cave_noise.SetFrequency(0.1f);
 
     for (int i = CHUNK_WIDTH - 1; i >= 0; i--) {
         for (int j = CHUNK_HEIGHT - 1; j >= 0; j--) {
             for (int k = CHUNK_WIDTH - 1; k >= 0; k--) {
 
-                float val = 5 * noise.GetNoise(static_cast<float>(x * CHUNK_WIDTH + i),
-                                               static_cast<float>(z * CHUNK_WIDTH + k));
+                float val =
+                    5 * noise.GetNoise(static_cast<float>(x * CHUNK_WIDTH + i),
+                                       static_cast<float>(z * CHUNK_WIDTH + k));
+
+                float cave_val = cave_noise.GetNoise(
+                    static_cast<float>(x * CHUNK_WIDTH + i),
+                    static_cast<float>(j),
+                    static_cast<float>(z * CHUNK_WIDTH + k));
+
                 Block block{};
-                if (j < static_cast<float>(CHUNK_HEIGHT) / 3 + val) {
+                if ((j < static_cast<float>(CHUNK_HEIGHT) / 3 + val) &&
+                    (cave_val < 0.2)) {
                     unsigned char id = 1;
                     // stone or dirt
-                    if (j > CHUNK_HEIGHT / 3) {
+                    if (j > CHUNK_HEIGHT / 4) {
                         // grass or dirt
-                        id = (j == CHUNK_WIDTH - 1 || chunk->blocks[i][j + 1][k].ID == 0) ? 3 : 2;
+                        id = (j == CHUNK_WIDTH - 1 ||
+                              chunk->blocks[i][j + 1][k].ID == 0)
+                                 ? 3
+                                 : 2;
                     }
                     block = Block(id, true);
                 }
@@ -63,10 +80,13 @@ std::unique_ptr<Chunk> Chunk::generateChunk(int x, int z) {
     return chunk;
 }
 
-void Chunk::setBlock(int x, int y, int z, Block block) { blocks[x][y][z] = block; }
+void Chunk::setBlock(int x, int y, int z, Block block) {
+    blocks[x][y][z] = block;
+}
 
-void Chunk::updateBlock(int x, int y, int z, const Chunk *leftChunk, const Chunk *rightChunk,
-                        const Chunk *frontChunk, const Chunk *backChunk) {
+void Chunk::updateBlock(int x, int y, int z, const Chunk *leftChunk,
+                        const Chunk *rightChunk, const Chunk *frontChunk,
+                        const Chunk *backChunk) {
     if (blocks[x][y][z].ID == 0) {
         blocks[x][y][z].faces = 0;
         return;
@@ -97,8 +117,8 @@ void Chunk::updateBlock(int x, int y, int z, const Chunk *leftChunk, const Chunk
     blocks[x][y][z].faces = newFaces;
 }
 
-void Chunk::updateBlocks(const Chunk *leftChunk, const Chunk *rightChunk, const Chunk *frontChunk,
-                         const Chunk *backChunk) {
+void Chunk::updateBlocks(const Chunk *leftChunk, const Chunk *rightChunk,
+                         const Chunk *frontChunk, const Chunk *backChunk) {
 
     for (int x = 0; x < CHUNK_WIDTH; x++)
         for (int y = 0; y < CHUNK_HEIGHT; y++)
@@ -113,18 +133,20 @@ void Chunk::updateBlocks(const Chunk *leftChunk, const Chunk *rightChunk, const 
                     : rightChunk         ? rightChunk->blocks[0][y][z].ID != 0
                                          : false)
                     newFaces &= ~RIGHT_FACE;
-                if (x != 0      ? blocks[x - 1][y][z].ID != 0
-                    : leftChunk ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].ID != 0
-                                : false)
+                if (x != 0 ? blocks[x - 1][y][z].ID != 0
+                    : leftChunk
+                        ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].ID != 0
+                        : false)
                     newFaces &= ~LEFT_FACE;
 
                 if (z != CHUNK_WIDTH - 1 ? blocks[x][y][z + 1].ID != 0
                     : frontChunk         ? frontChunk->blocks[x][y][0].ID != 0
                                          : false)
                     newFaces &= ~FRONT_FACE;
-                if (z != 0      ? blocks[x][y][z - 1].ID != 0
-                    : backChunk ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].ID != 0
-                                : false)
+                if (z != 0 ? blocks[x][y][z - 1].ID != 0
+                    : backChunk
+                        ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].ID != 0
+                        : false)
                     newFaces &= ~BACK_FACE;
 
                 if (y != CHUNK_HEIGHT - 1 && blocks[x][y + 1][z].ID != 0)
@@ -136,10 +158,12 @@ void Chunk::updateBlocks(const Chunk *leftChunk, const Chunk *rightChunk, const 
             }
 }
 
-void Chunk::updateSide(const Side side, const Chunk *leftChunk, const Chunk *rightChunk,
-                       const Chunk *frontChunk, const Chunk *backChunk) {
-    bool isXVar =
-        (side == front || side == back) ? true : false; // checks if X or Z is the variable
+void Chunk::updateSide(const Side side, const Chunk *leftChunk,
+                       const Chunk *rightChunk, const Chunk *frontChunk,
+                       const Chunk *backChunk) {
+    bool isXVar = (side == front || side == back)
+                      ? true
+                      : false; // checks if X or Z is the variable
 
     int x = (side == right) ? CHUNK_WIDTH - 1 : 0;
     int z = (side == front) ? CHUNK_WIDTH - 1 : 0;
@@ -186,8 +210,10 @@ void Chunk::updateSide(const Side side, const Chunk *leftChunk, const Chunk *rig
 }
 
 glm::vec3 Chunk::chunkOffSet(glm::vec3 position) {
-    int offsetX = static_cast<int>(std::floor(position.x / static_cast<float>(CHUNK_WIDTH)));
-    int offsetZ = static_cast<int>(std::floor(position.z / static_cast<float>(CHUNK_WIDTH)));
+    int offsetX = static_cast<int>(
+        std::floor(position.x / static_cast<float>(CHUNK_WIDTH)));
+    int offsetZ = static_cast<int>(
+        std::floor(position.z / static_cast<float>(CHUNK_WIDTH)));
 
     return glm::vec3(offsetX, 0, offsetZ);
 }
