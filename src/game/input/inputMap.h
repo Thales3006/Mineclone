@@ -14,6 +14,16 @@ enum Action {
     DestroyBlock,
     PlaceBlock,
 
+    HotbarSlot1,
+    HotbarSlot2,
+    HotbarSlot3,
+    HotbarSlot4,
+    HotbarSlot5,
+    HotbarSlot6,
+    HotbarSlot7,
+    HotbarSlot8,
+    HotbarSlot9,
+
     Fullscreen,
     IncreaseFOV,
     DecreaseFOV,

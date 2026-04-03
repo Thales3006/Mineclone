@@ -161,8 +161,36 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
                                   glm::floor(player.position))) {
             world->getChunkManager()->setBlock(player.chunkx, player.chunkz,
                                                initial_pos + dir * i,
-                                               Block(7, true));
+                                               Block(player.hotbarIndex, true));
         }
+        break;
+
+    case HotbarSlot1:
+        player.hotbarIndex = 1;
+        break;
+    case HotbarSlot2:
+        player.hotbarIndex = 2;
+        break;
+    case HotbarSlot3:
+        player.hotbarIndex = 3;
+        break;
+    case HotbarSlot4:
+        player.hotbarIndex = 4;
+        break;
+    case HotbarSlot5:
+        player.hotbarIndex = 5;
+        break;
+    case HotbarSlot6:
+        player.hotbarIndex = 6;
+        break;
+    case HotbarSlot7:
+        player.hotbarIndex = 7;
+        break;
+    case HotbarSlot8:
+        player.hotbarIndex = 8;
+        break;
+    case HotbarSlot9:
+        player.hotbarIndex = 9;
         break;
     default:
         break;

@@ -14,6 +14,8 @@ class Player : public Entity {
     Player(glm::vec3 pos, glm::vec3 siz);
 
     void updatePlayer(ChunkManager &chunkManager, float deltaTime);
+
+    int hotbarIndex;
 };
 
 #endif
