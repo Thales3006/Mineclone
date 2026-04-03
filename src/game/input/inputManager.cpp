@@ -84,19 +84,25 @@ void InputManager::handleKeyboardCallback(GLFWwindow *window, int key, int scanc
         break;
     }
 }
+
 void InputManager::handleMouseMovementCallback(double xoffset, double yoffset) {
     Player &player = world->getEntityManager()->player;
-
     float rotX = -xoffset * sensibility;
     float rotY = yoffset * sensibility;
 
     glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), rotX, glm::vec3(0, 1, 0));
     player.direction = glm::vec3(rotMat * glm::vec4(player.direction, 0.0f));
 
-    glm::vec3 right = glm::normalize(glm::cross(player.direction, glm::vec3(0, 1, 0)));
-    rotMat = glm::rotate(glm::mat4(1.0f), rotY, right);
+    float currentPitch = asin(player.direction.y);
+    float maxPitch = glm::radians(89.9f);
+    float newPitch = currentPitch + rotY;
 
-    player.direction = glm::vec3(rotMat * glm::vec4(player.direction, 0.0f));
+    if (newPitch > -maxPitch && newPitch < maxPitch) {
+        glm::vec3 right = glm::normalize(glm::cross(player.direction, glm::vec3(0, 1, 0)));
+        rotMat = glm::rotate(glm::mat4(1.0f), rotY, right);
+        player.direction = glm::vec3(rotMat * glm::vec4(player.direction, 0.0f));
+    }
+
     player.direction = glm::normalize(player.direction);
 }
 
