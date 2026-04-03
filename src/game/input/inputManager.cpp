@@ -103,34 +103,37 @@ void InputManager::handleMouseMovementCallback(double xoffset, double yoffset) {
 void InputManager::handleMouseClickCallback(GLFWwindow *window, int button, int action, int mods) {
     Player &player = world->getEntityManager()->player;
 
+    glm::vec3 initial_pos = player.position + player.size * glm::vec3(1.0f, 0.9f, 1.0f);
+
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         glm::vec3 dir = glm::normalize(player.direction);
         glm::vec3 i = glm::vec3(0);
         while (world->getChunkManager()
-                   ->getBlock(player.chunkx, player.chunkz, player.position + dir * i)
+                   ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
                    .ID == 0) {
             if (i.x > 6)
                 return;
-            i += glm::vec3(1);
+            i += glm::vec3(0.25);
         }
-        world->getChunkManager()->setBlock(player.chunkx, player.chunkz, player.position + dir * i,
+        world->getChunkManager()->setBlock(player.chunkx, player.chunkz, initial_pos + dir * i,
                                            Block());
     } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         glm::vec3 dir = glm::normalize(player.direction);
         glm::vec3 i = glm::vec3(0);
         while (world->getChunkManager()
-                   ->getBlock(player.chunkx, player.chunkz, player.position + dir * i)
+                   ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
                    .ID == 0) {
             if (i.x > 6)
                 return;
-            i += glm::vec3(1);
+            i += glm::vec3(0.25);
         }
-        i -= glm::vec3(1);
+        i -= glm::vec3(0.25);
 
         if (!Entity::colision(
-                player.position + dir * i, glm::vec3(0, 0, 0), glm::floor(player.position),
-                glm::ceil(player.position + player.size) - glm::floor(player.position)))
-            world->getChunkManager()->setBlock(player.chunkx, player.chunkz,
-                                               player.position + dir * i, Block(1, true));
+                initial_pos + dir * i, glm::vec3(0, 0, 0), glm::floor(player.position),
+                glm::ceil(player.position + player.size) - glm::floor(player.position))) {
+            world->getChunkManager()->setBlock(player.chunkx, player.chunkz, initial_pos + dir * i,
+                                               Block(1, true));
+        }
     }
 }
