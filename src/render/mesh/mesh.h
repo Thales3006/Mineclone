@@ -1,8 +1,8 @@
 #ifndef MESH_CLASS_H
 #define MESH_CLASS_H
 
-#include "shader.h"
-#include "texture.h"
+#include "render/shader.h"
+#include "render/texture.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -25,20 +25,20 @@ class Mesh {
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
          std::vector<Texture> textures);
     Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures);
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 
     ~Mesh();
 
-    void draw(Shader &shader);
-
-    void setupMesh();
-    bool isSetup = false; // temporary fix for big threading problem
+    virtual void render(Shader &shader, int chunkx, int chunkz);
 
     Mesh(const Mesh &other) = delete;
     Mesh &operator=(const Mesh &other) = delete;
 
+  protected:
+    void draw(Shader &shader);
+
   private:
     unsigned int VAO, VBO, EBO;
+    void setupMesh();
 };
 
 #endif

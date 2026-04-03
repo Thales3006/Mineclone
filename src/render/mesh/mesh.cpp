@@ -1,17 +1,16 @@
-#include "render/mesh.h"
+#include "render/mesh/mesh.h"
 
 #include "render/renderLib.h"
 #include <iostream>
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
            std::vector<Texture> textures)
-    : VAO(0), VBO(0), EBO(0), vertices(vertices), indices(indices), textures(textures) {}
+    : VAO(0), VBO(0), EBO(0), vertices(vertices), indices(indices), textures(textures) {
+    setupMesh();
+}
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures)
     : Mesh(vertices, std::vector<unsigned int>(), textures) {}
-
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
-    : Mesh(vertices, indices, std::vector<Texture>()) {}
 
 void Mesh::setupMesh() {
     if (vertices.empty())
@@ -54,7 +53,6 @@ void Mesh::setupMesh() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    isSetup = true;
 }
 
 void Mesh::draw(Shader &shader) {
@@ -89,6 +87,8 @@ void Mesh::draw(Shader &shader) {
 
     glBindVertexArray(0);
 }
+
+void Mesh::render(Shader &shader, int chunkx, int chunkz) { draw(shader); }
 
 Mesh::~Mesh() {
     if (VAO)
