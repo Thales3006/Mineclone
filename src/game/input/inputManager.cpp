@@ -62,6 +62,9 @@ void InputManager::handleKeyboardCallback(GLFWwindow *window, int key, int scanc
         }
     }
 
+    if (keyAction != GLFW_PRESS) {
+        return;
+    }
     static bool fullScreen = false;
     const GLFWvidmode *mode = glfwGetVideoMode(windowManager->getMonitor());
 
@@ -109,7 +112,7 @@ void InputManager::handleMouseMovementCallback(double xoffset, double yoffset) {
 void InputManager::handleMouseClickCallback(GLFWwindow *window, int button, int action, int mods) {
     Player &player = world->getEntityManager()->player;
 
-    glm::vec3 initial_pos = player.position + player.size * glm::vec3(1.0f, 0.9f, 1.0f);
+    glm::vec3 initial_pos = player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         glm::vec3 dir = glm::normalize(player.direction);

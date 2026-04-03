@@ -44,6 +44,7 @@ void RenderManager::renderFrame() {
     camera.position =
         player.position + glm::vec3(player.size.x / 2, player.size.y * 0.9, player.size.z / 2);
     camera.direction = player.direction;
+
     float ratio = static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
     shaders[0].setMat4("projection", camera.getMatrixProjection(ratio));
     shaders[0].setMat4("view", camera.getMatrixView());

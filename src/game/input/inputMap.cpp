@@ -6,6 +6,7 @@ InputMap::InputMap() {
     setInput(MoveLeft, GLFW_KEY_A);
     setInput(MoveRight, GLFW_KEY_D);
     setInput(Jump, GLFW_KEY_SPACE);
+    setInput(Fullscreen, GLFW_KEY_F11);
     setInput(IncreaseFOV, GLFW_KEY_Z);
     setInput(DecreaseFOV, GLFW_KEY_X);
 }
