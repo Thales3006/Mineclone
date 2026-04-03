@@ -64,35 +64,10 @@ void InputManager::handleKeyboardCallback(GLFWwindow *window, int key,
     if (Action action = inputMap.getInput(key); action != None) {
         if (keyAction == GLFW_PRESS) {
             activeActions.insert(action);
+            handleSingleAction(window, action);
         } else if (keyAction == GLFW_RELEASE) {
             activeActions.erase(action);
         }
-    }
-
-    if (keyAction != GLFW_PRESS) {
-        return;
-    }
-    static bool fullScreen = false;
-    const GLFWvidmode *mode = glfwGetVideoMode(windowManager->getMonitor());
-
-    switch (inputMap.getInput(key)) {
-
-    case Fullscreen:
-        if (!fullScreen) {
-            glfwSetWindowMonitor(window, windowManager->getMonitor(), 0, 0,
-                                 mode->width, mode->height, mode->refreshRate);
-            glViewport(0, 0, mode->width, mode->height);
-            fullScreen = true;
-        } else {
-            glfwSetWindowMonitor(window, 0, mode->width / 2 - 1200 / 2,
-                                 mode->height / 2 - 600 / 2, 1200, 600,
-                                 mode->refreshRate);
-            glViewport(0, 0, 1200, 600);
-            fullScreen = false;
-        }
-        break;
-    default:
-        break;
     }
 }
 
@@ -120,15 +95,44 @@ void InputManager::handleMouseMovementCallback(double xoffset, double yoffset) {
 }
 
 void InputManager::handleMouseClickCallback(GLFWwindow *window, int button,
-                                            int action, int mods) {
-    Player &player = world->getEntityManager()->player;
+                                            int mouseAction, int mods) {
+    if (Action action = inputMap.getInput(button); action != None) {
+        if (mouseAction == GLFW_PRESS) {
+            activeActions.insert(action);
+            handleSingleAction(window, action);
+        } else if (mouseAction == GLFW_RELEASE) {
+            activeActions.erase(action);
+        }
+    }
+}
 
+void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
+    static bool fullScreen = false;
+    const GLFWvidmode *mode = glfwGetVideoMode(windowManager->getMonitor());
+
+    Player &player = world->getEntityManager()->player;
     glm::vec3 initial_pos =
         player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
+    glm::vec3 dir = glm::normalize(player.direction);
+    glm::vec3 i = glm::vec3(0);
 
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        glm::vec3 dir = glm::normalize(player.direction);
-        glm::vec3 i = glm::vec3(0);
+    switch (action) {
+
+    case Fullscreen:
+        if (!fullScreen) {
+            glfwSetWindowMonitor(window, windowManager->getMonitor(), 0, 0,
+                                 mode->width, mode->height, mode->refreshRate);
+            glViewport(0, 0, mode->width, mode->height);
+            fullScreen = true;
+        } else {
+            glfwSetWindowMonitor(window, 0, mode->width / 2 - 1200 / 2,
+                                 mode->height / 2 - 600 / 2, 1200, 600,
+                                 mode->refreshRate);
+            glViewport(0, 0, 1200, 600);
+            fullScreen = false;
+        }
+        break;
+    case DestroyBlock:
         while (
             world->getChunkManager()
                 ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
@@ -139,9 +143,8 @@ void InputManager::handleMouseClickCallback(GLFWwindow *window, int button,
         }
         world->getChunkManager()->setBlock(player.chunkx, player.chunkz,
                                            initial_pos + dir * i, Block());
-    } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-        glm::vec3 dir = glm::normalize(player.direction);
-        glm::vec3 i = glm::vec3(0);
+        break;
+    case PlaceBlock:
         while (
             world->getChunkManager()
                 ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
@@ -160,5 +163,8 @@ void InputManager::handleMouseClickCallback(GLFWwindow *window, int button,
                                                initial_pos + dir * i,
                                                Block(7, true));
         }
+        break;
+    default:
+        break;
     }
 }

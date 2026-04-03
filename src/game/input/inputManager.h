@@ -9,11 +9,14 @@
 class InputManager {
   public:
     InputManager();
-    InputManager(World *world, WindowManager *windowManager, RenderManager *renderManager);
+    InputManager(World *world, WindowManager *windowManager,
+                 RenderManager *renderManager);
 
-    void handleMouseClickCallback(GLFWwindow *window, int button, int action, int mods);
+    void handleMouseClickCallback(GLFWwindow *window, int button, int action,
+                                  int mods);
     void handleMouseMovementCallback(double xoffset, double yoffset);
-    void handleKeyboardCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+    void handleKeyboardCallback(GLFWwindow *window, int key, int scancode,
+                                int action, int mods);
 
     void processKeyboard(float deltaTime);
 
@@ -26,6 +29,8 @@ class InputManager {
     RenderManager *renderManager;
 
     float sensibility;
+
+    void handleSingleAction(GLFWwindow *window, Action action);
 };
 
 #endif

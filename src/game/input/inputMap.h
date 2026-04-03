@@ -10,6 +10,10 @@ enum Action {
     MoveLeft,
     MoveRight,
     Jump,
+
+    DestroyBlock,
+    PlaceBlock,
+
     Fullscreen,
     IncreaseFOV,
     DecreaseFOV,
