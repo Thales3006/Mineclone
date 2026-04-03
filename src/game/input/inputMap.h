@@ -1,6 +1,7 @@
 #ifndef INPUT_MAP_CLASS
 #define INPUT_MAP_CLASS
 
+#include "render/renderLib.h"
 #include <map>
 
 enum Action {

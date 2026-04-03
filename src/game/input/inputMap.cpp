@@ -1,7 +1,5 @@
 #include "game/input/inputMap.h"
 
-#include "render/renderLib.h"
-
 InputMap::InputMap() {
     setInput(MoveFoward, GLFW_KEY_W);
     setInput(MoveBackward, GLFW_KEY_S);
