@@ -16,8 +16,6 @@ class Texture {
 
     void bind();
 
-    void changeTexture(std::string tipo, const char *imagePath);
-
     unsigned int getID();
     std::string getType();
     std::string getPath();
