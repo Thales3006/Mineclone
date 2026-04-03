@@ -15,7 +15,7 @@ RenderManager::RenderManager(WindowManager *windowManager, World *world)
     camera.setFOV(glm::radians(90.0f));
 
     textures = {Texture("texture_diffuse", "textures/container.jpg"),
-                Texture("texture_diffuse", "textures/blocks_opaque_01.png")};
+                Texture("texture_diffuse", "textures/blocks_01.png")};
 
     shaders.push_back(Shader("shaders/shader.vert", "shaders/shader.frag"));
 }
@@ -29,9 +29,13 @@ void RenderManager::initOpenGL() {
 
     glm::uvec2 windowSize = windowManager->getWindowSize();
     glViewport(0, 0, windowSize.x, windowSize.y);
+
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+
+    glDepthFunc(GL_LESS);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void RenderManager::renderFrame() {
@@ -43,10 +47,12 @@ void RenderManager::renderFrame() {
 
     Player &player = world->getEntityManager()->player;
     camera.position =
-        player.position + glm::vec3(player.size.x / 2, player.size.y * 0.9, player.size.z / 2);
+        player.position +
+        glm::vec3(player.size.x / 2, player.size.y * 0.9, player.size.z / 2);
     camera.direction = player.direction;
 
-    float ratio = static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
+    float ratio =
+        static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
     shaders[0].setMat4("projection", camera.getMatrixProjection(ratio));
     shaders[0].setMat4("view", camera.getMatrixView());
 
