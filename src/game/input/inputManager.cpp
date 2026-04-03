@@ -133,7 +133,7 @@ void InputManager::handleMouseClickCallback(GLFWwindow *window, int button, int 
                 initial_pos + dir * i, glm::vec3(0, 0, 0), glm::floor(player.position),
                 glm::ceil(player.position + player.size) - glm::floor(player.position))) {
             world->getChunkManager()->setBlock(player.chunkx, player.chunkz, initial_pos + dir * i,
-                                               Block(1, true));
+                                               Block(7, true));
         }
     }
 }
