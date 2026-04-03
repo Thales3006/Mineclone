@@ -1,9 +1,9 @@
 #ifndef CHUNK_CLASS_H
 #define CHUNK_CLASS_H
 
-#include "render/mesh.h"
 #include "world/terrain/block/block.h"
 
+#include <glm/vec3.hpp>
 #include <map>
 #include <memory>
 
@@ -18,8 +18,6 @@ class Chunk {
     int z;
     Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH];
 
-    std::unique_ptr<Mesh> mesh;
-
     Chunk();
     Chunk(int x, int z);
     Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH]);
@@ -33,9 +31,6 @@ class Chunk {
                       const Chunk *backChunk);
     void updateSide(const Side side, const Chunk *leftChunk, const Chunk *rightChunk,
                     const Chunk *frontChunk, const Chunk *backChunk);
-
-    void setMesh();
-    void renderChunk(Shader &shader, int chunkx, int chunkz, std::vector<Texture> textures);
 
     static std::unique_ptr<Chunk> generateChunk(int x, int z);
 

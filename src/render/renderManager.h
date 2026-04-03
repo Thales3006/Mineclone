@@ -3,6 +3,7 @@
 
 #include "game/windowManager.h"
 #include "render/camera.h"
+#include "render/mesh/mesh.h"
 #include "render/shader.h"
 #include "render/texture.h"
 #include "world/world.h"
@@ -13,6 +14,8 @@ class RenderManager {
     RenderManager(WindowManager *WindowManager, World *world);
 
     void initOpenGL();
+
+    void updateView();
     void renderFrame();
 
     void handleMouseMovement(double xoffset, double yoffset);
@@ -22,9 +25,12 @@ class RenderManager {
   private:
     std::vector<Texture> textures;
     std::vector<Shader> shaders;
+    std::vector<std::unique_ptr<Mesh>> meshes;
 
     WindowManager *windowManager;
     World *world;
+
+    void renderChunks(Shader &shader, int chunkx, int chunkz);
 };
 
 #endif

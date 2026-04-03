@@ -1,5 +1,6 @@
 #include "render/renderManager.h"
 
+#include "render/mesh/chunkMesh.h"
 #include "render/renderLib.h"
 
 #include <iostream>
@@ -49,5 +50,21 @@ void RenderManager::renderFrame() {
     shaders[0].setMat4("projection", camera.getMatrixProjection(ratio));
     shaders[0].setMat4("view", camera.getMatrixView());
 
-    world->getChunkManager()->renderChunks(shaders[0], player.chunkx, player.chunkz, textures);
+    renderChunks(shaders[0], player.chunkx, player.chunkz);
+}
+
+void RenderManager::renderChunks(Shader &shader, int chunkx, int chunkz) {
+    for (auto &mesh : meshes) {
+        mesh->render(shader, chunkx, chunkz);
+    }
+}
+
+void RenderManager::updateView() {
+    auto [mutex, chunks] = world->getChunkManager()->unsafe_getChunkMap();
+    std::lock_guard<std::mutex> lock(*mutex);
+
+    meshes.clear();
+    for (auto &[coord, chunk] : *chunks) {
+        meshes.push_back(ChunkMesh::fromChunk(*chunk, {textures[1]}));
+    }
 }

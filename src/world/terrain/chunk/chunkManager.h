@@ -9,10 +9,12 @@
 #include <mutex>
 #include <tuple>
 
+using chunk_map = std::map<std::tuple<int, int>, std::unique_ptr<Chunk>>;
+
 class ChunkManager {
   public:
     std::mutex chunks_mutex;
-    std::map<std::tuple<int, int>, std::unique_ptr<Chunk>> chunks;
+    chunk_map chunks;
 
     ChunkManager();
 
@@ -22,9 +24,9 @@ class ChunkManager {
     void setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block);
     Block getBlock(int chunkx, int chunkz, glm::vec3 pos);
 
-    void renderChunks(Shader &shader, int chunkx, int chunkz, std::vector<Texture> textures);
-
     void fillChunkRadius(int radius, int chunkx, int chunkz);
+
+    std::pair<std::mutex *, chunk_map *> unsafe_getChunkMap();
 
     void updateChunks();
 

@@ -29,6 +29,7 @@ void Game::run() {
         inputManager.processKeyboard(deltaTime);
 
         world.updateTick(deltaTime);
+        renderManager.updateView();
         renderManager.renderFrame();
 
         // std::cout << "FPS: "<< 1/deltaTime <<" \n";

@@ -61,7 +61,6 @@ void ChunkManager::updateChunk(Chunk &chunk) {
     Chunk *backChunk = getChunkPtr(chunk.x, chunk.z - 1);
 
     chunk.updateBlocks(leftChunk, rightChunk, frontChunk, backChunk);
-    chunk.setMesh();
 }
 
 void ChunkManager::updateChunks() {
@@ -92,13 +91,11 @@ void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
         chunk.updateBlock(x + 1, y, z, leftChunk, rightChunk, frontChunk, backChunk);
     else if (rightChunk) {
         updateBlock(*rightChunk, 0, y, z);
-        rightChunk->setMesh();
     }
     if (x - 1 >= 0)
         chunk.updateBlock(x - 1, y, z, leftChunk, rightChunk, frontChunk, backChunk);
     else if (leftChunk) {
         updateBlock(*leftChunk, CHUNK_WIDTH - 1, y, z);
-        leftChunk->setMesh();
     }
 
     if (y + 1 < CHUNK_WIDTH)
@@ -110,15 +107,12 @@ void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
         chunk.updateBlock(x, y, z + 1, leftChunk, rightChunk, frontChunk, backChunk);
     else if (frontChunk) {
         updateBlock(*frontChunk, x, y, 0);
-        frontChunk->setMesh();
     }
     if (z - 1 >= 0)
         chunk.updateBlock(x, y, z - 1, leftChunk, rightChunk, frontChunk, backChunk);
     else if (backChunk) {
         updateBlock(*backChunk, x, y, CHUNK_WIDTH - 1);
-        backChunk->setMesh();
     }
-    chunk.setMesh();
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block block) {
@@ -163,15 +157,6 @@ Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos) {
         return Block();
 
     return chunks[{chunkx, chunkz}]->blocks[int(pos.x)][int(pos.y)][int(pos.z)];
-}
-
-void ChunkManager::renderChunks(Shader &shader, int chunkx, int chunkz,
-                                std::vector<Texture> textures) {
-    std::lock_guard<std::mutex> lock(chunks_mutex);
-
-    for (auto &[coord, chunk] : chunks) {
-        chunk->renderChunk(shader, chunkx, chunkz, textures);
-    }
 }
 
 void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
@@ -236,4 +221,8 @@ bool ChunkManager::isEmpty(int x, int z) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
     return getChunkPtr(x, z) == nullptr;
+}
+
+std::pair<std::mutex *, chunk_map *> ChunkManager::unsafe_getChunkMap() {
+    return std::make_pair(&chunks_mutex, &chunks);
 }
