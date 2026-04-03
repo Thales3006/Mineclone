@@ -5,13 +5,10 @@
 Game::Game() : world(42) {
     windowManager.createWindow(this);
     renderManager = RenderManager(&windowManager, &world);
+    inputManager = InputManager(&world, &windowManager, &renderManager);
 
     deltaTime = 0;
     glfwSetTime(0);
-
-    Player &player = world.getEntityManager()->player;
-    world.getChunkManager()->fillChunkRadius(6, player.chunkx, player.chunkz);
-    sensibility = 0.005f;
 }
 
 void Game::autoLoadChunks() {
@@ -28,6 +25,8 @@ void Game::run() {
     while (!glfwWindowShouldClose(windowManager.getWindow())) {
         deltaTime = glfwGetTime();
         glfwSetTime(0);
+
+        inputManager.processKeyboard(deltaTime);
 
         world.updateTick(deltaTime);
         renderManager.renderFrame();

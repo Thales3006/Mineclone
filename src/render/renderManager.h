@@ -17,9 +17,9 @@ class RenderManager {
 
     void handleMouseMovement(double xoffset, double yoffset);
 
-  private:
     Camera camera;
 
+  private:
     std::vector<Texture> textures;
     std::vector<Shader> shaders;
 

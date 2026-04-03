@@ -1,4 +1,4 @@
-#include "game/inputMap.h"
+#include "game/input/inputMap.h"
 
 #include "render/renderLib.h"
 
@@ -8,6 +8,8 @@ InputMap::InputMap() {
     setInput(MoveLeft, GLFW_KEY_A);
     setInput(MoveRight, GLFW_KEY_D);
     setInput(Jump, GLFW_KEY_SPACE);
+    setInput(IncreaseFOV, GLFW_KEY_Z);
+    setInput(DecreaseFOV, GLFW_KEY_X);
 }
 
 void InputMap::setInput(Action action, int key) {

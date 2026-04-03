@@ -3,7 +3,17 @@
 
 #include <map>
 
-enum Action { MoveFoward, MoveBackward, MoveLeft, MoveRight, Jump, None };
+enum Action {
+    MoveFoward,
+    MoveBackward,
+    MoveLeft,
+    MoveRight,
+    Jump,
+    Fullscreen,
+    IncreaseFOV,
+    DecreaseFOV,
+    None,
+};
 
 class InputMap {
   public:
