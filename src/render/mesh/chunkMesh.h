@@ -7,11 +7,14 @@
 class ChunkMesh : public Mesh {
   public:
     ChunkMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-              std::vector<Texture> textures, int x, int z);
+              std::vector<std::shared_ptr<Texture>> textures,
+              std::shared_ptr<Shader> shader, int x, int z);
 
-    static std::unique_ptr<ChunkMesh> fromChunk(Chunk &chunk, std::vector<Texture> textures);
+    static std::unique_ptr<ChunkMesh>
+    fromChunk(Chunk &chunk, std::vector<std::shared_ptr<Texture>> textures,
+              std::shared_ptr<Shader> shader);
 
-    void render(Shader &shader, int chunkx, int chunkz) override;
+    void render(int chunkx, int chunkz) override;
 
   private:
     int x, z;

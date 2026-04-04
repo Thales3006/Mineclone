@@ -23,14 +23,14 @@ class RenderManager {
     Camera camera;
 
   private:
-    std::vector<Texture> textures;
-    std::vector<Shader> shaders;
+    std::vector<std::shared_ptr<Texture>> textures;
+    std::vector<std::shared_ptr<Shader>> shaders;
     std::vector<std::unique_ptr<Mesh>> meshes;
 
     WindowManager *windowManager;
     World *world;
 
-    void renderChunks(Shader &shader, int chunkx, int chunkz);
+    void renderChunks(int chunkx, int chunkz);
 };
 
 #endif

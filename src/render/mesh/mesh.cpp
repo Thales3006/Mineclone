@@ -4,13 +4,17 @@
 #include <iostream>
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-           std::vector<Texture> textures)
-    : VAO(0), VBO(0), EBO(0), vertices(vertices), indices(indices), textures(textures) {
+           std::vector<std::shared_ptr<Texture>> textures,
+           std::shared_ptr<Shader> shader)
+    : VAO(0), VBO(0), EBO(0), vertices(vertices), indices(indices),
+      textures(textures), shader(shader) {
     setupMesh();
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<Texture> textures)
-    : Mesh(vertices, std::vector<unsigned int>(), textures) {}
+Mesh::Mesh(std::vector<Vertex> vertices,
+           std::vector<std::shared_ptr<Texture>> textures,
+           std::shared_ptr<Shader> shader)
+    : Mesh(vertices, std::vector<unsigned int>(), textures, shader) {}
 
 void Mesh::setupMesh() {
     if (vertices.empty())
@@ -26,12 +30,13 @@ void Mesh::setupMesh() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
+                 vertices.data(), GL_STATIC_DRAW);
 
     if (!indices.empty()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(),
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     indices.size() * sizeof(unsigned int), indices.data(),
                      GL_STATIC_DRAW);
     }
 
@@ -47,7 +52,8 @@ void Mesh::setupMesh() {
                           (void *)offsetof(Vertex, texCoords));
 
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, ID));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void *)offsetof(Vertex, ID));
 
     // zerando
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -55,13 +61,13 @@ void Mesh::setupMesh() {
     glBindVertexArray(0);
 }
 
-void Mesh::draw(Shader &shader) {
+void Mesh::draw() {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
 
     for (unsigned int i = 0; i < textures.size(); i++) {
         std::string number;
-        std::string name = textures[i].getType();
+        std::string name = textures[i]->getType();
 
         glActiveTexture(GL_TEXTURE0 + i);
 
@@ -72,23 +78,24 @@ void Mesh::draw(Shader &shader) {
         else
             std::cout << "Texture not identified" << std::endl;
 
-        shader.setInt((name + number).c_str(), i);
-        textures[i].bind();
+        shader->setInt((name + number).c_str(), i);
+        textures[i]->bind();
     }
     glActiveTexture(GL_TEXTURE0);
 
-    shader.use();
+    shader->use();
     glBindVertexArray(VAO);
     if (!indices.empty()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     }
-    !indices.empty() ? glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0)
-                     : glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    !indices.empty()
+        ? glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0)
+        : glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
     glBindVertexArray(0);
 }
 
-void Mesh::render(Shader &shader, int chunkx, int chunkz) { draw(shader); }
+void Mesh::render(int chunkx, int chunkz) { draw(); }
 
 Mesh::~Mesh() {
     if (VAO)

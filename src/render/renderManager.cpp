@@ -14,10 +14,12 @@ RenderManager::RenderManager(WindowManager *windowManager, World *world)
     camera.setMinMax(0.01f, 400.0f);
     camera.setFOV(glm::radians(90.0f));
 
-    textures = {Texture("texture_diffuse", "textures/container.jpg"),
-                Texture("texture_diffuse", "textures/blocks_01.png")};
+    textures = {
+        std::make_shared<Texture>("texture_diffuse", "textures/container.jpg"),
+        std::make_shared<Texture>("texture_diffuse", "textures/blocks_01.png")};
 
-    shaders.push_back(Shader("shaders/shader.vert", "shaders/shader.frag"));
+    shaders.push_back(
+        std::make_shared<Shader>("shaders/shader.vert", "shaders/shader.frag"));
 }
 
 void RenderManager::initOpenGL() {
@@ -53,15 +55,15 @@ void RenderManager::renderFrame() {
 
     float ratio =
         static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
-    shaders[0].setMat4("projection", camera.getMatrixProjection(ratio));
-    shaders[0].setMat4("view", camera.getMatrixView());
+    shaders[0]->setMat4("projection", camera.getMatrixProjection(ratio));
+    shaders[0]->setMat4("view", camera.getMatrixView());
 
-    renderChunks(shaders[0], player.chunkx, player.chunkz);
+    renderChunks(player.chunkx, player.chunkz);
 }
 
-void RenderManager::renderChunks(Shader &shader, int chunkx, int chunkz) {
+void RenderManager::renderChunks(int chunkx, int chunkz) {
     for (auto &mesh : meshes) {
-        mesh->render(shader, chunkx, chunkz);
+        mesh->render(chunkx, chunkz);
     }
 }
 
@@ -71,6 +73,7 @@ void RenderManager::updateView() {
 
     meshes.clear();
     for (auto &[coord, chunk] : *chunks) {
-        meshes.push_back(ChunkMesh::fromChunk(*chunk, {textures[1]}));
+        meshes.push_back(
+            ChunkMesh::fromChunk(*chunk, {textures[1]}, shaders[0]));
     }
 }
