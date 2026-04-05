@@ -174,13 +174,13 @@ generateChunkMesh(Chunk &chunk, std::vector<std::shared_ptr<Texture>> textures,
     return Mesh<TerrainVertex>(drawableFaces, indices, textures, shader);
 }
 
-ChunkMesh::ChunkMesh(Chunk &chunk,
+ChunkView::ChunkView(Chunk &chunk,
                      std::vector<std::shared_ptr<Texture>> textures,
                      std::shared_ptr<Shader> shader)
     : x(chunk.x), z(chunk.z), mesh(generateChunkMesh(chunk, textures, shader)) {
 }
 
-void ChunkMesh::render(int chunkx, int chunkz) {
+void ChunkView::render(int chunkx, int chunkz) {
     mesh.shader->setMat4(
         "model",
         glm::translate(glm::mat4(1.0f), glm::vec3((x - chunkx) * CHUNK_WIDTH, 0,

@@ -4,9 +4,9 @@
 #include "render/mesh/mesh.h"
 #include "world/terrain/chunk/chunk.h"
 
-class ChunkMesh {
+class ChunkView {
   public:
-    ChunkMesh(Chunk &chunk, std::vector<std::shared_ptr<Texture>> textures,
+    ChunkView(Chunk &chunk, std::vector<std::shared_ptr<Texture>> textures,
               std::shared_ptr<Shader> shader);
 
     void render(int chunkx, int chunkz);

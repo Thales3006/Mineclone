@@ -26,7 +26,8 @@ class RenderManager {
   private:
     std::map<std::string, std::shared_ptr<Texture>> textures;
     std::map<std::string, std::shared_ptr<Shader>> shaders;
-    std::vector<std::unique_ptr<ChunkMesh>> meshes;
+
+    std::vector<std::unique_ptr<ChunkView>> chunkViews;
 
     WindowManager *windowManager;
     World *world;

@@ -67,8 +67,8 @@ void RenderManager::renderFrame() {
 }
 
 void RenderManager::renderChunks(int chunkx, int chunkz) {
-    for (auto &mesh : meshes) {
-        mesh->render(chunkx, chunkz);
+    for (auto &chunkView : chunkViews) {
+        chunkView->render(chunkx, chunkz);
     }
 }
 
@@ -76,9 +76,9 @@ void RenderManager::updateView() {
     auto [mutex, chunks] = world->getChunkManager()->unsafe_getChunkMap();
     std::lock_guard<std::mutex> lock(*mutex);
 
-    meshes.clear();
+    chunkViews.clear();
     for (auto &[coord, chunk] : *chunks) {
-        meshes.push_back(std::make_unique<ChunkMesh>(
+        chunkViews.push_back(std::make_unique<ChunkView>(
             *chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
     }
 }
