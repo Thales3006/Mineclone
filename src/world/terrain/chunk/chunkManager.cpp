@@ -80,6 +80,7 @@ void ChunkManager::updateBlock(Chunk &chunk, int x, int y, int z) {
     Chunk *backChunk = getChunkPtr(chunk.x, chunk.z - 1);
 
     chunk.updateBlock(x, y, z, leftChunk, rightChunk, frontChunk, backChunk);
+    onChunkUpdated(chunks[{chunk.x, chunk.z}]);
 }
 
 void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
@@ -122,6 +123,8 @@ void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
     else if (backChunk) {
         updateBlock(*backChunk, x, y, CHUNK_WIDTH - 1);
     }
+
+    onChunkUpdated(chunks[{chunk.x, chunk.z}]);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
@@ -134,8 +137,6 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
     auto chunk = chunks[{chunkx, chunkz}];
     chunk->setBlock(x, y, z, block);
     updateRegion(*chunk, x, y, z);
-
-    onChunkUpdated(chunk);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
