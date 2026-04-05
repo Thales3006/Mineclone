@@ -88,38 +88,46 @@ void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
     chunk.updateBlock(x, y, z, leftChunk, rightChunk, frontChunk, backChunk);
 
     if (x + 1 < CHUNK_WIDTH)
-        chunk.updateBlock(x + 1, y, z, leftChunk, rightChunk, frontChunk, backChunk);
+        chunk.updateBlock(x + 1, y, z, leftChunk, rightChunk, frontChunk,
+                          backChunk);
     else if (rightChunk) {
         updateBlock(*rightChunk, 0, y, z);
     }
     if (x - 1 >= 0)
-        chunk.updateBlock(x - 1, y, z, leftChunk, rightChunk, frontChunk, backChunk);
+        chunk.updateBlock(x - 1, y, z, leftChunk, rightChunk, frontChunk,
+                          backChunk);
     else if (leftChunk) {
         updateBlock(*leftChunk, CHUNK_WIDTH - 1, y, z);
     }
 
-    if (y + 1 < CHUNK_WIDTH)
-        chunk.updateBlock(x, y + 1, z, leftChunk, rightChunk, frontChunk, backChunk);
+    if (y + 1 < CHUNK_HEIGHT)
+        chunk.updateBlock(x, y + 1, z, leftChunk, rightChunk, frontChunk,
+                          backChunk);
     if (y - 1 >= 0)
-        chunk.updateBlock(x, y - 1, z, leftChunk, rightChunk, frontChunk, backChunk);
+        chunk.updateBlock(x, y - 1, z, leftChunk, rightChunk, frontChunk,
+                          backChunk);
 
     if (z + 1 < CHUNK_WIDTH)
-        chunk.updateBlock(x, y, z + 1, leftChunk, rightChunk, frontChunk, backChunk);
+        chunk.updateBlock(x, y, z + 1, leftChunk, rightChunk, frontChunk,
+                          backChunk);
     else if (frontChunk) {
         updateBlock(*frontChunk, x, y, 0);
     }
     if (z - 1 >= 0)
-        chunk.updateBlock(x, y, z - 1, leftChunk, rightChunk, frontChunk, backChunk);
+        chunk.updateBlock(x, y, z - 1, leftChunk, rightChunk, frontChunk,
+                          backChunk);
     else if (backChunk) {
         updateBlock(*backChunk, x, y, CHUNK_WIDTH - 1);
     }
 }
 
-void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block block) {
+void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
+                            Block block) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
-    if ((chunks.find({chunkx, chunkz}) == chunks.end()) || (x < 0 || x >= CHUNK_WIDTH) ||
-        (y < 0 || y >= CHUNK_HEIGHT) || (z < 0 || z >= CHUNK_WIDTH))
+    if ((chunks.find({chunkx, chunkz}) == chunks.end()) ||
+        (x < 0 || x >= CHUNK_WIDTH) || (y < 0 || y >= CHUNK_HEIGHT) ||
+        (z < 0 || z >= CHUNK_WIDTH))
         return;
 
     Chunk &chunk = *chunks[{chunkx, chunkz}];
@@ -128,7 +136,8 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z, Block b
     updateRegion(chunk, x, y, z);
 }
 
-void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block) {
+void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
+                            Block block) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
     glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
@@ -170,8 +179,8 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
             int x = std::get<0>(coord);
             int z = std::get<1>(coord);
 
-            if (x < -radius + chunkx || x > radius + chunkx || z < -radius + chunkz ||
-                z > radius + chunkz) {
+            if (x < -radius + chunkx || x > radius + chunkx ||
+                z < -radius + chunkz || z > radius + chunkz) {
                 to_delete.push_back(coord);
             }
         }
