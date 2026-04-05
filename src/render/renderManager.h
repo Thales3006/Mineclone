@@ -23,8 +23,8 @@ class RenderManager {
     Camera camera;
 
   private:
-    std::vector<std::shared_ptr<Texture>> textures;
-    std::vector<std::shared_ptr<Shader>> shaders;
+    std::map<std::string, std::shared_ptr<Texture>> textures;
+    std::map<std::string, std::shared_ptr<Shader>> shaders;
     std::vector<std::unique_ptr<Mesh>> meshes;
 
     WindowManager *windowManager;

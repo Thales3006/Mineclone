@@ -15,11 +15,16 @@ RenderManager::RenderManager(WindowManager *windowManager, World *world)
     camera.setFOV(glm::radians(90.0f));
 
     textures = {
-        std::make_shared<Texture>("texture_diffuse", "textures/container.jpg"),
-        std::make_shared<Texture>("texture_diffuse", "textures/blocks_01.png")};
+        {"container_box", std::make_shared<Texture>("texture_diffuse",
+                                                    "textures/container.jpg")},
+        {"blocks", std::make_shared<Texture>("texture_diffuse",
+                                             "textures/blocks_01.png")},
+    };
 
-    shaders.push_back(
-        std::make_shared<Shader>("shaders/shader.vert", "shaders/shader.frag"));
+    shaders = {
+        {"terrain", std::make_shared<Shader>("shaders/shader.vert",
+                                             "shaders/shader.frag")},
+    };
 }
 
 void RenderManager::initOpenGL() {
@@ -34,10 +39,12 @@ void RenderManager::initOpenGL() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
 
     glDepthFunc(GL_LESS);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // No translucent blocks yet
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void RenderManager::renderFrame() {
@@ -73,7 +80,7 @@ void RenderManager::updateView() {
 
     meshes.clear();
     for (auto &[coord, chunk] : *chunks) {
-        meshes.push_back(
-            ChunkMesh::fromChunk(*chunk, {textures[1]}, shaders[0]));
+        meshes.push_back(ChunkMesh::fromChunk(*chunk, {textures["blocks"]},
+                                              shaders["terrain"]));
     }
 }
