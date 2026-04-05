@@ -79,6 +79,6 @@ void RenderManager::updateView() {
     chunkViews.clear();
     for (auto &[coord, chunk] : *chunks) {
         chunkViews.push_back(std::make_unique<ChunkView>(
-            *chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
+            chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
     }
 }

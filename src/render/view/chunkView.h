@@ -6,14 +6,14 @@
 
 class ChunkView {
   public:
-    ChunkView(Chunk &chunk, std::vector<std::shared_ptr<Texture>> textures,
+    ChunkView(std::shared_ptr<Chunk> chunk,
+              std::vector<std::shared_ptr<Texture>> textures,
               std::shared_ptr<Shader> shader);
 
     void render(int chunkx, int chunkz);
     Mesh<TerrainVertex> mesh;
 
-  private:
-    int x, z;
+    std::weak_ptr<Chunk> chunk;
 };
 
 #endif
