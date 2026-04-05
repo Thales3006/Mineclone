@@ -13,7 +13,7 @@ class ChunkView {
     void render(int chunkx, int chunkz);
     Mesh<TerrainVertex> mesh;
 
-    std::weak_ptr<Chunk> chunk;
+    std::shared_ptr<Chunk> chunk;
 };
 
 #endif

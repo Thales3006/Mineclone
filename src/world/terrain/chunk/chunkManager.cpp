@@ -27,12 +27,15 @@ void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
         updateSide(back, *chunks[{x, z + 1}]);
     if (chunks.find({x, z - 1}) != chunks.end())
         updateSide(front, *chunks[{x, z - 1}]);
+
+    onChunkAdded(chunks[{x, z}]);
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
     if (chunks.find({x, z}) == chunks.end())
         return;
 
+    onChunkRemoved(chunks[{x, z}]);
     chunks.erase({x, z});
 
     if (chunks.find({x - 1, z}) != chunks.end())
@@ -124,34 +127,24 @@ void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
                             Block block) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
-
     if ((chunks.find({chunkx, chunkz}) == chunks.end()) ||
         (x < 0 || x >= CHUNK_WIDTH) || (y < 0 || y >= CHUNK_HEIGHT) ||
         (z < 0 || z >= CHUNK_WIDTH))
         return;
+    auto chunk = chunks[{chunkx, chunkz}];
+    chunk->setBlock(x, y, z, block);
+    updateRegion(*chunk, x, y, z);
 
-    Chunk &chunk = *chunks[{chunkx, chunkz}];
-
-    chunk.setBlock(x, y, z, block);
-    updateRegion(chunk, x, y, z);
+    onChunkUpdated(chunk);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
                             Block block) {
-    std::lock_guard<std::mutex> lock(chunks_mutex);
-
     glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
     pos -= chunkOffset * float(CHUNK_WIDTH);
     chunkx += chunkOffset.x;
     chunkz += chunkOffset.z;
-
-    if ((chunks.find({chunkx, chunkz}) == chunks.end()))
-        return;
-
-    Chunk &chunk = *chunks[{chunkx, chunkz}];
-
-    chunk.setBlock(pos.x, pos.y, pos.z, block);
-    updateRegion(chunk, pos.x, pos.y, pos.z);
+    setBlock(chunkx, chunkz, (int)pos.x, (int)pos.y, (int)pos.z, block);
 }
 
 Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos) {
@@ -207,17 +200,7 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
         for (auto &coord : to_delete) {
             int x = std::get<0>(coord);
             int z = std::get<1>(coord);
-
-            chunks.erase(coord);
-
-            if (chunks.find({x - 1, z}) != chunks.end())
-                updateSide(right, *chunks[{x - 1, z}]);
-            if (chunks.find({x + 1, z}) != chunks.end())
-                updateSide(left, *chunks[{x + 1, z}]);
-            if (chunks.find({x, z + 1}) != chunks.end())
-                updateSide(back, *chunks[{x, z + 1}]);
-            if (chunks.find({x, z - 1}) != chunks.end())
-                updateSide(front, *chunks[{x, z - 1}]);
+            unloadChunk(x, z);
         }
 
         for (auto &chunk : to_add_chunks) {

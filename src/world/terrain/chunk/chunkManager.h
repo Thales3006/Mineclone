@@ -7,6 +7,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <sigslot/signal.hpp>
 #include <tuple>
 
 using chunk_map = std::map<std::tuple<int, int>, std::shared_ptr<Chunk>>;
@@ -15,6 +16,10 @@ class ChunkManager {
   public:
     std::mutex chunks_mutex;
     chunk_map chunks;
+
+    sigslot::signal<std::shared_ptr<Chunk>> onChunkAdded;
+    sigslot::signal<std::shared_ptr<Chunk>> onChunkRemoved;
+    sigslot::signal<std::shared_ptr<Chunk>> onChunkUpdated;
 
     ChunkManager();
 

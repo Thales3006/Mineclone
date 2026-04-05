@@ -17,7 +17,6 @@ class RenderManager {
 
     void initOpenGL();
 
-    void updateView();
     void renderFrame();
 
     void handleMouseMovement(double xoffset, double yoffset);

@@ -2,6 +2,7 @@
 
 #include "render/renderLib.h"
 
+#include <algorithm>
 #include <iostream>
 
 RenderManager::RenderManager() {}
@@ -23,6 +24,39 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
         {"terrain", std::make_shared<Shader>("shaders/shader.vert",
                                              "shaders/shader.frag")},
     };
+
+    world->getChunkManager()->onChunkAdded.connect(
+        [&](std::shared_ptr<Chunk> chunk) {
+            chunkViews.push_back(std::make_unique<ChunkView>(
+                chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
+        });
+
+    world->getChunkManager()->onChunkRemoved.connect(
+        [&](std::shared_ptr<Chunk> chunk) {
+            auto it = std::remove_if(
+                chunkViews.begin(), chunkViews.end(),
+                [&](const std::unique_ptr<ChunkView> &chunkView) {
+                    return chunkView->chunk == chunk;
+                });
+
+            if (it != chunkViews.end()) {
+                chunkViews.erase(it, chunkViews.end());
+            }
+        });
+
+    world->getChunkManager()->onChunkUpdated.connect(
+        [&](std::shared_ptr<Chunk> chunk) {
+            auto it = std::remove_if(
+                chunkViews.begin(), chunkViews.end(),
+                [&](const std::unique_ptr<ChunkView> &chunkView) {
+                    return chunkView->chunk == chunk;
+                });
+            if (it != chunkViews.end()) {
+                chunkViews.erase(it, chunkViews.end());
+            }
+            chunkViews.push_back(std::make_unique<ChunkView>(
+                chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
+        });
 }
 
 void RenderManager::initOpenGL() {
@@ -70,16 +104,5 @@ void RenderManager::renderFrame() {
 void RenderManager::renderChunks(int chunkx, int chunkz) {
     for (auto &chunkView : chunkViews) {
         chunkView->render(chunkx, chunkz);
-    }
-}
-
-void RenderManager::updateView() {
-    auto [mutex, chunks] = world->getChunkManager()->unsafe_getChunkMap();
-    std::lock_guard<std::mutex> lock(*mutex);
-
-    chunkViews.clear();
-    for (auto &[coord, chunk] : *chunks) {
-        chunkViews.push_back(std::make_unique<ChunkView>(
-            chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
     }
 }

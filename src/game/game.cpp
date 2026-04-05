@@ -3,8 +3,9 @@
 #include <thread>
 
 Game::Game()
-    : world(std::make_shared<World>(42)),
+    : isRunning(false), world(std::make_shared<World>(42)),
       windowManager(std::make_shared<WindowManager>()) {
+
     windowManager->createWindow(this);
     renderManager = std::make_shared<RenderManager>(windowManager, world);
     inputManager =
@@ -17,13 +18,14 @@ Game::Game()
 void Game::autoLoadChunks() {
     Player &player = world->getEntityManager()->player;
     while (isRunning) {
-        world->getChunkManager()->fillChunkRadius(6, player.chunkx,
+        world->getChunkManager()->fillChunkRadius(0, player.chunkx,
                                                   player.chunkz);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
 
 void Game::run() {
+    isRunning = true;
     std::thread chunkLoader(&Game::autoLoadChunks, this);
 
     while (!glfwWindowShouldClose(windowManager->getWindow())) {
@@ -33,7 +35,6 @@ void Game::run() {
         inputManager->processKeyboard(deltaTime);
 
         world->updateTick(deltaTime);
-        renderManager->updateView();
         renderManager->renderFrame();
 
         // std::cout << "FPS: "<< 1/deltaTime <<" \n";

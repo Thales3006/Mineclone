@@ -180,14 +180,10 @@ ChunkView::ChunkView(std::shared_ptr<Chunk> chunk,
     : chunk(chunk), mesh(generateChunkMesh(*chunk, textures, shader)) {}
 
 void ChunkView::render(int chunkx, int chunkz) {
-    auto chunkPtr = chunk.lock();
-    if (!chunkPtr) {
-        return;
-    }
+    mesh.setupMesh();
     mesh.shader->setMat4(
-        "model",
-        glm::translate(glm::mat4(1.0f),
-                       glm::vec3((chunkPtr->x - chunkx) * CHUNK_WIDTH, 0,
-                                 (chunkPtr->z - chunkz) * CHUNK_WIDTH)));
+        "model", glm::translate(glm::mat4(1.0f),
+                                glm::vec3((chunk->x - chunkx) * CHUNK_WIDTH, 0,
+                                          (chunk->z - chunkz) * CHUNK_WIDTH)));
     mesh.render();
 }
