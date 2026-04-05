@@ -52,28 +52,9 @@ template <typename T> void Mesh<T>::setupMesh() {
 }
 
 template <typename T> void Mesh<T>::render() {
-    unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
-
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        std::string number;
-        std::string name = textures[i]->getType();
-
-        glActiveTexture(GL_TEXTURE0 + i);
-
-        if (name == "texture_diffuse")
-            number = std::to_string(diffuseNr++);
-        else if (name == "texture_specular")
-            number = std::to_string(specularNr++);
-        else
-            std::cout << "Texture not identified" << std::endl;
-
-        shader->setInt((name + number).c_str(), i);
-        textures[i]->bind();
-    }
-    glActiveTexture(GL_TEXTURE0);
-
     shader->use();
+    textures[0]->bind();
+
     glBindVertexArray(VAO);
     if (!indices.empty()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);

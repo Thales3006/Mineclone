@@ -14,10 +14,8 @@ RenderManager::RenderManager(WindowManager *windowManager, World *world)
     camera.setFOV(glm::radians(90.0f));
 
     textures = {
-        {"container_box", std::make_shared<Texture>("texture_diffuse",
-                                                    "textures/container.jpg")},
-        {"blocks", std::make_shared<Texture>("texture_diffuse",
-                                             "textures/blocks_01.png")},
+        {"container_box", std::make_shared<Texture>("textures/container.jpg")},
+        {"blocks", std::make_shared<Texture>("textures/blocks_01.png")},
     };
 
     shaders = {

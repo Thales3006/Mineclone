@@ -6,13 +6,12 @@
 class Texture {
   private:
     unsigned int ID;
-    std::string type;
     std::string path;
     int width, height, nrChannels;
 
   public:
     Texture();
-    Texture(std::string tipo, const char *imagePath);
+    Texture(const char *imagePath);
 
     void bind();
 

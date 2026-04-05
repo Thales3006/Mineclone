@@ -5,8 +5,7 @@ in vec2 texCoord;
 in vec3 normal;
 in float index;
 
-uniform sampler2D texture_diffuse1;
-//uniform sampler2D texture_diffuse2;
+uniform sampler2D block_texture;
 
 void main(){
     vec3 lightdir = normalize(vec3(1.0,10.0, 10.0));
@@ -23,7 +22,7 @@ void main(){
     
     if(abs(index - 3.0) < 0.001){
         if(abs(normal.y - 1.0) < 0.001){
-            FragColor = texture(texture_diffuse1, (texCoord + texOffset) * vec2(1.0/16.0)) * vec4(0.6,0.9,0.4,1.0) * vec4(light, 1.0);
+            FragColor = texture(block_texture, (texCoord + texOffset) * vec2(1.0/16.0)) * vec4(0.6,0.9,0.4,1.0) * vec4(light, 1.0);
             return;
         }
         else if(abs(normal.y + 1.0) < 0.001)
@@ -31,7 +30,7 @@ void main(){
     }
     texOffset.x += i;
 
-    FragColor = texture(texture_diffuse1, (texCoord + texOffset) * vec2(1.0/16.0)) * vec4(light, 1.0);
+    FragColor = texture(block_texture, (texCoord + texOffset) * vec2(1.0/16.0)) * vec4(light, 1.0);
 
     if (FragColor.a < 0.1) {
       discard;

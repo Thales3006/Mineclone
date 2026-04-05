@@ -7,7 +7,7 @@
 
 Texture::Texture() {}
 
-Texture::Texture(std::string tipo, const char *imagePath) {
+Texture::Texture(const char *imagePath) {
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
 
@@ -28,7 +28,6 @@ Texture::Texture(std::string tipo, const char *imagePath) {
     }
 
     path = imagePath;
-    type = tipo;
 
     stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -37,7 +36,5 @@ Texture::Texture(std::string tipo, const char *imagePath) {
 void Texture::bind() { glBindTexture(GL_TEXTURE_2D, ID); }
 
 unsigned int Texture::getID() { return ID; }
-
-std::string Texture::getType() { return type; }
 
 std::string Texture::getPath() { return path; }
