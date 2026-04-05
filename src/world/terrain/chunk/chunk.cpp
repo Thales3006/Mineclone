@@ -85,26 +85,32 @@ void Chunk::updateBlock(int x, int y, int z, const Chunk *leftChunk,
     }
 
     unsigned char newFaces = ALL_FACE;
-    if (x != CHUNK_WIDTH - 1 ? blocks[x + 1][y][z].ID != 0
-        : rightChunk         ? rightChunk->blocks[0][y][z].ID != 0
-                             : false)
+    if (x != CHUNK_WIDTH - 1 ? blocks[x + 1][y][z].solid != 0
+        : rightChunk         ? rightChunk->blocks[0][y][z].solid != 0
+                             : false) {
         newFaces &= ~RIGHT_FACE;
-    if (x != 0      ? blocks[x - 1][y][z].ID != 0
-        : leftChunk ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].ID != 0
-                    : false)
+    }
+    if (x != 0      ? blocks[x - 1][y][z].solid != 0
+        : leftChunk ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].solid != 0
+                    : false) {
         newFaces &= ~LEFT_FACE;
-    if (z != CHUNK_WIDTH - 1 ? blocks[x][y][z + 1].ID != 0
-        : frontChunk         ? frontChunk->blocks[x][y][0].ID != 0
-                             : false)
+    }
+    if (z != CHUNK_WIDTH - 1 ? blocks[x][y][z + 1].solid != 0
+        : frontChunk         ? frontChunk->blocks[x][y][0].solid != 0
+                             : false) {
         newFaces &= ~FRONT_FACE;
-    if (z != 0      ? blocks[x][y][z - 1].ID != 0
-        : backChunk ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].ID != 0
-                    : false)
+    }
+    if (z != 0      ? blocks[x][y][z - 1].solid != 0
+        : backChunk ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].solid != 0
+                    : false) {
         newFaces &= ~BACK_FACE;
-    if (y != CHUNK_HEIGHT - 1 && blocks[x][y + 1][z].ID != 0)
+    }
+    if (y != CHUNK_HEIGHT - 1 && blocks[x][y + 1][z].solid != 0) {
         newFaces &= ~UP_FACE;
-    if (y != 0 && blocks[x][y - 1][z].ID != 0)
+    }
+    if (y != 0 && blocks[x][y - 1][z].solid != 0) {
         newFaces &= ~DOWN_FACE;
+    }
 
     blocks[x][y][z].faces = newFaces;
 }

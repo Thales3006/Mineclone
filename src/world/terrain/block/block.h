@@ -8,7 +8,8 @@
 #define UP_FACE 0b00010000
 #define DOWN_FACE 0b00100000
 
-#define ALL_FACE RIGHT_FACE + LEFT_FACE + FRONT_FACE + BACK_FACE + UP_FACE + DOWN_FACE
+#define ALL_FACE                                                               \
+    RIGHT_FACE + LEFT_FACE + FRONT_FACE + BACK_FACE + UP_FACE + DOWN_FACE
 #define NO_FACE 0b00000000
 
 class Block {
