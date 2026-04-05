@@ -2,9 +2,9 @@
 
 #include "world/terrain/chunk/chunk.h"
 
-Mesh<TerrainVertex>
-generateChunkMesh(Chunk &chunk, std::vector<std::shared_ptr<Texture>> textures,
-                  std::shared_ptr<Shader> shader) {
+Mesh<TerrainVertex> generateChunkMesh(Chunk &chunk,
+                                      std::shared_ptr<Texture> texture,
+                                      std::shared_ptr<Shader> shader) {
     std::vector<TerrainVertex> drawableFaces;
     std::vector<unsigned int> indices;
 
@@ -171,13 +171,13 @@ generateChunkMesh(Chunk &chunk, std::vector<std::shared_ptr<Texture>> textures,
             }
         }
     }
-    return Mesh<TerrainVertex>(drawableFaces, indices, textures, shader);
+    return Mesh<TerrainVertex>(drawableFaces, indices, texture, shader);
 }
 
 ChunkView::ChunkView(std::shared_ptr<Chunk> chunk,
-                     std::vector<std::shared_ptr<Texture>> textures,
+                     std::shared_ptr<Texture> texture,
                      std::shared_ptr<Shader> shader)
-    : chunk(chunk), mesh(generateChunkMesh(*chunk, textures, shader)) {}
+    : chunk(chunk), mesh(generateChunkMesh(*chunk, texture, shader)) {}
 
 void ChunkView::render(int chunkx, int chunkz) {
     mesh.setupMesh();

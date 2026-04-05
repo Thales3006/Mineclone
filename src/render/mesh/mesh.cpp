@@ -4,10 +4,9 @@
 
 template <typename T>
 Mesh<T>::Mesh(std::vector<T> vertices, std::vector<unsigned int> indices,
-              std::vector<std::shared_ptr<Texture>> textures,
-              std::shared_ptr<Shader> shader)
+              std::shared_ptr<Texture> texture, std::shared_ptr<Shader> shader)
     : VAO(0), VBO(0), EBO(0), vertices(std::move(vertices)),
-      indices(std::move(indices)), textures(textures), shader(shader) {}
+      indices(std::move(indices)), texture(texture), shader(shader) {}
 
 template <typename T> void Mesh<T>::setupMesh() {
     if (VAO != 0) {
@@ -37,7 +36,7 @@ template <typename T> void Mesh<T>::setupMesh() {
 
 template <typename T> void Mesh<T>::render() {
     shader->use();
-    textures[0]->bind();
+    texture->bind();
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);

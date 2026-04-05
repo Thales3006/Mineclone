@@ -28,7 +28,7 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
     world->getChunkManager()->onChunkAdded.connect(
         [&](std::shared_ptr<Chunk> chunk) {
             chunkViews.push_back(std::make_unique<ChunkView>(
-                chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
+                chunk, textures["blocks"], shaders["terrain"]));
         });
 
     world->getChunkManager()->onChunkRemoved.connect(
@@ -55,7 +55,7 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
                 chunkViews.erase(it, chunkViews.end());
             }
             chunkViews.push_back(std::make_unique<ChunkView>(
-                chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
+                chunk, textures["blocks"], shaders["terrain"]));
         });
 }
 

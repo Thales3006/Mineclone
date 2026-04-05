@@ -6,8 +6,7 @@
 
 class ChunkView {
   public:
-    ChunkView(std::shared_ptr<Chunk> chunk,
-              std::vector<std::shared_ptr<Texture>> textures,
+    ChunkView(std::shared_ptr<Chunk> chunk, std::shared_ptr<Texture> texture,
               std::shared_ptr<Shader> shader);
 
     void render(int chunkx, int chunkz);
