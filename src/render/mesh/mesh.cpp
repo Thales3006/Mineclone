@@ -2,8 +2,6 @@
 
 #include "render/renderLib.h"
 
-#include <iostream>
-
 template <typename T>
 Mesh<T>::Mesh(std::vector<T> vertices, std::vector<unsigned int> indices,
               std::vector<std::shared_ptr<Texture>> textures,
@@ -13,35 +11,23 @@ Mesh<T>::Mesh(std::vector<T> vertices, std::vector<unsigned int> indices,
     setupMesh();
 }
 
-template <typename T>
-Mesh<T>::Mesh(std::vector<T> vertices,
-              std::vector<std::shared_ptr<Texture>> textures,
-              std::shared_ptr<Shader> shader)
-    : Mesh(vertices, std::vector<unsigned int>(), textures, shader) {}
-
 template <typename T> void Mesh<T>::setupMesh() {
     if (vertices.empty())
         return;
 
-    // criando VAO VBO EBO
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    if (!indices.empty())
-        glGenBuffers(1, &EBO);
+    glGenBuffers(1, &EBO);
 
-    // Setando os dados
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(),
                  GL_STATIC_DRAW);
 
-    if (!indices.empty()) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     indices.size() * sizeof(unsigned int), indices.data(),
-                     GL_STATIC_DRAW);
-    }
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
+                 indices.data(), GL_STATIC_DRAW);
 
     setupAttributes();
 
@@ -56,12 +42,8 @@ template <typename T> void Mesh<T>::render() {
     textures[0]->bind();
 
     glBindVertexArray(VAO);
-    if (!indices.empty()) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    }
-    !indices.empty()
-        ? glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0)
-        : glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
 }

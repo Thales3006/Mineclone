@@ -33,9 +33,6 @@ template <typename T> class Mesh {
     Mesh(std::vector<T> vertices, std::vector<unsigned int> indices,
          std::vector<std::shared_ptr<Texture>> textures,
          std::shared_ptr<Shader> shader);
-    Mesh(std::vector<T> vertices,
-         std::vector<std::shared_ptr<Texture>> textures,
-         std::shared_ptr<Shader> shader);
 
     ~Mesh();
 
