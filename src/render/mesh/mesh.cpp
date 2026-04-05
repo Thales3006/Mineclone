@@ -7,13 +7,12 @@ Mesh<T>::Mesh(std::vector<T> vertices, std::vector<unsigned int> indices,
               std::vector<std::shared_ptr<Texture>> textures,
               std::shared_ptr<Shader> shader)
     : VAO(0), VBO(0), EBO(0), vertices(std::move(vertices)),
-      indices(std::move(indices)), textures(textures), shader(shader) {
-    setupMesh();
-}
+      indices(std::move(indices)), textures(textures), shader(shader) {}
 
 template <typename T> void Mesh<T>::setupMesh() {
-    if (vertices.empty())
+    if (VAO != 0) {
         return;
+    }
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -31,7 +30,6 @@ template <typename T> void Mesh<T>::setupMesh() {
 
     setupAttributes();
 
-    // zerando
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

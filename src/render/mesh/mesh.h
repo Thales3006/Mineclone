@@ -37,13 +37,13 @@ template <typename T> class Mesh {
     ~Mesh();
 
     void render();
+    void setupMesh();
 
     Mesh(const Mesh &other) = delete;
     Mesh &operator=(const Mesh &other) = delete;
 
   private:
     unsigned int VAO, VBO, EBO;
-    void setupMesh();
     void setupAttributes();
 };
 
