@@ -25,8 +25,8 @@ Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
 
 Chunk::~Chunk() {}
 
-std::unique_ptr<Chunk> Chunk::generateChunk(int x, int z) {
-    std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>(x, z);
+std::shared_ptr<Chunk> Chunk::generateChunk(int x, int z) {
+    std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(x, z);
 
     FastNoiseLite noise;
     noise.SetSeed(42);

@@ -9,7 +9,7 @@
 #include <mutex>
 #include <tuple>
 
-using chunk_map = std::map<std::tuple<int, int>, std::unique_ptr<Chunk>>;
+using chunk_map = std::map<std::tuple<int, int>, std::shared_ptr<Chunk>>;
 
 class ChunkManager {
   public:
@@ -31,7 +31,7 @@ class ChunkManager {
     void updateChunks();
 
   private:
-    void loadChunk(std::unique_ptr<Chunk> chunk);
+    void loadChunk(std::shared_ptr<Chunk> chunk);
     void unloadChunk(int x, int z);
 
     void updateChunk(Chunk &chunk);

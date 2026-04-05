@@ -10,7 +10,7 @@ Chunk *ChunkManager::getChunkPtr(int x, int z) {
     return nullptr;
 }
 
-void ChunkManager::loadChunk(std::unique_ptr<Chunk> chunk) {
+void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
     if (chunks.find({chunk->x, chunk->z}) != chunks.end())
         return;
 
@@ -194,7 +194,7 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
         }
     }
 
-    std::vector<std::unique_ptr<Chunk>> to_add_chunks{};
+    std::vector<std::shared_ptr<Chunk>> to_add_chunks{};
     for (auto &coord : to_add) {
         int x = std::get<0>(coord);
         int z = std::get<1>(coord);

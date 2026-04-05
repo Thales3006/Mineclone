@@ -34,7 +34,7 @@ class Chunk {
                     const Chunk *rightChunk, const Chunk *frontChunk,
                     const Chunk *backChunk);
 
-    static std::unique_ptr<Chunk> generateChunk(int x, int z);
+    static std::shared_ptr<Chunk> generateChunk(int x, int z);
 
     static glm::vec3 chunkOffSet(glm::vec3 position);
 };
