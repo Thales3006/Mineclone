@@ -1,22 +1,25 @@
 #include "render/mesh/mesh.h"
 
 #include "render/renderLib.h"
+
 #include <iostream>
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-           std::vector<std::shared_ptr<Texture>> textures,
-           std::shared_ptr<Shader> shader)
-    : VAO(0), VBO(0), EBO(0), vertices(vertices), indices(indices),
-      textures(textures), shader(shader) {
+template <typename T>
+Mesh<T>::Mesh(std::vector<T> vertices, std::vector<unsigned int> indices,
+              std::vector<std::shared_ptr<Texture>> textures,
+              std::shared_ptr<Shader> shader)
+    : VAO(0), VBO(0), EBO(0), vertices(std::move(vertices)),
+      indices(std::move(indices)), textures(textures), shader(shader) {
     setupMesh();
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices,
-           std::vector<std::shared_ptr<Texture>> textures,
-           std::shared_ptr<Shader> shader)
+template <typename T>
+Mesh<T>::Mesh(std::vector<T> vertices,
+              std::vector<std::shared_ptr<Texture>> textures,
+              std::shared_ptr<Shader> shader)
     : Mesh(vertices, std::vector<unsigned int>(), textures, shader) {}
 
-void Mesh::setupMesh() {
+template <typename T> void Mesh<T>::setupMesh() {
     if (vertices.empty())
         return;
 
@@ -30,8 +33,8 @@ void Mesh::setupMesh() {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
-                 vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(),
+                 GL_STATIC_DRAW);
 
     if (!indices.empty()) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -40,20 +43,7 @@ void Mesh::setupMesh() {
                      GL_STATIC_DRAW);
     }
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, normal));
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, texCoords));
-
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, ID));
+    setupAttributes();
 
     // zerando
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -61,7 +51,7 @@ void Mesh::setupMesh() {
     glBindVertexArray(0);
 }
 
-void Mesh::draw() {
+template <typename T> void Mesh<T>::render() {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
 
@@ -95,9 +85,7 @@ void Mesh::draw() {
     glBindVertexArray(0);
 }
 
-void Mesh::render(int chunkx, int chunkz) { draw(); }
-
-Mesh::~Mesh() {
+template <typename T> Mesh<T>::~Mesh() {
     if (VAO)
         glDeleteVertexArrays(1, &VAO);
     if (VBO)
@@ -105,3 +93,34 @@ Mesh::~Mesh() {
     if (EBO)
         glDeleteBuffers(1, &EBO);
 }
+
+template <> void Mesh<TerrainVertex>::setupAttributes() {
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+                          (void *)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+                          (void *)offsetof(TerrainVertex, normal));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+                          (void *)offsetof(TerrainVertex, texCoords));
+
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+                          (void *)offsetof(TerrainVertex, ID));
+}
+
+template <> void Mesh<UIVertex>::setupAttributes() {
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(UIVertex),
+                          (void *)offsetof(UIVertex, pos));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(UIVertex),
+                          (void *)offsetof(UIVertex, uv));
+}
+
+template class Mesh<TerrainVertex>;
+template class Mesh<UIVertex>;

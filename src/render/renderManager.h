@@ -6,6 +6,7 @@
 #include "render/mesh/mesh.h"
 #include "render/shader.h"
 #include "render/texture.h"
+#include "render/view/chunkView.h"
 #include "world/world.h"
 
 class RenderManager {
@@ -25,7 +26,7 @@ class RenderManager {
   private:
     std::map<std::string, std::shared_ptr<Texture>> textures;
     std::map<std::string, std::shared_ptr<Shader>> shaders;
-    std::vector<std::unique_ptr<Mesh>> meshes;
+    std::vector<std::unique_ptr<ChunkMesh>> meshes;
 
     WindowManager *windowManager;
     World *world;

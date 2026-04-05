@@ -10,41 +10,44 @@
 #include <memory>
 #include <vector>
 
-struct Vertex {
+struct TerrainVertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 texCoords;
     float ID;
 };
 
-class Mesh {
+struct UIVertex {
+    glm::vec2 pos;
+    glm::vec2 uv;
+};
+
+template <typename T> class Mesh {
   public:
-    std::vector<Vertex> vertices;
+    std::vector<T> vertices;
     std::vector<unsigned int> indices;
     std::vector<std::shared_ptr<Texture>> textures;
 
     std::shared_ptr<Shader> shader;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+    Mesh(std::vector<T> vertices, std::vector<unsigned int> indices,
          std::vector<std::shared_ptr<Texture>> textures,
          std::shared_ptr<Shader> shader);
-    Mesh(std::vector<Vertex> vertices,
+    Mesh(std::vector<T> vertices,
          std::vector<std::shared_ptr<Texture>> textures,
          std::shared_ptr<Shader> shader);
 
     ~Mesh();
 
-    virtual void render(int chunkx, int chunkz);
+    void render();
 
     Mesh(const Mesh &other) = delete;
     Mesh &operator=(const Mesh &other) = delete;
 
-  protected:
-    void draw();
-
   private:
     unsigned int VAO, VBO, EBO;
     void setupMesh();
+    void setupAttributes();
 };
 
 #endif

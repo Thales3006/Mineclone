@@ -1,6 +1,5 @@
 #include "render/renderManager.h"
 
-#include "render/mesh/chunkMesh.h"
 #include "render/renderLib.h"
 
 #include <iostream>
@@ -81,7 +80,7 @@ void RenderManager::updateView() {
 
     meshes.clear();
     for (auto &[coord, chunk] : *chunks) {
-        meshes.push_back(ChunkMesh::fromChunk(*chunk, {textures["blocks"]},
-                                              shaders["terrain"]));
+        meshes.push_back(std::make_unique<ChunkMesh>(
+            *chunk, std::vector{textures["blocks"]}, shaders["terrain"]));
     }
 }
