@@ -32,4 +32,9 @@ void main(){
     texOffset.x += i;
 
     FragColor = texture(texture_diffuse1, (texCoord + texOffset) * vec2(1.0/16.0)) * vec4(light, 1.0);
+
+    if (FragColor.a < 0.1) {
+      discard;
+    }
+
 }

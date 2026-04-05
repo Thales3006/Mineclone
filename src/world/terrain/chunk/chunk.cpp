@@ -7,20 +7,12 @@
 
 #include <FastNoiseLite.h>
 
-Chunk::Chunk() {
-    x = 0;
-    z = 0;
-}
+Chunk::Chunk() : Chunk(0, 0) {}
 
-Chunk::Chunk(int x, int z) {
-    this->x = x;
-    this->z = z;
-}
+Chunk::Chunk(int x, int z) : x(x), z(z) {}
 
-Chunk::Chunk(int x, int z,
-             Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH]) {
-    this->x = x;
-    this->z = z;
+Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
+    : Chunk(x, z) {
 
     for (int h = 0; h < CHUNK_WIDTH; ++h) {
         for (int w = 0; w < CHUNK_HEIGHT; ++w) {
@@ -123,38 +115,8 @@ void Chunk::updateBlocks(const Chunk *leftChunk, const Chunk *rightChunk,
     for (int x = 0; x < CHUNK_WIDTH; x++)
         for (int y = 0; y < CHUNK_HEIGHT; y++)
             for (int z = 0; z < CHUNK_WIDTH; z++) {
-                if (blocks[x][y][z].ID == 0) {
-                    blocks[x][y][z].faces = 0;
-                    continue;
-                }
-                unsigned char newFaces = ALL_FACE;
-
-                if (x != CHUNK_WIDTH - 1 ? blocks[x + 1][y][z].ID != 0
-                    : rightChunk         ? rightChunk->blocks[0][y][z].ID != 0
-                                         : false)
-                    newFaces &= ~RIGHT_FACE;
-                if (x != 0 ? blocks[x - 1][y][z].ID != 0
-                    : leftChunk
-                        ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].ID != 0
-                        : false)
-                    newFaces &= ~LEFT_FACE;
-
-                if (z != CHUNK_WIDTH - 1 ? blocks[x][y][z + 1].ID != 0
-                    : frontChunk         ? frontChunk->blocks[x][y][0].ID != 0
-                                         : false)
-                    newFaces &= ~FRONT_FACE;
-                if (z != 0 ? blocks[x][y][z - 1].ID != 0
-                    : backChunk
-                        ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].ID != 0
-                        : false)
-                    newFaces &= ~BACK_FACE;
-
-                if (y != CHUNK_HEIGHT - 1 && blocks[x][y + 1][z].ID != 0)
-                    newFaces &= ~UP_FACE;
-                if (y != 0 && blocks[x][y - 1][z].ID != 0)
-                    newFaces &= ~DOWN_FACE;
-
-                blocks[x][y][z].faces = newFaces;
+                updateBlock(x, y, z, leftChunk, rightChunk, frontChunk,
+                            backChunk);
             }
 }
 
@@ -170,42 +132,13 @@ void Chunk::updateSide(const Side side, const Chunk *leftChunk,
 
     while (x < CHUNK_WIDTH && z < CHUNK_WIDTH) {
         for (int y = 0; y < CHUNK_HEIGHT; y++) {
-
-            if (blocks[x][y][z].ID == 0) {
-                blocks[x][y][z].faces = 0;
-                continue;
-            }
-            unsigned char newFaces = ALL_FACE;
-
-            if (x != CHUNK_WIDTH - 1 ? blocks[x + 1][y][z].ID != 0
-                : rightChunk         ? rightChunk->blocks[0][y][z].ID != 0
-                                     : false)
-                newFaces &= ~RIGHT_FACE;
-            if (x != 0      ? blocks[x - 1][y][z].ID != 0
-                : leftChunk ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].ID != 0
-                            : false)
-                newFaces &= ~LEFT_FACE;
-
-            if (z != CHUNK_WIDTH - 1 ? blocks[x][y][z + 1].ID != 0
-                : frontChunk         ? frontChunk->blocks[x][y][0].ID != 0
-                                     : false)
-                newFaces &= ~FRONT_FACE;
-            if (z != 0      ? blocks[x][y][z - 1].ID != 0
-                : backChunk ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].ID != 0
-                            : false)
-                newFaces &= ~BACK_FACE;
-
-            if (y != CHUNK_HEIGHT - 1 && blocks[x][y + 1][z].ID != 0)
-                newFaces &= ~UP_FACE;
-            if (y != 0 && blocks[x][y - 1][z].ID != 0)
-                newFaces &= ~DOWN_FACE;
-
-            blocks[x][y][z].faces = newFaces;
+            updateBlock(x, y, z, leftChunk, rightChunk, frontChunk, backChunk);
         }
-        if (isXVar)
+        if (isXVar) {
             x++;
-        else
+        } else {
             z++;
+        }
     }
 }
 

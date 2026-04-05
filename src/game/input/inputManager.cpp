@@ -190,7 +190,7 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
         player.hotbarIndex = 8;
         break;
     case HotbarSlot9:
-        player.hotbarIndex = 9;
+        player.hotbarIndex = 12;
         break;
     default:
         break;

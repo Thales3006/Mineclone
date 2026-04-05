@@ -62,8 +62,9 @@ void RenderManager::renderFrame() {
 
     float ratio =
         static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
-    shaders[0]->setMat4("projection", camera.getMatrixProjection(ratio));
-    shaders[0]->setMat4("view", camera.getMatrixView());
+    shaders["terrain"]->setMat4("projection",
+                                camera.getMatrixProjection(ratio));
+    shaders["terrain"]->setMat4("view", camera.getMatrixView());
 
     renderChunks(player.chunkx, player.chunkz);
 }
