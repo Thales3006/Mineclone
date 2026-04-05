@@ -1,5 +1,7 @@
 #include "game/input/inputManager.h"
 
+#include <optional>
+
 InputManager::InputManager() {}
 
 InputManager::InputManager(std::shared_ptr<World> world,
@@ -107,6 +109,23 @@ void InputManager::handleMouseClickCallback(GLFWwindow *window, int button,
     }
 }
 
+std::optional<glm::vec3> get_player_looking(World &world) {
+    Player &player = world.getEntityManager()->player;
+    glm::vec3 initial_pos =
+        player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
+    glm::vec3 dir = glm::normalize(player.direction);
+    glm::vec3 i = glm::vec3(0);
+
+    while (world.getChunkManager()
+               ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
+               .ID == 0) {
+        if (i.x > 6)
+            return std::nullopt;
+        i += glm::vec3(0.25);
+    }
+    return std::make_optional<glm::vec3>(initial_pos + dir * i);
+}
+
 void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
     static bool fullScreen = false;
     const GLFWvidmode *mode = glfwGetVideoMode(windowManager->getMonitor());
@@ -118,7 +137,6 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
     glm::vec3 i = glm::vec3(0);
 
     switch (action) {
-
     case Fullscreen:
         if (!fullScreen) {
             glfwSetWindowMonitor(window, windowManager->getMonitor(), 0, 0,
@@ -134,16 +152,10 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
         }
         break;
     case DestroyBlock:
-        while (
-            world->getChunkManager()
-                ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
-                .ID == 0) {
-            if (i.x > 6)
-                return;
-            i += glm::vec3(0.25);
+        if (auto pos = get_player_looking(*world); pos.has_value()) {
+            world->getChunkManager()->setBlock(player.chunkx, player.chunkz,
+                                               pos.value(), Block());
         }
-        world->getChunkManager()->setBlock(player.chunkx, player.chunkz,
-                                           initial_pos + dir * i, Block());
         break;
     case PlaceBlock:
         while (
