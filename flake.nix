@@ -29,6 +29,7 @@
           libXrandr
           glm
           stb
+          sigslot
         ];
 
         shellHook = ''
@@ -69,6 +70,7 @@
 
             glm
             stb
+            sigslot
           ];
         };
 
@@ -87,6 +89,7 @@
           buildInputs = with pkgsWin; [
             glfw
             stb
+            sigslot
           ];
 
           cmakeFlags = [

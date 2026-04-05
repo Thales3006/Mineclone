@@ -3,6 +3,10 @@ project(mineclone)
 
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(PalSigslot REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(OpenGL REQUIRED)
+
 add_library(glad STATIC lib/glad/glad.c)
 target_include_directories(glad PUBLIC lib)
 
@@ -25,6 +29,7 @@ target_link_libraries(mineclone
     glfw
     OpenGL::GL
     fastnoise
+    Pal::Sigslot
 )
 
 install(TARGETS mineclone
