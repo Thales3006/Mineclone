@@ -44,6 +44,7 @@
               - -I${pkgs.glfw}/include
               - -I${pkgs.glm}/include
               - -I${pkgs.stb}/include
+              - -I${pkgs.sigslot}/include
               - -I${pkgs.stdenv.cc.cc.lib}/include
           EOF
           echo "ambiente pronto"
