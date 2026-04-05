@@ -10,7 +10,7 @@ class EntityManager {
   public:
     EntityManager();
 
-    Player player;
+    std::shared_ptr<Player> player;
 
     void update(ChunkManager &chunkManager, float deltaTime);
 

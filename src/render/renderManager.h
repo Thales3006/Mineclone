@@ -7,6 +7,7 @@
 #include "render/shader.h"
 #include "render/texture.h"
 #include "render/view/chunkView.h"
+#include "render/view/firstPersonView.h"
 #include "world/world.h"
 
 class RenderManager {
@@ -28,6 +29,7 @@ class RenderManager {
     std::map<std::string, std::shared_ptr<Shader>> shaders;
 
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
+    std::unique_ptr<FirstPersonView> firstPersonView;
 
     std::shared_ptr<WindowManager> windowManager;
     std::shared_ptr<World> world;

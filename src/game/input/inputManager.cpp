@@ -12,7 +12,7 @@ InputManager::InputManager(std::shared_ptr<World> world,
 
 void InputManager::processKeyboard(float deltaTime) {
 
-    Player &player = world->getEntityManager()->player;
+    Player &player = *world->getEntityManager()->player;
     glm::vec3 front =
         glm::normalize(glm::vec3(player.direction.x, 0, player.direction.z));
     glm::vec3 side = glm::normalize(
@@ -75,7 +75,7 @@ void InputManager::handleKeyboardCallback(GLFWwindow *window, int key,
 }
 
 void InputManager::handleMouseMovementCallback(double xoffset, double yoffset) {
-    Player &player = world->getEntityManager()->player;
+    Player &player = *world->getEntityManager()->player;
     float rotX = -xoffset * sensibility;
     float rotY = -yoffset * sensibility;
 
@@ -110,7 +110,7 @@ void InputManager::handleMouseClickCallback(GLFWwindow *window, int button,
 }
 
 std::optional<glm::vec3> get_player_looking(World &world) {
-    Player &player = world.getEntityManager()->player;
+    Player &player = *world.getEntityManager()->player;
     glm::vec3 initial_pos =
         player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
     glm::vec3 dir = glm::normalize(player.direction);
@@ -130,7 +130,7 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
     static bool fullScreen = false;
     const GLFWvidmode *mode = glfwGetVideoMode(windowManager->getMonitor());
 
-    Player &player = world->getEntityManager()->player;
+    Player &player = *world->getEntityManager()->player;
     glm::vec3 initial_pos =
         player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
     glm::vec3 dir = glm::normalize(player.direction);

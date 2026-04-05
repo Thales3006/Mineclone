@@ -57,6 +57,10 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
             chunkViews.push_back(std::make_unique<ChunkView>(
                 chunk, textures["blocks"], shaders["terrain"]));
         });
+
+    firstPersonView = std::make_unique<FirstPersonView>(
+        world->getEntityManager()->player, world, textures["blocks"],
+        shaders["terrain"]);
 }
 
 void RenderManager::initOpenGL() {
@@ -86,7 +90,7 @@ void RenderManager::renderFrame() {
     glm::uvec2 windowSize = windowManager->getWindowSize();
     glViewport(0, 0, windowSize.x, windowSize.y);
 
-    Player &player = world->getEntityManager()->player;
+    Player &player = *world->getEntityManager()->player;
     camera.position =
         player.position +
         glm::vec3(player.size.x / 2, player.size.y * 0.9, player.size.z / 2);
@@ -99,6 +103,7 @@ void RenderManager::renderFrame() {
     shaders["terrain"]->setMat4("view", camera.getMatrixView());
 
     renderChunks(player.chunkx, player.chunkz);
+    firstPersonView->render(player.chunkx, player.chunkz);
 }
 
 void RenderManager::renderChunks(int chunkx, int chunkz) {
