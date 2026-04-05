@@ -30,6 +30,8 @@
           glm
           stb
           sigslot
+
+          valgrind
         ];
 
         shellHook = ''
