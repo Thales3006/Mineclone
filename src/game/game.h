@@ -19,18 +19,21 @@ class Game {
     void run();
 
     static void mouseMoveCallback(GLFWwindow *window, double xpos, double ypos);
-    static void mouseClickCallback(GLFWwindow *window, int button, int action, int mods);
-    static void keyboardCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void mouseClickCallback(GLFWwindow *window, int button, int action,
+                                   int mods);
+    static void keyboardCallback(GLFWwindow *window, int key, int scancode,
+                                 int action, int mods);
 
   private:
     double deltaTime;
     std::atomic<bool> isRunning;
-    InputManager inputManager;
 
-    WindowManager windowManager;
-    RenderManager renderManager;
+    std::unique_ptr<InputManager> inputManager;
 
-    World world;
+    std::shared_ptr<WindowManager> windowManager;
+    std::shared_ptr<RenderManager> renderManager;
+
+    std::shared_ptr<World> world;
     void autoLoadChunks();
 };
 

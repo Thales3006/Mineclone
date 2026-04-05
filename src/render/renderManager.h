@@ -12,7 +12,8 @@
 class RenderManager {
   public:
     RenderManager();
-    RenderManager(WindowManager *WindowManager, World *world);
+    RenderManager(std::shared_ptr<WindowManager> WindowManager,
+                  std::shared_ptr<World> world);
 
     void initOpenGL();
 
@@ -29,8 +30,8 @@ class RenderManager {
 
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
 
-    WindowManager *windowManager;
-    World *world;
+    std::shared_ptr<WindowManager> windowManager;
+    std::shared_ptr<World> world;
 
     void renderChunks(int chunkx, int chunkz);
 };

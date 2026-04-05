@@ -6,6 +6,8 @@
 
 class WindowManager {
   public:
+    WindowManager();
+
     GLFWwindow *getWindow();
     GLFWmonitor *getMonitor();
 

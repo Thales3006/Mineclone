@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+WindowManager::WindowManager() {}
+
 void WindowManager::createWindow(void *game) {
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW.\n";
@@ -26,7 +28,8 @@ void WindowManager::createWindow(void *game) {
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-    window = glfwCreateWindow(defaultWidth, defaultHeight, "Mineclone", NULL, NULL);
+    window =
+        glfwCreateWindow(defaultWidth, defaultHeight, "Mineclone", NULL, NULL);
     if (!window) {
         std::cout << "Failed to create window.\n";
         exit(-1);

@@ -2,8 +2,9 @@
 
 InputManager::InputManager() {}
 
-InputManager::InputManager(World *world, WindowManager *windowManager,
-                           RenderManager *renderManager)
+InputManager::InputManager(std::shared_ptr<World> world,
+                           std::shared_ptr<WindowManager> windowManager,
+                           std::shared_ptr<RenderManager> renderManager)
     : world(world), windowManager(windowManager), renderManager(renderManager),
       sensibility(0.005f) {}
 
@@ -74,7 +75,7 @@ void InputManager::handleKeyboardCallback(GLFWwindow *window, int key,
 void InputManager::handleMouseMovementCallback(double xoffset, double yoffset) {
     Player &player = world->getEntityManager()->player;
     float rotX = -xoffset * sensibility;
-    float rotY = yoffset * sensibility;
+    float rotY = -yoffset * sensibility;
 
     glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), rotX, glm::vec3(0, 1, 0));
     player.direction = glm::vec3(rotMat * glm::vec4(player.direction, 0.0f));
