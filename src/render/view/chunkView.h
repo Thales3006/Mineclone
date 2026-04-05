@@ -10,9 +10,11 @@ class ChunkView {
               std::shared_ptr<Shader> shader);
 
     void render(int chunkx, int chunkz);
-    Mesh<TerrainVertex> mesh;
 
     std::shared_ptr<Chunk> chunk;
+
+  private:
+    Mesh<TerrainVertex> mesh;
 };
 
 #endif
