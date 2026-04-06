@@ -83,7 +83,7 @@ void FirstPersonView::render(int chunkx, int chunkz) {
         selectionBoxMesh.shader->setMat4("model",
                                          glm::translate(glm::mat4(1.0f), pos));
 
-        glLineWidth(2.0f);
+        glLineWidth(5.0f);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
