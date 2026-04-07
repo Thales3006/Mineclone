@@ -1,6 +1,7 @@
 #ifndef TEXTURE_CLASS_H
 #define TEXTURE_CLASS_H
 
+#include <glm/vec2.hpp>
 #include <string>
 
 class Texture {
@@ -18,6 +19,7 @@ class Texture {
     unsigned int getID();
     std::string getType();
     std::string getPath();
+    glm::uvec2 getSize();
 };
 
 #endif

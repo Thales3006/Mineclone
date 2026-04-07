@@ -38,3 +38,5 @@ void Texture::bind() { glBindTexture(GL_TEXTURE_2D, ID); }
 unsigned int Texture::getID() { return ID; }
 
 std::string Texture::getPath() { return path; }
+
+glm::uvec2 Texture::getSize() { return glm::uvec2(width, height); }

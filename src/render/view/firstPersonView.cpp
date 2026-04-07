@@ -12,7 +12,7 @@ std::optional<glm::vec3> get_player_looking(Player &player, World &world) {
 
     while (world.getChunkManager()
                ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
-               .ID == 0) {
+               .id == BlockID::air) {
         if (i.x > 6)
             return std::nullopt;
         i += glm::vec3(0.25);
@@ -21,57 +21,26 @@ std::optional<glm::vec3> get_player_looking(Player &player, World &world) {
 }
 
 Mesh<TerrainVertex> createBoxMesh(Player &player, World &world,
+                                  TerrainVertexMap &terrainVertexMap,
                                   std::shared_ptr<Texture> texture,
                                   std::shared_ptr<Shader> shader) {
-    std::vector<TerrainVertex> drawableFaces;
-    std::vector<unsigned int> indices;
 
-    drawableFaces.insert(drawableFaces.end(),
-                         {
-                             TerrainVertex{glm::vec3(-0.001f, -0.001f, -0.001f),
-                                           glm::vec3(-1.0f, -1.0f, -1.0f),
-                                           glm::vec2(0.0f, 0.0f), 14}, // 0
-                             TerrainVertex{glm::vec3(1.001f, -0.001f, -0.001f),
-                                           glm::vec3(1.0f, -1.0f, -1.0f),
-                                           glm::vec2(1.0f, 0.0f), 14}, // 1
-                             TerrainVertex{glm::vec3(1.001f, 1.001f, -0.001f),
-                                           glm::vec3(1.0f, 1.0f, -1.0f),
-                                           glm::vec2(1.0f, 1.0f), 14}, // 2
-                             TerrainVertex{glm::vec3(-0.001f, 1.001f, -0.001f),
-                                           glm::vec3(-1.0f, 1.0f, -1.0f),
-                                           glm::vec2(0.0f, 1.0f), 14}, // 3
-                             TerrainVertex{glm::vec3(-0.001f, -0.001f, 1.001f),
-                                           glm::vec3(-1.0f, -1.0f, 1.0f),
-                                           glm::vec2(0.0f, 0.0f), 14}, // 4
-                             TerrainVertex{glm::vec3(1.001f, -0.001f, 1.001f),
-                                           glm::vec3(1.0f, -1.0f, 1.0f),
-                                           glm::vec2(1.0f, 0.0f), 14}, // 5
-                             TerrainVertex{glm::vec3(1.001f, 1.001f, 1.001f),
-                                           glm::vec3(1.0f, 1.0f, 1.0f),
-                                           glm::vec2(1.0f, 1.0f), 14}, // 6
-                             TerrainVertex{glm::vec3(-0.001f, 1.001f, 1.001f),
-                                           glm::vec3(-1.0f, 1.0f, 1.0f),
-                                           glm::vec2(0.0f, 1.0f), 14}, // 7
-                         });
-
-    indices.insert(indices.end(), {
-                                      0, 2, 1, 0, 3, 2, // frente
-                                      4, 5, 6, 4, 6, 7, // trás
-                                      0, 4, 7, 0, 7, 3, // esquerda
-                                      1, 6, 5, 1, 2, 6, // direita
-                                      0, 5, 4, 0, 1, 5, // baixo
-                                      3, 6, 2, 3, 7, 6, // cima
-                                  });
-
-    return Mesh<TerrainVertex>(drawableFaces, indices, texture, shader);
+    auto block = Block(BlockID::smooth_stone, false);
+    auto blockGeometry = terrainVertexMap.getGeometry(block);
+    for (auto &vertex : blockGeometry.vertices) {
+        vertex.color = glm::vec3(0.3, 0.3, 0.3);
+    }
+    return Mesh<TerrainVertex>(std::move(blockGeometry), texture, shader);
 }
 
 FirstPersonView::FirstPersonView(std::shared_ptr<Player> player,
                                  std::shared_ptr<World> world,
+                                 TerrainVertexMap &terrainVertexMap,
                                  std::shared_ptr<Texture> texture,
                                  std::shared_ptr<Shader> shader)
     : player(player), world(world),
-      selectionBoxMesh(createBoxMesh(*player, *world, texture, shader)) {}
+      selectionBoxMesh(
+          createBoxMesh(*player, *world, terrainVertexMap, texture, shader)) {}
 
 void FirstPersonView::render(int chunkx, int chunkz) {
     selectionBoxMesh.setupMesh();

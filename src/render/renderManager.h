@@ -4,8 +4,9 @@
 #include "game/windowManager.h"
 #include "render/camera.h"
 #include "render/mesh/mesh.h"
+#include "render/mesh/terrainVertexMap.h"
 #include "render/shader.h"
-#include "render/texture.h"
+#include "render/textureManager.h"
 #include "render/view/chunkView.h"
 #include "render/view/firstPersonView.h"
 #include "world/world.h"
@@ -20,13 +21,12 @@ class RenderManager {
 
     void renderFrame();
 
-    void handleMouseMovement(double xoffset, double yoffset);
-
     Camera camera;
 
   private:
-    std::map<std::string, std::shared_ptr<Texture>> textures;
+    std::shared_ptr<TextureManager> textureManager;
     std::map<std::string, std::shared_ptr<Shader>> shaders;
+    std::shared_ptr<TerrainVertexMap> terrainVertexMap;
 
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;

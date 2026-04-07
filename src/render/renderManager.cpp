@@ -15,20 +15,17 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
     camera.setMinMax(0.01f, 400.0f);
     camera.setFOV(glm::radians(90.0f));
 
-    textures = {
-        {"container_box", std::make_shared<Texture>("textures/container.jpg")},
-        {"blocks", std::make_shared<Texture>("textures/blocks_01.png")},
-    };
-
+    textureManager = std::make_shared<TextureManager>();
     shaders = {
         {"terrain", std::make_shared<Shader>("shaders/shader.vert",
                                              "shaders/shader.frag")},
     };
+    terrainVertexMap = std::make_shared<TerrainVertexMap>(textureManager);
 
     world->getChunkManager()->onChunkAdded.connect(
         [&](std::shared_ptr<Chunk> chunk) {
             chunkViews.push_back(std::make_unique<ChunkView>(
-                chunk, textures["blocks"], shaders["terrain"]));
+                chunk, *terrainVertexMap, textureManager, shaders["terrain"]));
         });
 
     world->getChunkManager()->onChunkRemoved.connect(
@@ -55,12 +52,12 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
                 chunkViews.erase(it, chunkViews.end());
             }
             chunkViews.push_back(std::make_unique<ChunkView>(
-                chunk, textures["blocks"], shaders["terrain"]));
+                chunk, *terrainVertexMap, textureManager, shaders["terrain"]));
         });
 
     firstPersonView = std::make_unique<FirstPersonView>(
-        world->getEntityManager()->player, world, textures["blocks"],
-        shaders["terrain"]);
+        world->getEntityManager()->player, world, *terrainVertexMap,
+        textureManager->getTexture("blocks"), shaders["terrain"]);
 }
 
 void RenderManager::initOpenGL() {
