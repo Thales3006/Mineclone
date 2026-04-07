@@ -62,21 +62,36 @@ TerrainVertexMap::TerrainVertexMap(
         },
         {0, 3, 2, 0, 2, 1},
     };
+
+    plantBlock = Geometry<TerrainVertex>{
+        {
+            {glm::vec3(0, 0, 0), glm::vec3(0, 0, 1)},
+            {glm::vec3(1, 0, 1), glm::vec3(0, 0, 1)},
+            {glm::vec3(1, 1, 1), glm::vec3(0, 0, 1)},
+            {glm::vec3(0, 1, 0), glm::vec3(0, 0, 1)},
+
+            {glm::vec3(1, 0, 0), glm::vec3(0, 0, -1)},
+            {glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)},
+            {glm::vec3(0, 1, 1), glm::vec3(0, 0, -1)},
+            {glm::vec3(1, 1, 0), glm::vec3(0, 0, -1)},
+        },
+        {0, 1, 3, 1, 2, 3, 6, 7, 4, 6, 4, 5,
+         0, 3, 1, 1, 3, 2, 6, 4, 7, 6, 5, 4},
+    };
 }
 
-Geometry<TerrainVertex> TerrainVertexMap::getUVFace(BlockTextureID id,
-                                                    unsigned char face) {
-    Geometry<TerrainVertex> faceGeometry = fullBlock[face];
+Geometry<TerrainVertex>
+TerrainVertexMap::setUV(Geometry<TerrainVertex> geometry, BlockTextureID id) {
     std::array<glm::vec2, 4> tex = textureManager->getBlockUV(id);
-    for (int i = 0; i < 4; i++) {
-        faceGeometry.vertices[i].uv = tex[i];
+    for (int i = 0; i < geometry.vertices.size(); i++) {
+        geometry.vertices[i].uv = tex[i % 4];
     }
-    return faceGeometry;
+    return geometry;
 }
 
 #define ADD_FACE(TEXTURE_ID, FACE)                                             \
     if (block.faces & FACE)                                                    \
-        blockGeometry.append(getUVFace(TEXTURE_ID, FACE));
+        blockGeometry.append(setUV(fullBlock[FACE], TEXTURE_ID));
 
 Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
     Geometry<TerrainVertex> blockGeometry{};
@@ -112,7 +127,8 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         if (block.faces & UP_FACE) {
-            auto geometry = getUVFace(BlockTextureID::grass_top, UP_FACE);
+            auto geometry =
+                setUV(fullBlock[UP_FACE], BlockTextureID::grass_top);
             for (auto &vertex : geometry.vertices)
                 vertex.color = glm::vec3(0.5f, 0.8, 0.4f);
             blockGeometry.append(geometry);
@@ -159,22 +175,12 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
             vertex.color = glm::vec3(1.0f);
         return blockGeometry;
     case BlockID::red_flower:
-        ADD_FACE(BlockTextureID::red_flower, UP_FACE)
-        ADD_FACE(BlockTextureID::red_flower, DOWN_FACE)
-        ADD_FACE(BlockTextureID::red_flower, FRONT_FACE)
-        ADD_FACE(BlockTextureID::red_flower, BACK_FACE)
-        ADD_FACE(BlockTextureID::red_flower, LEFT_FACE)
-        ADD_FACE(BlockTextureID::red_flower, RIGHT_FACE)
+        blockGeometry = setUV(plantBlock, BlockTextureID::red_flower);
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         return blockGeometry;
     case BlockID::yellow_flower:
-        ADD_FACE(BlockTextureID::yellow_flower, UP_FACE)
-        ADD_FACE(BlockTextureID::yellow_flower, DOWN_FACE)
-        ADD_FACE(BlockTextureID::yellow_flower, FRONT_FACE)
-        ADD_FACE(BlockTextureID::yellow_flower, BACK_FACE)
-        ADD_FACE(BlockTextureID::yellow_flower, LEFT_FACE)
-        ADD_FACE(BlockTextureID::yellow_flower, RIGHT_FACE)
+        blockGeometry = setUV(plantBlock, BlockTextureID::yellow_flower);
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         return blockGeometry;

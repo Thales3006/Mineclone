@@ -15,9 +15,12 @@ class TerrainVertexMap {
 
   private:
     std::map<unsigned char, Geometry<TerrainVertex>> fullBlock;
+    Geometry<TerrainVertex> plantBlock;
+
     std::shared_ptr<TextureManager> textureManager;
 
-    Geometry<TerrainVertex> getUVFace(BlockTextureID id, unsigned char face);
+    Geometry<TerrainVertex> setUV(Geometry<TerrainVertex> geometry,
+                                  BlockTextureID id);
 };
 
 #endif
