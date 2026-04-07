@@ -118,7 +118,7 @@ std::optional<glm::vec3> get_player_looking(World &world) {
 
     while (world.getChunkManager()
                ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
-               .ID == 0) {
+               .id == BlockID::air) {
         if (i.x > 6)
             return std::nullopt;
         i += glm::vec3(0.25);
@@ -161,7 +161,7 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
         while (
             world->getChunkManager()
                 ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
-                .ID == 0) {
+                .id == BlockID::air) {
             if (i.x > 6)
                 return;
             i += glm::vec3(0.25);
@@ -172,9 +172,9 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
                               glm::floor(player.position),
                               glm::ceil(player.position + player.size) -
                                   glm::floor(player.position))) {
-            world->getChunkManager()->setBlock(player.chunkx, player.chunkz,
-                                               initial_pos + dir * i,
-                                               Block(player.hotbarIndex, true));
+            world->getChunkManager()->setBlock(
+                player.chunkx, player.chunkz, initial_pos + dir * i,
+                Block((BlockID)player.hotbarIndex, true));
         }
         break;
 
@@ -203,7 +203,7 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
         player.hotbarIndex = 8;
         break;
     case HotbarSlot9:
-        player.hotbarIndex = 12;
+        player.hotbarIndex = 9;
         break;
     default:
         break;

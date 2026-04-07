@@ -12,15 +12,28 @@
     RIGHT_FACE + LEFT_FACE + FRONT_FACE + BACK_FACE + UP_FACE + DOWN_FACE
 #define NO_FACE 0b00000000
 
+enum class BlockID {
+    air,
+    stone,
+    dirt,
+    grass,
+    brick_block,
+    tnt,
+    smooth_stone,
+    planks,
+    red_flower,
+    yellow_flower,
+};
+
 class Block {
   public:
-    unsigned int ID;
+    BlockID id;
     bool solid;
 
     unsigned char faces;
 
     Block();
-    Block(unsigned int ID, bool solid);
+    Block(BlockID id, bool solid);
 };
 
 #endif

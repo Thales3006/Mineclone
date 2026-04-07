@@ -13,7 +13,7 @@ Mesh<TerrainVertex> generateChunkMesh(Chunk &chunk,
         for (int j = 0; j < CHUNK_HEIGHT; j++) {
             for (int k = 0; k < CHUNK_WIDTH; k++) {
                 Block &block = chunk.blocks[i][j][k];
-                if (block.ID == 0 || block.faces == NO_FACE)
+                if (block.id == BlockID::air || block.faces == NO_FACE)
                     continue;
 
                 glm::vec3 pos = glm::vec3(i, j, k);

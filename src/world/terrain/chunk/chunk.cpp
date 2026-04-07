@@ -54,14 +54,14 @@ std::shared_ptr<Chunk> Chunk::generateChunk(int x, int z) {
                 Block block{};
                 if ((j < static_cast<float>(CHUNK_HEIGHT) / 3 + val) &&
                     (cave_val < 0.2)) {
-                    unsigned char id = 1;
+                    BlockID id = BlockID::stone;
                     // stone or dirt
                     if (j > CHUNK_HEIGHT / 4) {
                         // grass or dirt
                         id = (j == CHUNK_WIDTH - 1 ||
-                              chunk->blocks[i][j + 1][k].ID == 0)
-                                 ? 3
-                                 : 2;
+                              chunk->blocks[i][j + 1][k].id == BlockID::air)
+                                 ? BlockID::grass
+                                 : BlockID::dirt;
                     }
                     block = Block(id, true);
                 }
@@ -79,36 +79,36 @@ void Chunk::setBlock(int x, int y, int z, Block block) {
 void Chunk::updateBlock(int x, int y, int z, const Chunk *leftChunk,
                         const Chunk *rightChunk, const Chunk *frontChunk,
                         const Chunk *backChunk) {
-    if (blocks[x][y][z].ID == 0) {
-        blocks[x][y][z].faces = 0;
+    if (blocks[x][y][z].id == BlockID::air) {
+        blocks[x][y][z].faces = NO_FACE;
         return;
     }
 
     unsigned char newFaces = ALL_FACE;
-    if (x != CHUNK_WIDTH - 1 ? blocks[x + 1][y][z].solid != 0
-        : rightChunk         ? rightChunk->blocks[0][y][z].solid != 0
+    if (x != CHUNK_WIDTH - 1 ? blocks[x + 1][y][z].solid != false
+        : rightChunk         ? rightChunk->blocks[0][y][z].solid != false
                              : false) {
         newFaces &= ~RIGHT_FACE;
     }
-    if (x != 0      ? blocks[x - 1][y][z].solid != 0
-        : leftChunk ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].solid != 0
+    if (x != 0      ? blocks[x - 1][y][z].solid != false
+        : leftChunk ? leftChunk->blocks[CHUNK_WIDTH - 1][y][z].solid != false
                     : false) {
         newFaces &= ~LEFT_FACE;
     }
-    if (z != CHUNK_WIDTH - 1 ? blocks[x][y][z + 1].solid != 0
-        : frontChunk         ? frontChunk->blocks[x][y][0].solid != 0
+    if (z != CHUNK_WIDTH - 1 ? blocks[x][y][z + 1].solid != false
+        : frontChunk         ? frontChunk->blocks[x][y][0].solid != false
                              : false) {
         newFaces &= ~FRONT_FACE;
     }
-    if (z != 0      ? blocks[x][y][z - 1].solid != 0
-        : backChunk ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].solid != 0
+    if (z != 0      ? blocks[x][y][z - 1].solid != false
+        : backChunk ? backChunk->blocks[x][y][CHUNK_WIDTH - 1].solid != false
                     : false) {
         newFaces &= ~BACK_FACE;
     }
-    if (y != CHUNK_HEIGHT - 1 && blocks[x][y + 1][z].solid != 0) {
+    if (y != CHUNK_HEIGHT - 1 && blocks[x][y + 1][z].solid != false) {
         newFaces &= ~UP_FACE;
     }
-    if (y != 0 && blocks[x][y - 1][z].solid != 0) {
+    if (y != 0 && blocks[x][y - 1][z].solid != false) {
         newFaces &= ~DOWN_FACE;
     }
 
