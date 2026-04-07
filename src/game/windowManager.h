@@ -1,8 +1,9 @@
 #ifndef WINDOW_MANAGER_CLASS_H
 #define WINDOW_MANAGER_CLASS_H
 
-#include "glm/vec2.hpp"
 #include "render/renderLib.h"
+
+#include <glm/vec2.hpp>
 
 class WindowManager {
   public:
