@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-WindowManager::WindowManager() {}
+WindowManager::WindowManager() : window(nullptr), monitor(nullptr) {}
 
 void WindowManager::createWindow(void *game) {
     if (!glfwInit()) {
