@@ -31,11 +31,11 @@ std::array<glm::vec2, 4> TextureManager::getBlockUV(BlockTextureID id) {
         return getUV(1, 15);
     case BlockTextureID::dirt:
         return getUV(2, 15);
-    case BlockTextureID::grass_side:
+    case BlockTextureID::grass_block_side:
         return getUV(3, 15);
-    case BlockTextureID::grass_top:
+    case BlockTextureID::grass_block_top:
         return getUV(0, 15);
-    case BlockTextureID::brick_block:
+    case BlockTextureID::bricks:
         return getUV(7, 15);
     case BlockTextureID::tnt_side:
         return getUV(8, 15);
@@ -45,12 +45,14 @@ std::array<glm::vec2, 4> TextureManager::getBlockUV(BlockTextureID id) {
         return getUV(10, 15);
     case BlockTextureID::smooth_stone:
         return getUV(6, 15);
-    case BlockTextureID::planks:
+    case BlockTextureID::oak_planks:
         return getUV(4, 15);
     case BlockTextureID::red_flower:
         return getUV(12, 15);
     case BlockTextureID::yellow_flower:
         return getUV(13, 15);
+    case BlockTextureID::grass:
+        return getUV(7, 13);
     default:
         return getUV(12, 1);
     }

@@ -127,29 +127,29 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         return blockGeometry;
-    case BlockID::grass:
+    case BlockID::grass_block:
         ADD_FACE(BlockTextureID::dirt, DOWN_FACE)
-        ADD_FACE(BlockTextureID::grass_side, FRONT_FACE)
-        ADD_FACE(BlockTextureID::grass_side, BACK_FACE)
-        ADD_FACE(BlockTextureID::grass_side, LEFT_FACE)
-        ADD_FACE(BlockTextureID::grass_side, RIGHT_FACE)
+        ADD_FACE(BlockTextureID::grass_block_side, FRONT_FACE)
+        ADD_FACE(BlockTextureID::grass_block_side, BACK_FACE)
+        ADD_FACE(BlockTextureID::grass_block_side, LEFT_FACE)
+        ADD_FACE(BlockTextureID::grass_block_side, RIGHT_FACE)
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         if (block.faces & UP_FACE) {
             auto geometry =
-                setUV(fullBlock[UP_FACE], BlockTextureID::grass_top);
+                setUV(fullBlock[UP_FACE], BlockTextureID::grass_block_top);
             for (auto &vertex : geometry.vertices)
                 vertex.color = glm::vec3(0.5f, 0.8, 0.4f);
             blockGeometry.append(geometry);
         }
         return blockGeometry;
-    case BlockID::brick_block:
-        ADD_FACE(BlockTextureID::brick_block, UP_FACE)
-        ADD_FACE(BlockTextureID::brick_block, DOWN_FACE)
-        ADD_FACE(BlockTextureID::brick_block, FRONT_FACE)
-        ADD_FACE(BlockTextureID::brick_block, BACK_FACE)
-        ADD_FACE(BlockTextureID::brick_block, LEFT_FACE)
-        ADD_FACE(BlockTextureID::brick_block, RIGHT_FACE)
+    case BlockID::bricks:
+        ADD_FACE(BlockTextureID::bricks, UP_FACE)
+        ADD_FACE(BlockTextureID::bricks, DOWN_FACE)
+        ADD_FACE(BlockTextureID::bricks, FRONT_FACE)
+        ADD_FACE(BlockTextureID::bricks, BACK_FACE)
+        ADD_FACE(BlockTextureID::bricks, LEFT_FACE)
+        ADD_FACE(BlockTextureID::bricks, RIGHT_FACE)
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         return blockGeometry;
@@ -173,13 +173,13 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         return blockGeometry;
-    case BlockID::planks:
-        ADD_FACE(BlockTextureID::planks, UP_FACE)
-        ADD_FACE(BlockTextureID::planks, DOWN_FACE)
-        ADD_FACE(BlockTextureID::planks, FRONT_FACE)
-        ADD_FACE(BlockTextureID::planks, BACK_FACE)
-        ADD_FACE(BlockTextureID::planks, LEFT_FACE)
-        ADD_FACE(BlockTextureID::planks, RIGHT_FACE)
+    case BlockID::oak_planks:
+        ADD_FACE(BlockTextureID::oak_planks, UP_FACE)
+        ADD_FACE(BlockTextureID::oak_planks, DOWN_FACE)
+        ADD_FACE(BlockTextureID::oak_planks, FRONT_FACE)
+        ADD_FACE(BlockTextureID::oak_planks, BACK_FACE)
+        ADD_FACE(BlockTextureID::oak_planks, LEFT_FACE)
+        ADD_FACE(BlockTextureID::oak_planks, RIGHT_FACE)
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
         return blockGeometry;
@@ -192,6 +192,11 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
         blockGeometry = setUV(plantBlock, BlockTextureID::yellow_flower);
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
+        return blockGeometry;
+    case BlockID::grass:
+        blockGeometry = setUV(plantBlock, BlockTextureID::grass);
+        for (auto &vertex : blockGeometry.vertices)
+            vertex.color = glm::vec3(0.5f, 0.6, 0.4f);
         return blockGeometry;
     default:
         return Geometry<TerrainVertex>{};
