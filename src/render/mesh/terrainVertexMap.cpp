@@ -78,6 +78,15 @@ TerrainVertexMap::TerrainVertexMap(
         {0, 1, 3, 1, 2, 3, 6, 7, 4, 6, 4, 5,
          0, 3, 1, 1, 3, 2, 6, 4, 7, 6, 5, 4},
     };
+
+    auto normalize_xz = [](glm::vec3 v) {
+        glm::vec3 center(0.5f, 0.0f, 0.5f);
+        return center +
+               (v - center) / glm::vec3(std::sqrt(2.0f), 1.0f, std::sqrt(2.0f));
+    };
+    for (auto &vertex : plantBlock.vertices) {
+        vertex.position = normalize_xz(vertex.position);
+    }
 }
 
 Geometry<TerrainVertex>
