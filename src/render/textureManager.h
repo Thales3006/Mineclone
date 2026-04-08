@@ -13,16 +13,17 @@
 enum class BlockTextureID {
     stone,
     dirt,
-    grass_side,
-    grass_top,
-    brick_block,
+    grass_block_side,
+    grass_block_top,
+    bricks,
     tnt_side,
     tnt_top,
     tnt_bottom,
     smooth_stone,
-    planks,
+    oak_planks,
     red_flower,
     yellow_flower,
+    grass,
 };
 
 class TextureManager {

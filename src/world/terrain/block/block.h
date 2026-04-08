@@ -16,13 +16,14 @@ enum class BlockID {
     air,
     stone,
     dirt,
-    grass,
-    brick_block,
+    grass_block,
+    bricks,
     tnt,
     smooth_stone,
-    planks,
+    oak_planks,
     red_flower,
     yellow_flower,
+    grass,
 };
 
 class Block {
