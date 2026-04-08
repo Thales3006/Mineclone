@@ -24,35 +24,20 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
 
     world->getChunkManager()->onChunkAdded.connect(
         [&](std::shared_ptr<Chunk> chunk) {
-            chunkViews.push_back(std::make_unique<ChunkView>(
-                chunk, *terrainVertexMap, textureManager, shaders["terrain"]));
+            std::lock_guard<std::mutex> lock(taskMutex);
+            pendingTasks.push([this, chunk]() { addChunkView(chunk); });
         });
 
     world->getChunkManager()->onChunkRemoved.connect(
         [&](std::shared_ptr<Chunk> chunk) {
-            auto it = std::remove_if(
-                chunkViews.begin(), chunkViews.end(),
-                [&](const std::unique_ptr<ChunkView> &chunkView) {
-                    return chunkView->chunk == chunk;
-                });
-
-            if (it != chunkViews.end()) {
-                chunkViews.erase(it, chunkViews.end());
-            }
+            std::lock_guard<std::mutex> lock(taskMutex);
+            pendingTasks.push([this, chunk]() { removeChunkView(chunk); });
         });
 
     world->getChunkManager()->onChunkUpdated.connect(
         [&](std::shared_ptr<Chunk> chunk) {
-            auto it = std::remove_if(
-                chunkViews.begin(), chunkViews.end(),
-                [&](const std::unique_ptr<ChunkView> &chunkView) {
-                    return chunkView->chunk == chunk;
-                });
-            if (it != chunkViews.end()) {
-                chunkViews.erase(it, chunkViews.end());
-            }
-            chunkViews.push_back(std::make_unique<ChunkView>(
-                chunk, *terrainVertexMap, textureManager, shaders["terrain"]));
+            std::lock_guard<std::mutex> lock(taskMutex);
+            pendingTasks.push([this, chunk]() { updateChunkView(chunk); });
         });
 
     firstPersonView = std::make_unique<FirstPersonView>(
@@ -81,6 +66,8 @@ void RenderManager::initOpenGL() {
 }
 
 void RenderManager::renderFrame() {
+    excuteTasks();
+
     glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -106,5 +93,34 @@ void RenderManager::renderFrame() {
 void RenderManager::renderChunks(int chunkx, int chunkz) {
     for (auto &chunkView : chunkViews) {
         chunkView->render(chunkx, chunkz);
+    }
+}
+
+void RenderManager::addChunkView(std::shared_ptr<Chunk> chunk) {
+    chunkViews.push_back(std::make_unique<ChunkView>(
+        chunk, *terrainVertexMap, textureManager, shaders["terrain"]));
+}
+
+void RenderManager::removeChunkView(std::shared_ptr<Chunk> chunk) {
+    auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
+                             [&](const std::unique_ptr<ChunkView> &chunkView) {
+                                 return chunkView->chunk == chunk;
+                             });
+    if (it != chunkViews.end()) {
+        chunkViews.erase(it, chunkViews.end());
+    }
+}
+void RenderManager::updateChunkView(std::shared_ptr<Chunk> chunk) {
+    removeChunkView(chunk);
+    addChunkView(chunk);
+}
+
+void RenderManager::excuteTasks() {
+    std::lock_guard<std::mutex> lock(taskMutex);
+
+    while (!pendingTasks.empty()) {
+        auto task = pendingTasks.front();
+        task();
+        pendingTasks.pop();
     }
 }

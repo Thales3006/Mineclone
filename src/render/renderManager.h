@@ -11,6 +11,8 @@
 #include "render/view/firstPersonView.h"
 #include "world/world.h"
 
+#include <queue>
+
 class RenderManager {
   public:
     RenderManager();
@@ -28,6 +30,9 @@ class RenderManager {
     std::map<std::string, std::shared_ptr<Shader>> shaders;
     std::shared_ptr<TerrainVertexMap> terrainVertexMap;
 
+    std::mutex taskMutex;
+    std::queue<std::function<void()>> pendingTasks;
+
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;
 
@@ -35,6 +40,12 @@ class RenderManager {
     std::shared_ptr<World> world;
 
     void renderChunks(int chunkx, int chunkz);
+
+    void addChunkView(std::shared_ptr<Chunk> chunk);
+    void removeChunkView(std::shared_ptr<Chunk> chunk);
+    void updateChunkView(std::shared_ptr<Chunk> chunk);
+
+    void excuteTasks();
 };
 
 #endif
