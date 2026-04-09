@@ -115,6 +115,13 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
         }
     };
 
+    auto add_plant = [this, &blockGeometry, &region, x, y, z,
+                      faces](BlockTextureID texture_id) {
+        blockGeometry = setUV(plantBlock, BlockTextureID::grass);
+        for (auto &vertex : blockGeometry.vertices)
+            vertex.color = glm::vec3(1.0f);
+    };
+
     switch (region.main->blocks[x][y][z].id) {
     case BlockID::air:
         return Geometry<TerrainVertex>{};
@@ -184,18 +191,15 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
         return blockGeometry;
     case BlockID::red_flower:
         blockGeometry = setUV(plantBlock, BlockTextureID::red_flower);
-        for (auto &vertex : blockGeometry.vertices)
-            vertex.color = glm::vec3(1.0f);
+        add_plant(BlockTextureID::red_flower);
         return blockGeometry;
     case BlockID::yellow_flower:
-        blockGeometry = setUV(plantBlock, BlockTextureID::yellow_flower);
-        for (auto &vertex : blockGeometry.vertices)
-            vertex.color = glm::vec3(1.0f);
+        add_plant(BlockTextureID::yellow_flower);
         return blockGeometry;
     case BlockID::grass:
-        blockGeometry = setUV(plantBlock, BlockTextureID::grass);
+        add_plant(BlockTextureID::grass);
         for (auto &vertex : blockGeometry.vertices)
-            vertex.color = glm::vec3(0.5f, 0.6f, 0.4f);
+            vertex.color = glm::vec3(0.5f, 0.8f, 0.4f);
         return blockGeometry;
     default:
         return Geometry<TerrainVertex>{};

@@ -9,7 +9,7 @@ uniform sampler2D block_tex;
 
 void main(){
     vec3 lightdir = normalize(vec3(1.0,10.0, 10.0));
-    float diff = max( dot(normal, lightdir), 0.0);
+    float diff = max( dot(normal, lightdir), 0.3);
     float ambient = 0.5;
     vec3 light = vec3(1.0) * (diff + ambient);
 
