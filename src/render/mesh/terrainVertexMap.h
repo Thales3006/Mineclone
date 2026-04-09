@@ -11,7 +11,8 @@ class TerrainVertexMap {
   public:
     TerrainVertexMap(std::shared_ptr<TextureManager> textureManager);
 
-    Geometry<TerrainVertex> getGeometry(Block &block, unsigned char faces);
+    Geometry<TerrainVertex>
+    getGeometry(Block &block, std::array<float, 8> color, unsigned char faces);
 
   private:
     std::map<unsigned char, Geometry<TerrainVertex>> fullBlock;

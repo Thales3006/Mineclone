@@ -1,5 +1,31 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
+Block ChunkRegion::getBlock(int x, int y, int z) {
+    int ox = (x < 0) ? -1 : (x >= CHUNK_WIDTH) ? 1 : 0;
+    int oz = (z < 0) ? -1 : (z >= CHUNK_WIDTH) ? 1 : 0;
+
+    int localX = x - ox * CHUNK_WIDTH;
+    int localZ = z - oz * CHUNK_WIDTH;
+
+    if (y < 0 || y >= CHUNK_HEIGHT)
+        return Block();
+
+    const std::optional<std::shared_ptr<Chunk>> *neighbors[3][3] = {
+        {&backLeft, &left, &frontLeft},
+        {&back, nullptr, &front},
+        {&backRight, &right, &frontRight},
+    };
+
+    if (ox == 0 && oz == 0)
+        return main->blocks[localX][y][localZ];
+
+    auto &neighbor = neighbors[ox + 1][oz + 1];
+    if (neighbor && neighbor->has_value())
+        return neighbor->value()->blocks[localX][y][localZ];
+
+    return Block();
+}
+
 unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) {
     if (main->blocks[x][y][z].id == BlockID::air) {
         return NO_FACE;
@@ -35,4 +61,33 @@ unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) {
         faces &= ~DOWN_FACE;
     }
     return faces;
+}
+
+std::array<float, 8> ChunkRegion::getBlockOcclusion(int x, int y, int z) {
+    std::array<float, 8> occlusion;
+    occlusion.fill(1.0f);
+
+    auto ao = [&](int bx, int by, int bz) -> float {
+        return getBlock(bx, by, bz).solid ? 0.6f : 1.0f;
+    };
+
+    occlusion[Node::frontRightUp] =
+        ao(x + 1, y + 1, z) * ao(x, y + 1, z + 1) * ao(x + 1, y + 1, z + 1);
+    occlusion[Node::frontLeftUp] =
+        ao(x - 1, y + 1, z) * ao(x, y + 1, z + 1) * ao(x - 1, y + 1, z + 1);
+    occlusion[Node::backRightUp] =
+        ao(x + 1, y + 1, z) * ao(x, y + 1, z - 1) * ao(x + 1, y + 1, z - 1);
+    occlusion[Node::backLeftUp] =
+        ao(x - 1, y + 1, z) * ao(x, y + 1, z - 1) * ao(x - 1, y + 1, z - 1);
+
+    occlusion[Node::frontRightDown] =
+        ao(x + 1, y - 1, z) * ao(x, y - 1, z + 1) * ao(x + 1, y - 1, z + 1);
+    occlusion[Node::frontLeftDown] =
+        ao(x - 1, y - 1, z) * ao(x, y - 1, z + 1) * ao(x - 1, y - 1, z + 1);
+    occlusion[Node::backRightDown] =
+        ao(x + 1, y - 1, z) * ao(x, y - 1, z - 1) * ao(x + 1, y - 1, z - 1);
+    occlusion[Node::backLeftDown] =
+        ao(x - 1, y - 1, z) * ao(x, y - 1, z - 1) * ao(x - 1, y - 1, z - 1);
+
+    return occlusion;
 }

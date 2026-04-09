@@ -17,6 +17,11 @@ ChunkRegion ChunkManager::getChunkRegion(int x, int z) {
         .left = std::move(getChunk(x - 1, z)),
         .front = std::move(getChunk(x, z + 1)),
         .back = std::move(getChunk(x, z - 1)),
+
+        .frontRight = std::move(getChunk(x + 1, z + 1)),
+        .backRight = std::move(getChunk(x + 1, z - 1)),
+        .frontLeft = std::move(getChunk(x - 1, z + 1)),
+        .backLeft = std::move(getChunk(x - 1, z - 1)),
     };
 }
 
@@ -43,22 +48,22 @@ void ChunkManager::updateRegion(ChunkRegion region) {
 
     onChunkUpdated(region);
 
-    if (region.right.has_value()) {
-        auto chunk = region.right.value();
-        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
-    }
-    if (region.left.has_value()) {
-        auto chunk = region.left.value();
-        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
-    }
-    if (region.front.has_value()) {
-        auto chunk = region.front.value();
-        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
-    }
-    if (region.back.has_value()) {
-        auto chunk = region.back.value();
-        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
-    }
+    auto update = [this](std::optional<std::shared_ptr<Chunk>> chunk) {
+        if (chunk.has_value()) {
+            onChunkUpdated(
+                std::move(getChunkRegion(chunk.value()->x, chunk.value()->z)));
+        }
+    };
+
+    update(region.right);
+    update(region.left);
+    update(region.front);
+    update(region.back);
+
+    update(region.frontRight);
+    update(region.backRight);
+    update(region.frontLeft);
+    update(region.backLeft);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
