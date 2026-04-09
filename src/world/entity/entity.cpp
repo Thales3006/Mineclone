@@ -33,9 +33,9 @@ void Entity::update(ChunkManager &chunkManager, float deltaTime) {
                                 velocity.z >= 0 ? 0 : -ceil(size.y));
     glm::vec3 dV = velocity * deltaTime + nSize;
 
-    for (int x = 0; abs(x) <= abs(dV.x) + 1; x += nV.x) {
-        for (int y = 0; abs(y) <= abs(dV.y) + 1; y += nV.y) {
-            for (int z = 0; abs(z) <= abs(dV.z) + 1; z += nV.z) {
+    for (int x = 0; abs(x) <= abs(dV.x) + abs(size.x) + 1; x += nV.x) {
+        for (int y = 0; abs(y) <= abs(dV.y) + abs(size.y) + 1; y += nV.y) {
+            for (int z = 0; abs(z) <= abs(dV.z) + abs(size.z) + 1; z += nV.z) {
                 const glm::vec3 colisionPos =
                     glm::floor(position) + glm::vec3(x, y, z) - nSize;
                 const Block &block =
@@ -64,11 +64,13 @@ void Entity::update(ChunkManager &chunkManager, float deltaTime) {
             correction.x = newCorrection.x;
             position.x += velocity.x * deltaTime + correction.x * 1.001f;
             velocity.x = 0;
-        } else if (newCorrection.y != 0 && correction.y == 0) {
+        }
+        if (newCorrection.y != 0 && correction.y == 0) {
             correction.y = newCorrection.y;
             position.y += velocity.y * deltaTime + correction.y * 1.001f;
             velocity.y = 0;
-        } else if (newCorrection.z != 0 && correction.z == 0) {
+        }
+        if (newCorrection.z != 0 && correction.z == 0) {
             correction.z = newCorrection.z;
             position.z += velocity.z * deltaTime + correction.z * 1.001f;
             velocity.z = 0;
@@ -131,6 +133,8 @@ glm::vec3 Entity::colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize,
                                         : normal = glm::vec3(0, 0, -1)
       : near.y > near.z ? normal = glm::vec3(0, -1, 0)
                       : normal = glm::vec3(0, 0, -1);
+
+    return (deltaVel * normal) * (1 - nearTime);
 
     return (deltaVel * normal) * (1 - nearTime);
 }
