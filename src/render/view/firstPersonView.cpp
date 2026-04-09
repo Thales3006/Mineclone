@@ -26,7 +26,7 @@ Mesh<TerrainVertex> createBoxMesh(Player &player, World &world,
                                   std::shared_ptr<Shader> shader) {
 
     auto block = Block(BlockID::smooth_stone, false);
-    auto blockGeometry = terrainVertexMap.getGeometry(block);
+    auto blockGeometry = terrainVertexMap.getGeometry(block, ALL_FACE);
     for (auto &vertex : blockGeometry.vertices) {
         vertex.color = glm::vec3(0.3, 0.3, 0.3);
     }

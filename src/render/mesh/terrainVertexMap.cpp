@@ -99,10 +99,11 @@ TerrainVertexMap::setUV(Geometry<TerrainVertex> geometry, BlockTextureID id) {
 }
 
 #define ADD_FACE(TEXTURE_ID, FACE)                                             \
-    if (block.faces & FACE)                                                    \
+    if (faces & FACE)                                                          \
         blockGeometry.append(setUV(fullBlock[FACE], TEXTURE_ID));
 
-Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
+Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block,
+                                                      unsigned char faces) {
     Geometry<TerrainVertex> blockGeometry{};
     switch (block.id) {
     case BlockID::air:
@@ -135,7 +136,7 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(Block &block) {
         ADD_FACE(BlockTextureID::grass_block_side, RIGHT_FACE)
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
-        if (block.faces & UP_FACE) {
+        if (faces & UP_FACE) {
             auto geometry =
                 setUV(fullBlock[UP_FACE], BlockTextureID::grass_block_top);
             for (auto &vertex : geometry.vertices)

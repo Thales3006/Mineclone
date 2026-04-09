@@ -41,9 +41,9 @@ class RenderManager {
 
     void renderChunks(int chunkx, int chunkz);
 
-    void addChunkView(std::shared_ptr<Chunk> chunk);
-    void removeChunkView(std::shared_ptr<Chunk> chunk);
-    void updateChunkView(std::shared_ptr<Chunk> chunk);
+    void addChunkView(ChunkRegion region);
+    void removeChunkView(ChunkRegion region);
+    void updateChunkView(ChunkRegion region);
 
     void excuteTasks();
 };

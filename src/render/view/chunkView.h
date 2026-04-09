@@ -5,16 +5,24 @@
 #include "render/mesh/terrainVertexMap.h"
 #include "render/textureManager.h"
 #include "world/terrain/chunk/chunk.h"
+#include "world/terrain/chunk/chunkRegion.h"
+
+#include <optional>
 
 class ChunkView {
   public:
-    ChunkView(std::shared_ptr<Chunk> chunk, TerrainVertexMap &terrainVertexMap,
+    ChunkView(ChunkRegion region, TerrainVertexMap &terrainVertexMap,
               std::shared_ptr<TextureManager> textureManager,
               std::shared_ptr<Shader> shader);
 
     void render(int chunkx, int chunkz);
 
-    std::shared_ptr<Chunk> chunk;
+    ChunkRegion region;
+
+    Mesh<TerrainVertex>
+    generateChunkMesh(ChunkRegion region, TerrainVertexMap &terrainVertexMap,
+                      std::shared_ptr<TextureManager> textureManager,
+                      std::shared_ptr<Shader> shader);
 
   private:
     Mesh<TerrainVertex> mesh;

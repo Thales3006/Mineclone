@@ -25,14 +25,6 @@ class Chunk {
     ~Chunk();
 
     void setBlock(int x, int y, int z, Block block);
-    void updateBlock(int x, int y, int z, const Chunk *leftChunk,
-                     const Chunk *rightChunk, const Chunk *frontChunk,
-                     const Chunk *backChunk);
-    void updateBlocks(const Chunk *leftChunk, const Chunk *rightChunk,
-                      const Chunk *frontChunk, const Chunk *backChunk);
-    void updateSide(const Side side, const Chunk *leftChunk,
-                    const Chunk *rightChunk, const Chunk *frontChunk,
-                    const Chunk *backChunk);
 
     static std::shared_ptr<Chunk> generateChunk(int x, int z);
 

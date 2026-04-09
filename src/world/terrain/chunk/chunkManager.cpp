@@ -2,12 +2,22 @@
 
 ChunkManager::ChunkManager() {}
 
-Chunk *ChunkManager::getChunkPtr(int x, int z) {
+std::optional<std::shared_ptr<Chunk>> ChunkManager::getChunk(int x, int z) {
     auto it = chunks.find({x, z});
     if (it != chunks.end()) {
-        return it->second.get();
+        return std::make_optional(it->second);
     }
-    return nullptr;
+    return std::nullopt;
+}
+
+ChunkRegion ChunkManager::getChunkRegion(int x, int z) {
+    return ChunkRegion{
+        .main = std::move(getChunk(x, z).value()),
+        .right = std::move(getChunk(x + 1, z)),
+        .left = std::move(getChunk(x - 1, z)),
+        .front = std::move(getChunk(x, z + 1)),
+        .back = std::move(getChunk(x, z - 1)),
+    };
 }
 
 void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
@@ -16,115 +26,17 @@ void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
 
     int x = chunk->x;
     int z = chunk->z;
-    updateChunk(*chunk);
     chunks[{x, z}] = std::move(chunk);
 
-    if (chunks.find({x - 1, z}) != chunks.end())
-        updateSide(right, *chunks[{x - 1, z}]);
-    if (chunks.find({x + 1, z}) != chunks.end())
-        updateSide(left, *chunks[{x + 1, z}]);
-    if (chunks.find({x, z + 1}) != chunks.end())
-        updateSide(back, *chunks[{x, z + 1}]);
-    if (chunks.find({x, z - 1}) != chunks.end())
-        updateSide(front, *chunks[{x, z - 1}]);
-
-    onChunkAdded(chunks[{x, z}]);
+    onChunkAdded(std::move(getChunkRegion(x, z)));
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
     if (chunks.find({x, z}) == chunks.end())
         return;
 
-    onChunkRemoved(chunks[{x, z}]);
+    onChunkRemoved(std::move(getChunkRegion(x, z)));
     chunks.erase({x, z});
-
-    if (chunks.find({x - 1, z}) != chunks.end())
-        updateSide(right, *chunks[{x - 1, z}]);
-    if (chunks.find({x + 1, z}) != chunks.end())
-        updateSide(left, *chunks[{x + 1, z}]);
-    if (chunks.find({x, z + 1}) != chunks.end())
-        updateSide(back, *chunks[{x, z + 1}]);
-    if (chunks.find({x, z - 1}) != chunks.end())
-        updateSide(front, *chunks[{x, z - 1}]);
-}
-
-void ChunkManager::updateSide(const Side side, Chunk &chunk) {
-    Chunk *leftChunk = getChunkPtr(chunk.x - 1, chunk.z);
-    Chunk *rightChunk = getChunkPtr(chunk.x + 1, chunk.z);
-    Chunk *frontChunk = getChunkPtr(chunk.x, chunk.z + 1);
-    Chunk *backChunk = getChunkPtr(chunk.x, chunk.z - 1);
-
-    chunk.updateSide(side, leftChunk, rightChunk, frontChunk, backChunk);
-}
-
-void ChunkManager::updateChunk(Chunk &chunk) {
-    Chunk *leftChunk = getChunkPtr(chunk.x - 1, chunk.z);
-    Chunk *rightChunk = getChunkPtr(chunk.x + 1, chunk.z);
-    Chunk *frontChunk = getChunkPtr(chunk.x, chunk.z + 1);
-    Chunk *backChunk = getChunkPtr(chunk.x, chunk.z - 1);
-
-    chunk.updateBlocks(leftChunk, rightChunk, frontChunk, backChunk);
-}
-
-void ChunkManager::updateChunks() {
-    std::lock_guard<std::mutex> lock(chunks_mutex);
-
-    for (auto &[coords, chunk] : chunks)
-        updateChunk(*chunk);
-}
-
-void ChunkManager::updateBlock(Chunk &chunk, int x, int y, int z) {
-    Chunk *leftChunk = getChunkPtr(chunk.x - 1, chunk.z);
-    Chunk *rightChunk = getChunkPtr(chunk.x + 1, chunk.z);
-    Chunk *frontChunk = getChunkPtr(chunk.x, chunk.z + 1);
-    Chunk *backChunk = getChunkPtr(chunk.x, chunk.z - 1);
-
-    chunk.updateBlock(x, y, z, leftChunk, rightChunk, frontChunk, backChunk);
-    onChunkUpdated(chunks[{chunk.x, chunk.z}]);
-}
-
-void ChunkManager::updateRegion(Chunk &chunk, int x, int y, int z) {
-    Chunk *leftChunk = getChunkPtr(chunk.x - 1, chunk.z);
-    Chunk *rightChunk = getChunkPtr(chunk.x + 1, chunk.z);
-    Chunk *frontChunk = getChunkPtr(chunk.x, chunk.z + 1);
-    Chunk *backChunk = getChunkPtr(chunk.x, chunk.z - 1);
-
-    chunk.updateBlock(x, y, z, leftChunk, rightChunk, frontChunk, backChunk);
-
-    if (x + 1 < CHUNK_WIDTH)
-        chunk.updateBlock(x + 1, y, z, leftChunk, rightChunk, frontChunk,
-                          backChunk);
-    else if (rightChunk) {
-        updateBlock(*rightChunk, 0, y, z);
-    }
-    if (x - 1 >= 0)
-        chunk.updateBlock(x - 1, y, z, leftChunk, rightChunk, frontChunk,
-                          backChunk);
-    else if (leftChunk) {
-        updateBlock(*leftChunk, CHUNK_WIDTH - 1, y, z);
-    }
-
-    if (y + 1 < CHUNK_HEIGHT)
-        chunk.updateBlock(x, y + 1, z, leftChunk, rightChunk, frontChunk,
-                          backChunk);
-    if (y - 1 >= 0)
-        chunk.updateBlock(x, y - 1, z, leftChunk, rightChunk, frontChunk,
-                          backChunk);
-
-    if (z + 1 < CHUNK_WIDTH)
-        chunk.updateBlock(x, y, z + 1, leftChunk, rightChunk, frontChunk,
-                          backChunk);
-    else if (frontChunk) {
-        updateBlock(*frontChunk, x, y, 0);
-    }
-    if (z - 1 >= 0)
-        chunk.updateBlock(x, y, z - 1, leftChunk, rightChunk, frontChunk,
-                          backChunk);
-    else if (backChunk) {
-        updateBlock(*backChunk, x, y, CHUNK_WIDTH - 1);
-    }
-
-    onChunkUpdated(chunks[{chunk.x, chunk.z}]);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
@@ -134,9 +46,17 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
         (x < 0 || x >= CHUNK_WIDTH) || (y < 0 || y >= CHUNK_HEIGHT) ||
         (z < 0 || z >= CHUNK_WIDTH))
         return;
-    auto chunk = chunks[{chunkx, chunkz}];
-    chunk->setBlock(x, y, z, block);
-    updateRegion(*chunk, x, y, z);
+
+    ChunkRegion region = getChunkRegion(chunkx, chunkz);
+
+    region.main->setBlock(x, y, z, block);
+
+    onChunkUpdated(std::move(region));
+
+    onChunkUpdated(std::move(getChunkRegion(chunkx + 1, chunkz)));
+    onChunkUpdated(std::move(getChunkRegion(chunkx - 1, chunkz)));
+    onChunkUpdated(std::move(getChunkRegion(chunkx, chunkz + 1)));
+    onChunkUpdated(std::move(getChunkRegion(chunkx, chunkz - 1)));
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
@@ -213,7 +133,7 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
 bool ChunkManager::isEmpty(int x, int z) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
-    return getChunkPtr(x, z) == nullptr;
+    return !getChunk(x, z).has_value();
 }
 
 std::pair<std::mutex *, chunk_map *> ChunkManager::unsafe_getChunkMap() {

@@ -22,23 +22,20 @@ RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
     };
     terrainVertexMap = std::make_shared<TerrainVertexMap>(textureManager);
 
-    world->getChunkManager()->onChunkAdded.connect(
-        [&](std::shared_ptr<Chunk> chunk) {
-            std::lock_guard<std::mutex> lock(taskMutex);
-            pendingTasks.push([this, chunk]() { addChunkView(chunk); });
-        });
+    world->getChunkManager()->onChunkAdded.connect([&](ChunkRegion region) {
+        std::lock_guard<std::mutex> lock(taskMutex);
+        pendingTasks.push([this, region]() { addChunkView(region); });
+    });
 
-    world->getChunkManager()->onChunkRemoved.connect(
-        [&](std::shared_ptr<Chunk> chunk) {
-            std::lock_guard<std::mutex> lock(taskMutex);
-            pendingTasks.push([this, chunk]() { removeChunkView(chunk); });
-        });
+    world->getChunkManager()->onChunkRemoved.connect([&](ChunkRegion region) {
+        std::lock_guard<std::mutex> lock(taskMutex);
+        pendingTasks.push([this, region]() { removeChunkView(region); });
+    });
 
-    world->getChunkManager()->onChunkUpdated.connect(
-        [&](std::shared_ptr<Chunk> chunk) {
-            std::lock_guard<std::mutex> lock(taskMutex);
-            pendingTasks.push([this, chunk]() { updateChunkView(chunk); });
-        });
+    world->getChunkManager()->onChunkUpdated.connect([&](ChunkRegion region) {
+        std::lock_guard<std::mutex> lock(taskMutex);
+        pendingTasks.push([this, region]() { updateChunkView(region); });
+    });
 
     firstPersonView = std::make_unique<FirstPersonView>(
         world->getEntityManager()->player, world, *terrainVertexMap,
@@ -96,23 +93,23 @@ void RenderManager::renderChunks(int chunkx, int chunkz) {
     }
 }
 
-void RenderManager::addChunkView(std::shared_ptr<Chunk> chunk) {
+void RenderManager::addChunkView(ChunkRegion region) {
     chunkViews.push_back(std::make_unique<ChunkView>(
-        chunk, *terrainVertexMap, textureManager, shaders["terrain"]));
+        region, *terrainVertexMap, textureManager, shaders["terrain"]));
 }
 
-void RenderManager::removeChunkView(std::shared_ptr<Chunk> chunk) {
+void RenderManager::removeChunkView(ChunkRegion region) {
     auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
                              [&](const std::unique_ptr<ChunkView> &chunkView) {
-                                 return chunkView->chunk == chunk;
+                                 return chunkView->region.main == region.main;
                              });
     if (it != chunkViews.end()) {
         chunkViews.erase(it, chunkViews.end());
     }
 }
-void RenderManager::updateChunkView(std::shared_ptr<Chunk> chunk) {
-    removeChunkView(chunk);
-    addChunkView(chunk);
+void RenderManager::updateChunkView(ChunkRegion region) {
+    removeChunkView(region);
+    addChunkView(region);
 }
 
 void RenderManager::excuteTasks() {
