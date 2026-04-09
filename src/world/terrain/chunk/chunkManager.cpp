@@ -39,6 +39,28 @@ void ChunkManager::unloadChunk(int x, int z) {
     chunks.erase({x, z});
 }
 
+void ChunkManager::updateRegion(ChunkRegion region) {
+
+    onChunkUpdated(region);
+
+    if (region.right.has_value()) {
+        auto chunk = region.right.value();
+        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
+    }
+    if (region.left.has_value()) {
+        auto chunk = region.left.value();
+        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
+    }
+    if (region.front.has_value()) {
+        auto chunk = region.front.value();
+        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
+    }
+    if (region.back.has_value()) {
+        auto chunk = region.back.value();
+        onChunkUpdated(std::move(getChunkRegion(chunk->x, chunk->z)));
+    }
+}
+
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
                             Block block) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
@@ -51,12 +73,7 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
 
     region.main->setBlock(x, y, z, block);
 
-    onChunkUpdated(std::move(region));
-
-    onChunkUpdated(std::move(getChunkRegion(chunkx + 1, chunkz)));
-    onChunkUpdated(std::move(getChunkRegion(chunkx - 1, chunkz)));
-    onChunkUpdated(std::move(getChunkRegion(chunkx, chunkz + 1)));
-    onChunkUpdated(std::move(getChunkRegion(chunkx, chunkz - 1)));
+    updateRegion(std::move(region));
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
