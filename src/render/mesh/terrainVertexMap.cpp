@@ -97,39 +97,25 @@ TerrainVertexMap::setUV(Geometry<TerrainVertex> geometry, BlockTextureID id) {
     }
     return geometry;
 }
-Geometry<TerrainVertex>
-TerrainVertexMap::getGeometry(Block &block, std::array<float, 8> color,
-                              unsigned char faces) {
+
+Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
+                                                      int x, int y, int z) {
     Geometry<TerrainVertex> blockGeometry{};
+    unsigned char faces = region.getBlockFaces(x, y, z);
 
-    static const Node faceNodes[6][4] = {
-        // FRONT (z=1): (0,0,1)(1,0,1)(1,1,1)(0,1,1)
-        {frontLeftDown, frontRightDown, frontRightUp, frontLeftUp},
-        // BACK (z=0): (1,0,0)(0,0,0)(0,1,0)(1,1,0)
-        {backRightDown, backLeftDown, backLeftUp, backRightUp},
-        // RIGHT (x=1): (1,0,1)(1,0,0)(1,1,0)(1,1,1)
-        {frontRightDown, backRightDown, backRightUp, frontRightUp},
-        // LEFT (x=0): (0,0,0)(0,0,1)(0,1,1)(0,1,0)
-        {backLeftDown, frontLeftDown, frontLeftUp, backLeftUp},
-        // UP (y=1): (0,1,1)(1,1,1)(1,1,0)(0,1,0)
-        {frontLeftUp, frontRightUp, backRightUp, backLeftUp},
-        // DOWN (y=0): (0,0,1)(1,0,1)(1,0,0)(0,0,0)
-        {frontLeftDown, frontRightDown, backRightDown, backLeftDown},
-    };
-
-    auto add_face = [this, &blockGeometry, &color,
+    auto add_face = [this, &blockGeometry, &region, x, y, z,
                      faces](BlockTextureID texture_id, unsigned char face) {
         if (faces & face) {
             auto geometry = setUV(fullBlock[face], texture_id);
-            int fi = __builtin_ctz(face);
+            auto occlusion = region.getBlockOcclusion(x, y, z, face);
             for (int i = 0; i < 4; i++) {
-                geometry.vertices[i].color = glm::vec3(color[faceNodes[fi][i]]);
+                geometry.vertices[i].color = glm::vec3(occlusion[i]);
             }
             blockGeometry.append(geometry);
         }
     };
 
-    switch (block.id) {
+    switch (region.main->blocks[x][y][z].id) {
     case BlockID::air:
         return Geometry<TerrainVertex>{};
     case BlockID::stone:
@@ -152,10 +138,10 @@ TerrainVertexMap::getGeometry(Block &block, std::array<float, 8> color,
         if (faces & UP_FACE) {
             auto geometry =
                 setUV(fullBlock[UP_FACE], BlockTextureID::grass_block_top);
-            int fi = __builtin_ctz(UP_FACE);
+            auto occlusion = region.getBlockOcclusion(x, y, z, UP_FACE);
             for (int i = 0; i < 4; i++)
                 geometry.vertices[i].color =
-                    glm::vec3(0.5f, 0.8f, 0.4f) * color[faceNodes[fi][i]];
+                    glm::vec3(0.5f, 0.8f, 0.4f) * occlusion[i];
             blockGeometry.append(geometry);
         }
         add_face(BlockTextureID::dirt, DOWN_FACE);
@@ -214,4 +200,25 @@ TerrainVertexMap::getGeometry(Block &block, std::array<float, 8> color,
     default:
         return Geometry<TerrainVertex>{};
     }
+}
+
+Geometry<TerrainVertex> TerrainVertexMap::getSelectionBox() {
+    Geometry<TerrainVertex> blockGeometry{};
+
+    auto add_face = [this, &blockGeometry](BlockTextureID texture_id,
+                                           unsigned char face) {
+        auto geometry = setUV(fullBlock[face], texture_id);
+        for (int i = 0; i < 4; i++) {
+            geometry.vertices[i].color = glm::vec3(0.2f);
+        }
+        blockGeometry.append(geometry);
+    };
+
+    add_face(BlockTextureID::stone, UP_FACE);
+    add_face(BlockTextureID::stone, DOWN_FACE);
+    add_face(BlockTextureID::stone, FRONT_FACE);
+    add_face(BlockTextureID::stone, BACK_FACE);
+    add_face(BlockTextureID::stone, LEFT_FACE);
+    add_face(BlockTextureID::stone, RIGHT_FACE);
+    return blockGeometry;
 }

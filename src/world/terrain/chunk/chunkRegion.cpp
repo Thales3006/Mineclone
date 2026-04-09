@@ -63,30 +63,78 @@ unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) {
     return faces;
 }
 
-std::array<float, 8> ChunkRegion::getBlockOcclusion(int x, int y, int z) {
-    std::array<float, 8> occlusion;
-    occlusion.fill(1.0f);
+std::array<float, 4> ChunkRegion::getBlockOcclusion(int x, int y, int z,
+                                                    unsigned char face) {
+    std::array<float, 4> occlusion;
 
-    auto ao = [this](int x, int y, int z) -> float {
-        return getBlock(x, y, z).solid ? 0.6f : 1.0f;
+    static const glm::ivec3 vertexAO[6][4][3] = {
+        {
+            // FRONT: v0=(0,0,1) v1=(1,0,1) v2=(1,1,1) v3=(0,1,1)
+            {{-1, 0, 1}, {0, -1, 1}, {-1, -1, 1}}, // v0 frontLeftDown
+            {{1, 0, 1}, {0, -1, 1}, {1, -1, 1}},   // v1 frontRightDown
+            {{1, 0, 1}, {0, 1, 1}, {1, 1, 1}},     // v2 frontRightUp
+            {{-1, 0, 1}, {0, 1, 1}, {-1, 1, 1}},   // v3 frontLeftUp
+        },
+        {
+            // BACK: v0=(1,0,0) v1=(0,0,0) v2=(0,1,0) v3=(1,1,0)
+            {{1, 0, -1}, {0, -1, -1}, {1, -1, -1}},   // v0 backRightDown
+            {{-1, 0, -1}, {0, -1, -1}, {-1, -1, -1}}, // v1 backLeftDown
+            {{-1, 0, -1}, {0, 1, -1}, {-1, 1, -1}},   // v2 backLeftUp
+            {{1, 0, -1}, {0, 1, -1}, {1, 1, -1}},     // v3 backRightUp
+        },
+        {
+            // LEFT: v0=(0,0,0) v1=(0,0,1) v2=(0,1,1) v3=(0,1,0)
+            {{-1, 0, -1}, {-1, -1, 0}, {-1, -1, -1}}, // v0 backLeftDown
+            {{-1, 0, 1}, {-1, -1, 0}, {-1, -1, 1}},   // v1 frontLeftDown
+            {{-1, 0, 1}, {-1, 1, 0}, {-1, 1, 1}},     // v2 frontLeftUp
+            {{-1, 0, -1}, {-1, 1, 0}, {-1, 1, -1}},   // v3 backLeftUp
+        },
+        {
+            // RIGHT: v0=(1,0,1) v1=(1,0,0) v2=(1,1,0) v3=(1,1,1)
+            {{1, 0, 1}, {1, -1, 0}, {1, -1, 1}},   // v0 frontRightDown
+            {{1, 0, -1}, {1, -1, 0}, {1, -1, -1}}, // v1 backRightDown
+            {{1, 0, -1}, {1, 1, 0}, {1, 1, -1}},   // v2 backRightUp
+            {{1, 0, 1}, {1, 1, 0}, {1, 1, 1}},     // v3 frontRightUp
+        },
+        {
+            // UP: v0=(0,1,1) v1=(1,1,1) v2=(1,1,0) v3=(0,1,0)
+            {{-1, 1, 0}, {0, 1, 1}, {-1, 1, 1}},   // v0 frontLeftUp
+            {{1, 1, 0}, {0, 1, 1}, {1, 1, 1}},     // v1 frontRightUp
+            {{1, 1, 0}, {0, 1, -1}, {1, 1, -1}},   // v2 backRightUp
+            {{-1, 1, 0}, {0, 1, -1}, {-1, 1, -1}}, // v3 backLeftUp
+        },
+        {
+            // DOWN: v0=(0,0,1) v1=(1,0,1) v2=(1,0,0) v3=(0,0,0)
+            {{-1, -1, 0}, {0, -1, 1}, {-1, -1, 1}},   // v0 frontLeftDown
+            {{1, -1, 0}, {0, -1, 1}, {1, -1, 1}},     // v1 frontRightDown
+            {{1, -1, 0}, {0, -1, -1}, {1, -1, -1}},   // v2 backRightDown
+            {{-1, -1, 0}, {0, -1, -1}, {-1, -1, -1}}, // v3 backLeftDown
+        },
     };
 
-    occlusion[Node::frontRightUp] =
-        ao(x + 1, y + 1, z + 1) * ao(x, y + 1, z + 1) * ao(x + 1, y + 1, z);
-    occlusion[Node::frontLeftUp] =
-        ao(x - 1, y + 1, z + 1) * ao(x, y + 1, z + 1) * ao(x - 1, y + 1, z);
-    occlusion[Node::backRightUp] =
-        ao(x + 1, y + 1, z - 1) * ao(x, y + 1, z - 1) * ao(x + 1, y + 1, z);
-    occlusion[Node::backLeftUp] =
-        ao(x - 1, y + 1, z - 1) * ao(x, y + 1, z - 1) * ao(x - 1, y + 1, z);
+    int fi = __builtin_ctz(face);
+    for (int v = 0; v < 4; v++) {
+        int s1 = getBlock(x + vertexAO[fi][v][0].x, y + vertexAO[fi][v][0].y,
+                          z + vertexAO[fi][v][0].z)
+                         .solid
+                     ? 1
+                     : 0;
+        int s2 = getBlock(x + vertexAO[fi][v][1].x, y + vertexAO[fi][v][1].y,
+                          z + vertexAO[fi][v][1].z)
+                         .solid
+                     ? 1
+                     : 0;
+        int diag =
+            (s1 && s2)
+                ? 1
+                : (getBlock(x + vertexAO[fi][v][2].x, y + vertexAO[fi][v][2].y,
+                            z + vertexAO[fi][v][2].z)
+                           .solid
+                       ? 1
+                       : 0);
 
-    occlusion[Node::frontRightDown] = ao(x + 1, y - 1, z + 1);
-    occlusion[Node::frontLeftDown] =
-        ao(x - 1, y - 1, z + 1) * ao(x, y - 1, z + 1) * ao(x - 1, y - 1, z);
-    occlusion[Node::backRightDown] =
-        ao(x + 1, y - 1, z - 1) * ao(x, y - 1, z - 1) * ao(x + 1, y - 1, z);
-    occlusion[Node::backLeftDown] =
-        ao(x - 1, y - 1, z - 1) * ao(x, y - 1, z - 1) * ao(x - 1, y - 1, z);
-
+        static const float aoValues[4] = {0.25f, 0.4f, 0.6f, 1.0f};
+        occlusion[v] = aoValues[3 - (s1 + s2 + diag)];
+    }
     return occlusion;
 }

@@ -18,15 +18,10 @@
 #define NO_FACE 0b00000000
 
 enum Node {
-    frontRightUp,
-    frontLeftUp,
-    backRightUp,
-    backLeftUp,
-
-    frontRightDown,
-    frontLeftDown,
-    backRightDown,
-    backLeftDown,
+    frontRight,
+    frontLeft,
+    backRight,
+    backLeft,
 };
 
 struct ChunkRegion {
@@ -44,7 +39,8 @@ struct ChunkRegion {
 
     unsigned char getBlockFaces(int x, int y, int z);
 
-    std::array<float, 8> getBlockOcclusion(int x, int y, int z);
+    std::array<float, 4> getBlockOcclusion(int x, int y, int z,
+                                           unsigned char face);
 
   private:
     Block getBlock(int x, int y, int z);

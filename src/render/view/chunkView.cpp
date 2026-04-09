@@ -18,8 +18,8 @@ ChunkView::generateChunkMesh(ChunkRegion region,
                     continue;
 
                 Block &block = region.main->blocks[i][j][k];
-                auto blockGeometry = terrainVertexMap.getGeometry(
-                    block, region.getBlockOcclusion(i, j, k), faces);
+                auto blockGeometry =
+                    terrainVertexMap.getGeometry(region, i, j, k);
 
                 glm::vec3 pos = glm::vec3(i, j, k);
                 blockGeometry.addVertexOffset(pos);

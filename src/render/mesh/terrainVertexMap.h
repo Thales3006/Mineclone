@@ -11,8 +11,10 @@ class TerrainVertexMap {
   public:
     TerrainVertexMap(std::shared_ptr<TextureManager> textureManager);
 
-    Geometry<TerrainVertex>
-    getGeometry(Block &block, std::array<float, 8> color, unsigned char faces);
+    Geometry<TerrainVertex> getGeometry(ChunkRegion &region, int x, int y,
+                                        int z);
+
+    Geometry<TerrainVertex> getSelectionBox();
 
   private:
     std::map<unsigned char, Geometry<TerrainVertex>> fullBlock;
