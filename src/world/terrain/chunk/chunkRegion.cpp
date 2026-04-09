@@ -67,27 +67,26 @@ std::array<float, 8> ChunkRegion::getBlockOcclusion(int x, int y, int z) {
     std::array<float, 8> occlusion;
     occlusion.fill(1.0f);
 
-    auto ao = [&](int bx, int by, int bz) -> float {
-        return getBlock(bx, by, bz).solid ? 0.6f : 1.0f;
+    auto ao = [this](int x, int y, int z) -> float {
+        return getBlock(x, y, z).solid ? 0.6f : 1.0f;
     };
 
     occlusion[Node::frontRightUp] =
-        ao(x + 1, y + 1, z) * ao(x, y + 1, z + 1) * ao(x + 1, y + 1, z + 1);
+        ao(x + 1, y + 1, z + 1) * ao(x, y + 1, z + 1) * ao(x + 1, y + 1, z);
     occlusion[Node::frontLeftUp] =
-        ao(x - 1, y + 1, z) * ao(x, y + 1, z + 1) * ao(x - 1, y + 1, z + 1);
+        ao(x - 1, y + 1, z + 1) * ao(x, y + 1, z + 1) * ao(x - 1, y + 1, z);
     occlusion[Node::backRightUp] =
-        ao(x + 1, y + 1, z) * ao(x, y + 1, z - 1) * ao(x + 1, y + 1, z - 1);
+        ao(x + 1, y + 1, z - 1) * ao(x, y + 1, z - 1) * ao(x + 1, y + 1, z);
     occlusion[Node::backLeftUp] =
-        ao(x - 1, y + 1, z) * ao(x, y + 1, z - 1) * ao(x - 1, y + 1, z - 1);
+        ao(x - 1, y + 1, z - 1) * ao(x, y + 1, z - 1) * ao(x - 1, y + 1, z);
 
-    occlusion[Node::frontRightDown] =
-        ao(x + 1, y - 1, z) * ao(x, y - 1, z + 1) * ao(x + 1, y - 1, z + 1);
+    occlusion[Node::frontRightDown] = ao(x + 1, y - 1, z + 1);
     occlusion[Node::frontLeftDown] =
-        ao(x - 1, y - 1, z) * ao(x, y - 1, z + 1) * ao(x - 1, y - 1, z + 1);
+        ao(x - 1, y - 1, z + 1) * ao(x, y - 1, z + 1) * ao(x - 1, y - 1, z);
     occlusion[Node::backRightDown] =
-        ao(x + 1, y - 1, z) * ao(x, y - 1, z - 1) * ao(x + 1, y - 1, z - 1);
+        ao(x + 1, y - 1, z - 1) * ao(x, y - 1, z - 1) * ao(x + 1, y - 1, z);
     occlusion[Node::backLeftDown] =
-        ao(x - 1, y - 1, z) * ao(x, y - 1, z - 1) * ao(x - 1, y - 1, z - 1);
+        ao(x - 1, y - 1, z - 1) * ao(x, y - 1, z - 1) * ao(x - 1, y - 1, z);
 
     return occlusion;
 }
