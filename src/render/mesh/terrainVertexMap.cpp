@@ -117,7 +117,7 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
 
     auto add_plant = [this, &blockGeometry, &region, x, y, z,
                       faces](BlockTextureID texture_id) {
-        blockGeometry = setUV(plantBlock, BlockTextureID::grass);
+        blockGeometry = setUV(plantBlock, texture_id);
         for (auto &vertex : blockGeometry.vertices)
             vertex.color = glm::vec3(1.0f);
     };
