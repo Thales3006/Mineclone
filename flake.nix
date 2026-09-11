@@ -33,24 +33,6 @@
 
           valgrind
         ];
-
-        shellHook = ''
-          cat > .clangd <<EOF
-          CompileFlags:
-            Compiler: clang++
-            Add:
-              - -std=c++17
-              - -I$PWD/src
-              - -I$PWD/lib
-              - -I${pkgs.libglvnd.dev}/include
-              - -I${pkgs.glfw}/include
-              - -I${pkgs.glm}/include
-              - -I${pkgs.stb}/include
-              - -I${pkgs.sigslot}/include
-              - -I${pkgs.stdenv.cc.cc.lib}/include
-          EOF
-          echo "ambiente pronto"
-        '';
       };
 
       packages.${system} = {
