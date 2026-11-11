@@ -26,7 +26,7 @@ class Chunk {
 
     void setBlock(int x, int y, int z, Block block);
 
-    static std::shared_ptr<Chunk> generateChunk(int x, int z);
+    static std::shared_ptr<Chunk> generateChunk(int seed, int x, int z);
 
     static glm::vec3 chunkOffSet(glm::vec3 position);
 };

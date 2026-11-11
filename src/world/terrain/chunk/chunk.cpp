@@ -25,16 +25,16 @@ Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
 
 Chunk::~Chunk() {}
 
-std::shared_ptr<Chunk> Chunk::generateChunk(int x, int z) {
+std::shared_ptr<Chunk> Chunk::generateChunk(int seed, int x, int z) {
     std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(x, z);
 
     FastNoiseLite noise;
-    noise.SetSeed(42);
+    noise.SetSeed(seed);
     noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     noise.SetFrequency(0.05f);
 
     FastNoiseLite cave_noise;
-    cave_noise.SetSeed(42);
+    cave_noise.SetSeed(seed);
     cave_noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     cave_noise.SetFrequency(0.1f);
 
