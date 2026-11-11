@@ -33,8 +33,7 @@ Mesh<TerrainVertex> createBoxMesh(Player &player, World &world,
     return Mesh<TerrainVertex>(std::move(blockGeometry), texture, shader);
 }
 
-FirstPersonView::FirstPersonView(std::shared_ptr<Player> player,
-                                 std::shared_ptr<World> world,
+FirstPersonView::FirstPersonView(std::shared_ptr<Player> player, World *world,
                                  TerrainVertexMap &terrainVertexMap,
                                  std::shared_ptr<Texture> texture,
                                  std::shared_ptr<Shader> shader)

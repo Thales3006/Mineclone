@@ -1,17 +1,11 @@
 #ifndef GAME_CLASS_H
 #define GAME_CLASS_H
 
-#include "game/input/inputManager.h"
+#include "game/scene/scene.h"
 #include "game/window.h"
 #include "render/renderer.h"
-#include "render/worldRenderer.h"
-#include "world/world.h"
 
-#include <atomic>
-#include <cmath>
-#include <iostream>
-#include <unordered_set>
-#include <vector>
+#include <memory>
 
 class Game {
   public:
@@ -27,15 +21,10 @@ class Game {
 
   private:
     double deltaTime;
-    std::atomic<bool> isRunning;
-
-    std::unique_ptr<InputManager> inputManager;
 
     Window window;
-    std::shared_ptr<World> world;
     Renderer renderer;
-    WorldRenderer worldRenderer;
-    void autoLoadChunks();
+    std::unique_ptr<Scene> scene;
 };
 
 #endif // GAME_CLASS_H

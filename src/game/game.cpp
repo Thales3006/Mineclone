@@ -1,51 +1,30 @@
 #include "game/game.h"
 
-#include <thread>
+#include "game/scene/gameScene.h"
 
-Game::Game()
-    : deltaTime(0), isRunning(false), window(),
-      world(std::make_shared<World>(42)), renderer(&window),
-      worldRenderer(world) {
+Game::Game() : deltaTime(0), window(), renderer(&window) {
     window.setUserPointer(this);
-
-    inputManager =
-        std::make_unique<InputManager>(world, &window, &worldRenderer);
-
+    scene = std::make_unique<GameScene>(&window);
     glfwSetTime(0);
 }
 
-void Game::autoLoadChunks() {
-    Player &player = *world->getEntityManager()->player;
-    while (isRunning) {
-        world->getChunkManager()->fillChunkRadius(6, player.chunkx,
-                                                  player.chunkz);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
-}
-
 void Game::run() {
-    isRunning = true;
-    std::thread chunkLoader(&Game::autoLoadChunks, this);
+    scene->onEnter();
 
     while (!glfwWindowShouldClose(window.getWindow())) {
         deltaTime = glfwGetTime();
         glfwSetTime(0);
 
-        inputManager->processKeyboard(deltaTime);
+        scene->update(deltaTime);
 
-        world->updateTick(deltaTime);
         renderer.beginFrame();
-        worldRenderer.render(renderer);
-
-        // std::cout << "FPS: "<< 1/deltaTime <<" \n";
+        scene->render(renderer);
 
         glfwSwapBuffers(window.getWindow());
         glfwPollEvents();
     }
 
-    isRunning = false;
-    chunkLoader.join();
-
+    scene->onExit();
     glfwTerminate();
 }
 
@@ -53,7 +32,7 @@ void Game::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
     static double xlast = xpos;
     static double ylast = ypos;
-    game.inputManager->handleMouseMovementCallback(xpos - xlast, ypos - ylast);
+    game.scene->onMouseMove(xpos - xlast, ypos - ylast);
     xlast = xpos;
     ylast = ypos;
 }
@@ -61,12 +40,11 @@ void Game::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
 void Game::mouseClickCallback(GLFWwindow *window, int button, int action,
                               int mods) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
-    game.inputManager->handleMouseClickCallback(window, button, action, mods);
+    game.scene->onMouseButton(window, button, action, mods);
 }
 
 void Game::keyboardCallback(GLFWwindow *window, int key, int scancode,
                             int action, int mods) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
-    game.inputManager->handleKeyboardCallback(window, key, scancode, action,
-                                              mods);
+    game.scene->onKey(window, key, scancode, action, mods);
 }

@@ -1,5 +1,5 @@
-#ifndef WORLD_RENDERER_CLASS_H
-#define WORLD_RENDERER_CLASS_H
+#ifndef GAME_VIEW_CLASS_H
+#define GAME_VIEW_CLASS_H
 
 #include "render/camera.h"
 #include "render/mesh/mesh.h"
@@ -13,10 +13,10 @@
 
 #include <queue>
 
-class WorldRenderer {
+class GameView {
   public:
-    WorldRenderer();
-    WorldRenderer(std::shared_ptr<World> world);
+    GameView();
+    GameView(World *world);
 
     void render(Renderer &renderer);
 
@@ -33,7 +33,7 @@ class WorldRenderer {
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;
 
-    std::shared_ptr<World> world;
+    World *world;
 
     void renderChunks(int chunkx, int chunkz);
 

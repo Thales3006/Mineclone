@@ -9,8 +9,7 @@
 
 class FirstPersonView {
   public:
-    FirstPersonView(std::shared_ptr<Player> player,
-                    std::shared_ptr<World> world,
+    FirstPersonView(std::shared_ptr<Player> player, World *world,
                     TerrainVertexMap &terrainVertexMap,
                     std::shared_ptr<Texture> texture,
                     std::shared_ptr<Shader> shader);
@@ -21,7 +20,7 @@ class FirstPersonView {
     Mesh<TerrainVertex> selectionBoxMesh;
 
     std::shared_ptr<Player> player;
-    std::shared_ptr<World> world;
+    World *world;
 };
 
 #endif

@@ -1,12 +1,12 @@
-#include "render/worldRenderer.h"
+#include "render/gameView.h"
 
 #include "render/renderLib.h"
 
 #include <algorithm>
 
-WorldRenderer::WorldRenderer() {}
+GameView::GameView() {}
 
-WorldRenderer::WorldRenderer(std::shared_ptr<World> world) : world(world) {
+GameView::GameView(World *world) : world(world) {
     camera.setMinMax(0.01f, 400.0f);
     camera.setFOV(glm::radians(90.0f));
 
@@ -37,7 +37,7 @@ WorldRenderer::WorldRenderer(std::shared_ptr<World> world) : world(world) {
         textureManager->getTexture("blocks"), shaders["terrain"]);
 }
 
-void WorldRenderer::render(Renderer &renderer) {
+void GameView::render(Renderer &renderer) {
     executeTasks();
 
     glm::uvec2 windowSize = renderer.getWindow()->getWindowSize();
@@ -58,18 +58,18 @@ void WorldRenderer::render(Renderer &renderer) {
     firstPersonView->render(player.chunkx, player.chunkz);
 }
 
-void WorldRenderer::renderChunks(int chunkx, int chunkz) {
+void GameView::renderChunks(int chunkx, int chunkz) {
     for (auto &chunkView : chunkViews) {
         chunkView->render(chunkx, chunkz);
     }
 }
 
-void WorldRenderer::addChunkView(ChunkRegion region) {
+void GameView::addChunkView(ChunkRegion region) {
     chunkViews.push_back(std::make_unique<ChunkView>(
         region, *terrainVertexMap, textureManager, shaders["terrain"]));
 }
 
-void WorldRenderer::removeChunkView(ChunkRegion region) {
+void GameView::removeChunkView(ChunkRegion region) {
     auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
                              [&](const std::unique_ptr<ChunkView> &chunkView) {
                                  return chunkView->region.main == region.main;
@@ -79,12 +79,12 @@ void WorldRenderer::removeChunkView(ChunkRegion region) {
     }
 }
 
-void WorldRenderer::updateChunkView(ChunkRegion region) {
+void GameView::updateChunkView(ChunkRegion region) {
     removeChunkView(region);
     addChunkView(region);
 }
 
-void WorldRenderer::executeTasks() {
+void GameView::executeTasks() {
     std::lock_guard<std::mutex> lock(taskMutex);
 
     while (!pendingTasks.empty()) {
