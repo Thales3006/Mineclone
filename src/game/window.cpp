@@ -55,3 +55,20 @@ glm::uvec2 Window::getWindowSize() {
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
     return glm::ivec2(windowWidth, windowHeight);
 }
+
+void Window::toggleFullscreen() {
+    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+
+    if (!fullscreen) {
+        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height,
+                             mode->refreshRate);
+        glViewport(0, 0, mode->width, mode->height);
+        fullscreen = true;
+    } else {
+        glfwSetWindowMonitor(window, 0, mode->width / 2 - defaultWidth / 2,
+                             mode->height / 2 - defaultHeight / 2, defaultWidth,
+                             defaultHeight, mode->refreshRate);
+        glViewport(0, 0, defaultWidth, defaultHeight);
+        fullscreen = false;
+    }
+}

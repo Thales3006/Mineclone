@@ -15,6 +15,13 @@ class Player : public Entity {
 
     void updatePlayer(ChunkManager &chunkManager, float deltaTime);
 
+    glm::vec3 forward() const;
+    glm::vec3 right() const;
+
+    void move(glm::vec3 worldDir, float deltaTime);
+    void jump();
+    void look(float dx, float dy, float sensibility);
+
     int hotbarIndex;
 };
 

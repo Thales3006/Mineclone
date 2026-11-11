@@ -17,9 +17,13 @@ class Window {
     void setUserPointer(void *game);
     void bindContext();
 
+    void toggleFullscreen();
+
   private:
     const int defaultWidth = 1200;
     const int defaultHeight = 600;
+
+    bool fullscreen = false;
 
     GLFWmonitor *monitor;
     GLFWwindow *window;

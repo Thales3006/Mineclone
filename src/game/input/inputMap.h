@@ -1,8 +1,10 @@
 #ifndef INPUT_MAP_CLASS
 #define INPUT_MAP_CLASS
 
-#include "render/renderLib.h"
+#include "game/input/inputEvent.h"
+
 #include <map>
+#include <optional>
 
 enum Action {
     MoveFoward,
@@ -27,15 +29,15 @@ enum Action {
     Fullscreen,
     IncreaseFOV,
     DecreaseFOV,
-    None,
 };
 
 class InputMap {
   public:
     InputMap();
 
-    void setInput(Action action, int key);
-    Action getInput(int key);
+    std::optional<Action> action(const InputEvent &e) const;
+    std::optional<Action> actionForCode(int keyOrButton) const;
+    void bind(Action a, int keyOrButton);
 
   private:
     std::map<Action, int> actionKeyMap;

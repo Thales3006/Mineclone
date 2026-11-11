@@ -1,39 +1,50 @@
 #include "game/input/inputMap.h"
 
+#include "render/renderLib.h"
+
 InputMap::InputMap() {
-    setInput(MoveFoward, GLFW_KEY_W);
-    setInput(MoveBackward, GLFW_KEY_S);
-    setInput(MoveLeft, GLFW_KEY_A);
-    setInput(MoveRight, GLFW_KEY_D);
-    setInput(Jump, GLFW_KEY_SPACE);
-    setInput(DestroyBlock, GLFW_MOUSE_BUTTON_LEFT);
-    setInput(PlaceBlock, GLFW_MOUSE_BUTTON_RIGHT);
-    setInput(Fullscreen, GLFW_KEY_F11);
-    setInput(IncreaseFOV, GLFW_KEY_Z);
-    setInput(DecreaseFOV, GLFW_KEY_X);
+    bind(MoveFoward, GLFW_KEY_W);
+    bind(MoveBackward, GLFW_KEY_S);
+    bind(MoveLeft, GLFW_KEY_A);
+    bind(MoveRight, GLFW_KEY_D);
+    bind(Jump, GLFW_KEY_SPACE);
+    bind(DestroyBlock, GLFW_MOUSE_BUTTON_LEFT);
+    bind(PlaceBlock, GLFW_MOUSE_BUTTON_RIGHT);
+    bind(Fullscreen, GLFW_KEY_F11);
+    bind(IncreaseFOV, GLFW_KEY_Z);
+    bind(DecreaseFOV, GLFW_KEY_X);
 
-    setInput(HotbarSlot1, GLFW_KEY_1);
-    setInput(HotbarSlot2, GLFW_KEY_2);
-    setInput(HotbarSlot3, GLFW_KEY_3);
-    setInput(HotbarSlot4, GLFW_KEY_4);
-    setInput(HotbarSlot5, GLFW_KEY_5);
-    setInput(HotbarSlot6, GLFW_KEY_6);
-    setInput(HotbarSlot7, GLFW_KEY_7);
-    setInput(HotbarSlot8, GLFW_KEY_8);
-    setInput(HotbarSlot9, GLFW_KEY_9);
+    bind(HotbarSlot1, GLFW_KEY_1);
+    bind(HotbarSlot2, GLFW_KEY_2);
+    bind(HotbarSlot3, GLFW_KEY_3);
+    bind(HotbarSlot4, GLFW_KEY_4);
+    bind(HotbarSlot5, GLFW_KEY_5);
+    bind(HotbarSlot6, GLFW_KEY_6);
+    bind(HotbarSlot7, GLFW_KEY_7);
+    bind(HotbarSlot8, GLFW_KEY_8);
+    bind(HotbarSlot9, GLFW_KEY_9);
 }
 
-void InputMap::setInput(Action action, int key) {
-    actionKeyMap[action] = key;
-    keyActionMap[key] = action;
+void InputMap::bind(Action a, int keyOrButton) {
+    auto previous = actionKeyMap.find(a);
+    if (previous != actionKeyMap.end())
+        keyActionMap.erase(previous->second);
+
+    actionKeyMap[a] = keyOrButton;
+    keyActionMap[keyOrButton] = a;
 }
 
-Action InputMap::getInput(int key) {
-    auto it = keyActionMap.find(key);
+std::optional<Action> InputMap::actionForCode(int keyOrButton) const {
+    auto it = keyActionMap.find(keyOrButton);
+    if (it == keyActionMap.end())
+        return std::nullopt;
+    return it->second;
+}
 
-    if (it != keyActionMap.end()) {
-        return it->second;
-    } else {
-        return None;
-    }
+std::optional<Action> InputMap::action(const InputEvent &e) const {
+    if (auto k = std::get_if<KeyEvent>(&e))
+        return actionForCode(k->key);
+    if (auto b = std::get_if<MouseButton>(&e))
+        return actionForCode(b->button);
+    return std::nullopt;
 }

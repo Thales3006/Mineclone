@@ -2,9 +2,9 @@
 
 #include "game/scene/gameScene.h"
 
-Game::Game() : deltaTime(0), window(), renderer(window) {
+Game::Game() : deltaTime(0), window(), renderer(window), bus(inputMap) {
     window.setUserPointer(this);
-    scene = std::make_unique<GameScene>(&window);
+    scene = std::make_unique<GameScene>(bus);
     glfwSetTime(0);
 }
 
@@ -28,11 +28,19 @@ void Game::run() {
     glfwTerminate();
 }
 
+void Game::onEvent(const InputEvent &e) {
+    if (auto k = std::get_if<KeyEvent>(&e);
+        k && k->action == GLFW_PRESS && bus.actionFor(e) == Fullscreen)
+        window.toggleFullscreen();
+
+    scene->onEvent(e);
+}
+
 void Game::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
     static double xlast = xpos;
     static double ylast = ypos;
-    game.scene->onMouseMove(xpos - xlast, ypos - ylast);
+    game.onEvent(game.bus.feedMouseMove(xpos - xlast, ypos - ylast));
     xlast = xpos;
     ylast = ypos;
 }
@@ -40,11 +48,13 @@ void Game::mouseMoveCallback(GLFWwindow *window, double xpos, double ypos) {
 void Game::mouseClickCallback(GLFWwindow *window, int button, int action,
                               int mods) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
-    game.scene->onMouseButton(window, button, action, mods);
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+    game.onEvent(game.bus.feedButton(button, action, mods, x, y));
 }
 
 void Game::keyboardCallback(GLFWwindow *window, int key, int scancode,
                             int action, int mods) {
     Game &game = *(static_cast<Game *>(glfwGetWindowUserPointer(window)));
-    game.scene->onKey(window, key, scancode, action, mods);
+    game.onEvent(game.bus.feedKey(key, scancode, action, mods));
 }
