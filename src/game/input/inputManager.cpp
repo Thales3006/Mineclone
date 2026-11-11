@@ -5,8 +5,9 @@
 InputManager::InputManager() {}
 
 InputManager::InputManager(std::shared_ptr<World> world, Window *window,
-                           Renderer *renderer)
-    : world(world), window(window), renderer(renderer), sensibility(0.005f) {}
+                           WorldRenderer *worldRenderer)
+    : world(world), window(window), worldRenderer(worldRenderer),
+      sensibility(0.005f) {}
 
 void InputManager::processKeyboard(float deltaTime) {
 
@@ -38,11 +39,11 @@ void InputManager::processKeyboard(float deltaTime) {
             }
             break;
         case IncreaseFOV:
-            renderer->camera.setFOV(renderer->camera.getFOV() +
+            worldRenderer->camera.setFOV(worldRenderer->camera.getFOV() +
                                          glm::radians(1.0));
             break;
         case DecreaseFOV:
-            renderer->camera.setFOV(renderer->camera.getFOV() -
+            worldRenderer->camera.setFOV(worldRenderer->camera.getFOV() -
                                          glm::radians(1.0));
             break;
         default:

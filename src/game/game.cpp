@@ -4,10 +4,12 @@
 
 Game::Game()
     : deltaTime(0), isRunning(false), window(),
-      world(std::make_shared<World>(42)), renderer(&window, world) {
+      world(std::make_shared<World>(42)), renderer(&window),
+      worldRenderer(world) {
     window.setUserPointer(this);
 
-    inputManager = std::make_unique<InputManager>(world, &window, &renderer);
+    inputManager =
+        std::make_unique<InputManager>(world, &window, &worldRenderer);
 
     glfwSetTime(0);
 }
@@ -32,7 +34,8 @@ void Game::run() {
         inputManager->processKeyboard(deltaTime);
 
         world->updateTick(deltaTime);
-        renderer.renderFrame();
+        renderer.beginFrame();
+        worldRenderer.render(renderer);
 
         // std::cout << "FPS: "<< 1/deltaTime <<" \n";
 

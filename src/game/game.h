@@ -4,6 +4,7 @@
 #include "game/input/inputManager.h"
 #include "game/window.h"
 #include "render/renderer.h"
+#include "render/worldRenderer.h"
 #include "world/world.h"
 
 #include <atomic>
@@ -33,6 +34,7 @@ class Game {
     Window window;
     std::shared_ptr<World> world;
     Renderer renderer;
+    WorldRenderer worldRenderer;
     void autoLoadChunks();
 };
 
