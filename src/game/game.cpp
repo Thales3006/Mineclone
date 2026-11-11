@@ -4,12 +4,7 @@
 
 Game::Game()
     : deltaTime(0), isRunning(false), window(),
-      world(std::make_shared<World>(42)),
-      // renderer segura um std::mutex → não é atribuível, então é construído
-      // aqui na lista de init (não no corpo). window e world já estão prontos.
-      renderer(&window, world) {
-    // window já criou a janela + contexto GL no seu construtor; só precisamos
-    // apontá-la de volta pra este Game para os callbacks estáticos do GLFW.
+      world(std::make_shared<World>(42)), renderer(&window, world) {
     window.setUserPointer(this);
 
     inputManager = std::make_unique<InputManager>(world, &window, &renderer);

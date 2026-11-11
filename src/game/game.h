@@ -32,7 +32,7 @@ class Game {
 
     Window window;
     std::shared_ptr<World> world;
-    Renderer renderer; // depende de window + world → declarado depois deles
+    Renderer renderer;
     void autoLoadChunks();
 };
 
