@@ -4,11 +4,9 @@
 
 InputManager::InputManager() {}
 
-InputManager::InputManager(std::shared_ptr<World> world,
-                           Window *windowManager,
-                           std::shared_ptr<Renderer> renderManager)
-    : world(world), windowManager(windowManager), renderManager(renderManager),
-      sensibility(0.005f) {}
+InputManager::InputManager(std::shared_ptr<World> world, Window *window,
+                           Renderer *renderer)
+    : world(world), window(window), renderer(renderer), sensibility(0.005f) {}
 
 void InputManager::processKeyboard(float deltaTime) {
 
@@ -40,11 +38,11 @@ void InputManager::processKeyboard(float deltaTime) {
             }
             break;
         case IncreaseFOV:
-            renderManager->camera.setFOV(renderManager->camera.getFOV() +
+            renderer->camera.setFOV(renderer->camera.getFOV() +
                                          glm::radians(1.0));
             break;
         case DecreaseFOV:
-            renderManager->camera.setFOV(renderManager->camera.getFOV() -
+            renderer->camera.setFOV(renderer->camera.getFOV() -
                                          glm::radians(1.0));
             break;
         default:
@@ -126,9 +124,9 @@ std::optional<glm::vec3> get_player_looking(World &world) {
     return std::make_optional<glm::vec3>(initial_pos + dir * i);
 }
 
-void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
+void InputManager::handleSingleAction(GLFWwindow *glfwWindow, Action action) {
     static bool fullScreen = false;
-    const GLFWvidmode *mode = glfwGetVideoMode(windowManager->getMonitor());
+    const GLFWvidmode *mode = glfwGetVideoMode(window->getMonitor());
 
     Player &player = *world->getEntityManager()->player;
     glm::vec3 initial_pos =
@@ -139,12 +137,12 @@ void InputManager::handleSingleAction(GLFWwindow *window, Action action) {
     switch (action) {
     case Fullscreen:
         if (!fullScreen) {
-            glfwSetWindowMonitor(window, windowManager->getMonitor(), 0, 0,
+            glfwSetWindowMonitor(glfwWindow, window->getMonitor(), 0, 0,
                                  mode->width, mode->height, mode->refreshRate);
             glViewport(0, 0, mode->width, mode->height);
             fullScreen = true;
         } else {
-            glfwSetWindowMonitor(window, 0, mode->width / 2 - 1200 / 2,
+            glfwSetWindowMonitor(glfwWindow, 0, mode->width / 2 - 1200 / 2,
                                  mode->height / 2 - 600 / 2, 1200, 600,
                                  mode->refreshRate);
             glViewport(0, 0, 1200, 600);

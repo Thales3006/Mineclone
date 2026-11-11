@@ -2,17 +2,18 @@
 
 #include <thread>
 
-Game::Game() : isRunning(false), world(std::make_shared<World>(42)) {
-    // windowManager is a value member: its constructor already created the
-    // window + GL context. We only need to point it back at this Game so the
-    // static GLFW callbacks can reach us.
-    windowManager.setUserPointer(this);
+Game::Game()
+    : deltaTime(0), isRunning(false), window(),
+      world(std::make_shared<World>(42)),
+      // renderer segura um std::mutex → não é atribuível, então é construído
+      // aqui na lista de init (não no corpo). window e world já estão prontos.
+      renderer(&window, world) {
+    // window já criou a janela + contexto GL no seu construtor; só precisamos
+    // apontá-la de volta pra este Game para os callbacks estáticos do GLFW.
+    window.setUserPointer(this);
 
-    renderManager = std::make_shared<Renderer>(&windowManager, world);
-    inputManager =
-        std::make_unique<InputManager>(world, &windowManager, renderManager);
+    inputManager = std::make_unique<InputManager>(world, &window, &renderer);
 
-    deltaTime = 0;
     glfwSetTime(0);
 }
 
@@ -29,18 +30,18 @@ void Game::run() {
     isRunning = true;
     std::thread chunkLoader(&Game::autoLoadChunks, this);
 
-    while (!glfwWindowShouldClose(windowManager.getWindow())) {
+    while (!glfwWindowShouldClose(window.getWindow())) {
         deltaTime = glfwGetTime();
         glfwSetTime(0);
 
         inputManager->processKeyboard(deltaTime);
 
         world->updateTick(deltaTime);
-        renderManager->renderFrame();
+        renderer.renderFrame();
 
         // std::cout << "FPS: "<< 1/deltaTime <<" \n";
 
-        glfwSwapBuffers(windowManager.getWindow());
+        glfwSwapBuffers(window.getWindow());
         glfwPollEvents();
     }
 

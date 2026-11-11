@@ -7,9 +7,9 @@
 
 Renderer::Renderer() {}
 
-Renderer::Renderer(Window *windowManager,
+Renderer::Renderer(Window *window,
                              std::shared_ptr<World> world)
-    : windowManager(windowManager), world(world) {
+    : window(window), world(world) {
     initOpenGL();
 
     camera.setMinMax(0.01f, 400.0f);
@@ -49,7 +49,7 @@ void Renderer::initOpenGL() {
         return;
     }
 
-    glm::uvec2 windowSize = windowManager->getWindowSize();
+    glm::uvec2 windowSize = window->getWindowSize();
     glViewport(0, 0, windowSize.x, windowSize.y);
 
     glEnable(GL_DEPTH_TEST);
@@ -68,7 +68,7 @@ void Renderer::renderFrame() {
     glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::uvec2 windowSize = windowManager->getWindowSize();
+    glm::uvec2 windowSize = window->getWindowSize();
     glViewport(0, 0, windowSize.x, windowSize.y);
 
     Player &player = *world->getEntityManager()->player;

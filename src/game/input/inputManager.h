@@ -9,8 +9,8 @@
 class InputManager {
   public:
     InputManager();
-    InputManager(std::shared_ptr<World> world, Window *windowManager,
-                 std::shared_ptr<Renderer> renderManager);
+    InputManager(std::shared_ptr<World> world, Window *window,
+                 Renderer *renderer);
 
     void handleMouseClickCallback(GLFWwindow *window, int button, int action,
                                   int mods);
@@ -25,8 +25,8 @@ class InputManager {
     std::unordered_set<Action> activeActions;
 
     std::shared_ptr<World> world;
-    Window *windowManager;
-    std::shared_ptr<Renderer> renderManager;
+    Window *window;
+    Renderer *renderer;
 
     float sensibility;
 

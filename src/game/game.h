@@ -30,10 +30,9 @@ class Game {
 
     std::unique_ptr<InputManager> inputManager;
 
-    Window windowManager;
-    std::shared_ptr<Renderer> renderManager;
-
+    Window window;
     std::shared_ptr<World> world;
+    Renderer renderer; // depende de window + world → declarado depois deles
     void autoLoadChunks();
 };
 

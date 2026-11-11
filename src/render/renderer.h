@@ -16,7 +16,7 @@
 class Renderer {
   public:
     Renderer();
-    Renderer(Window *windowManager, std::shared_ptr<World> world);
+    Renderer(Window *window, std::shared_ptr<World> world);
 
     void initOpenGL();
 
@@ -35,7 +35,7 @@ class Renderer {
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;
 
-    Window *windowManager;
+    Window *window;
     std::shared_ptr<World> world;
 
     void renderChunks(int chunkx, int chunkz);
