@@ -4,9 +4,10 @@
 
 #include <iostream>
 
-Renderer::Renderer() {}
-
-Renderer::Renderer(Window *window) : window(window) { initOpenGL(); }
+Renderer::Renderer(Window &window)
+    : window(window), viewportSize(window.getWindowSize()) {
+    initOpenGL();
+}
 
 void Renderer::initOpenGL() {
     if (!gladLoadGL()) {
@@ -23,8 +24,8 @@ void Renderer::beginFrame() {
     glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::uvec2 windowSize = window->getWindowSize();
-    glViewport(0, 0, windowSize.x, windowSize.y);
+    viewportSize = window.getWindowSize();
+    glViewport(0, 0, viewportSize.x, viewportSize.y);
 }
 
-Window *Renderer::getWindow() { return window; }
+glm::uvec2 Renderer::getViewportSize() { return viewportSize; }

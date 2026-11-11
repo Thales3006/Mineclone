@@ -5,15 +5,15 @@
 
 class Renderer {
   public:
-    Renderer();
-    Renderer(Window *window);
+    Renderer(Window &window);
 
     void beginFrame();
 
-    Window *getWindow();
+    glm::uvec2 getViewportSize();
 
   private:
-    Window *window;
+    Window &window;
+    glm::uvec2 viewportSize;
 
     void initOpenGL();
 };

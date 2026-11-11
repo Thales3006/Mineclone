@@ -2,7 +2,7 @@
 
 #include "game/scene/gameScene.h"
 
-Game::Game() : deltaTime(0), window(), renderer(&window) {
+Game::Game() : deltaTime(0), window(), renderer(window) {
     window.setUserPointer(this);
     scene = std::make_unique<GameScene>(&window);
     glfwSetTime(0);

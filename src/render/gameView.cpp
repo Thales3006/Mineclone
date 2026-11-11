@@ -40,7 +40,7 @@ GameView::GameView(World *world) : world(world) {
 void GameView::render(Renderer &renderer) {
     executeTasks();
 
-    glm::uvec2 windowSize = renderer.getWindow()->getWindowSize();
+    glm::uvec2 viewportSize = renderer.getViewportSize();
 
     Player &player = *world->getEntityManager()->player;
     camera.position =
@@ -48,8 +48,8 @@ void GameView::render(Renderer &renderer) {
         glm::vec3(player.size.x / 2, player.size.y * 0.9, player.size.z / 2);
     camera.direction = player.direction;
 
-    float ratio =
-        static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y);
+    float ratio = static_cast<float>(viewportSize.x) /
+                  static_cast<float>(viewportSize.y);
     shaders["terrain"]->setMat4("projection",
                                 camera.getMatrixProjection(ratio));
     shaders["terrain"]->setMat4("view", camera.getMatrixView());
