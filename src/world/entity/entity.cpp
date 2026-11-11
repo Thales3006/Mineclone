@@ -135,8 +135,6 @@ glm::vec3 Entity::colisionContinuous(glm::vec3 staticPos, glm::vec3 staticSize,
                       : normal = glm::vec3(0, 0, -1);
 
     return (deltaVel * normal) * (1 - nearTime);
-
-    return (deltaVel * normal) * (1 - nearTime);
 }
 
 bool Entity::colision(glm::vec3 entity1Pos, glm::vec3 entity1size,
