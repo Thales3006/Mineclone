@@ -1,6 +1,6 @@
 #include "world/world.h"
 
-World::World(int seed) : seed(seed) {}
+World::World(int seed) : seed(seed), chunkManager(seed) {}
 
 ChunkManager *World::getChunkManager() { return &chunkManager; }
 

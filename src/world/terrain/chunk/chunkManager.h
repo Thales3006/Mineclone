@@ -22,7 +22,7 @@ class ChunkManager {
     sigslot::signal<ChunkRegion> onChunkRemoved;
     sigslot::signal<ChunkRegion> onChunkUpdated;
 
-    ChunkManager();
+    ChunkManager(int seed);
 
     bool isEmpty(int x, int z);
 
@@ -35,6 +35,8 @@ class ChunkManager {
     std::pair<std::mutex *, chunk_map *> unsafe_getChunkMap();
 
   private:
+    int seed;
+    
     void loadChunk(std::shared_ptr<Chunk> chunk);
     void unloadChunk(int x, int z);
 

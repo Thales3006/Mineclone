@@ -1,6 +1,6 @@
 #include "world/terrain/chunk/chunkManager.h"
 
-ChunkManager::ChunkManager() {}
+ChunkManager::ChunkManager(int seed): seed(seed) {}
 
 std::optional<std::shared_ptr<Chunk>> ChunkManager::getChunk(int x, int z) {
     auto it = chunks.find({x, z});
@@ -134,7 +134,7 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
     for (auto &coord : to_add) {
         int x = std::get<0>(coord);
         int z = std::get<1>(coord);
-        to_add_chunks.push_back(std::move(Chunk::generateChunk(x, z)));
+        to_add_chunks.push_back(std::move(Chunk::generateChunk(seed, x, z)));
     }
 
     {
