@@ -4,7 +4,7 @@
 #include "world/entity/entity.h"
 #include "world/entity/player.h"
 
-#include "game/windowManager.h"
+#include "game/window.h"
 
 class EntityManager {
   public:

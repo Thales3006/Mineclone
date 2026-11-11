@@ -2,8 +2,8 @@
 #define GAME_CLASS_H
 
 #include "game/input/inputManager.h"
-#include "game/windowManager.h"
-#include "render/renderManager.h"
+#include "game/window.h"
+#include "render/renderer.h"
 #include "world/world.h"
 
 #include <atomic>
@@ -30,8 +30,8 @@ class Game {
 
     std::unique_ptr<InputManager> inputManager;
 
-    WindowManager windowManager;
-    std::shared_ptr<RenderManager> renderManager;
+    Window windowManager;
+    std::shared_ptr<Renderer> renderManager;
 
     std::shared_ptr<World> world;
     void autoLoadChunks();

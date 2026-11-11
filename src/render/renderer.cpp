@@ -1,13 +1,13 @@
-#include "render/renderManager.h"
+#include "render/renderer.h"
 
 #include "render/renderLib.h"
 
 #include <algorithm>
 #include <iostream>
 
-RenderManager::RenderManager() {}
+Renderer::Renderer() {}
 
-RenderManager::RenderManager(WindowManager *windowManager,
+Renderer::Renderer(Window *windowManager,
                              std::shared_ptr<World> world)
     : windowManager(windowManager), world(world) {
     initOpenGL();
@@ -42,7 +42,7 @@ RenderManager::RenderManager(WindowManager *windowManager,
         textureManager->getTexture("blocks"), shaders["terrain"]);
 }
 
-void RenderManager::initOpenGL() {
+void Renderer::initOpenGL() {
 
     if (!gladLoadGL()) {
         std::cout << "Failed to initialize Glad.\n";
@@ -62,7 +62,7 @@ void RenderManager::initOpenGL() {
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void RenderManager::renderFrame() {
+void Renderer::renderFrame() {
     excuteTasks();
 
     glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
@@ -87,18 +87,18 @@ void RenderManager::renderFrame() {
     firstPersonView->render(player.chunkx, player.chunkz);
 }
 
-void RenderManager::renderChunks(int chunkx, int chunkz) {
+void Renderer::renderChunks(int chunkx, int chunkz) {
     for (auto &chunkView : chunkViews) {
         chunkView->render(chunkx, chunkz);
     }
 }
 
-void RenderManager::addChunkView(ChunkRegion region) {
+void Renderer::addChunkView(ChunkRegion region) {
     chunkViews.push_back(std::make_unique<ChunkView>(
         region, *terrainVertexMap, textureManager, shaders["terrain"]));
 }
 
-void RenderManager::removeChunkView(ChunkRegion region) {
+void Renderer::removeChunkView(ChunkRegion region) {
     auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
                              [&](const std::unique_ptr<ChunkView> &chunkView) {
                                  return chunkView->region.main == region.main;
@@ -107,12 +107,12 @@ void RenderManager::removeChunkView(ChunkRegion region) {
         chunkViews.erase(it, chunkViews.end());
     }
 }
-void RenderManager::updateChunkView(ChunkRegion region) {
+void Renderer::updateChunkView(ChunkRegion region) {
     removeChunkView(region);
     addChunkView(region);
 }
 
-void RenderManager::excuteTasks() {
+void Renderer::excuteTasks() {
     std::lock_guard<std::mutex> lock(taskMutex);
 
     while (!pendingTasks.empty()) {

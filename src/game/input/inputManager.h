@@ -1,7 +1,7 @@
 #ifndef INPUT_MANAGER_CLASS
 
 #include "game/input/inputMap.h"
-#include "render/renderManager.h"
+#include "render/renderer.h"
 #include "world/world.h"
 
 #include <unordered_set>
@@ -9,8 +9,8 @@
 class InputManager {
   public:
     InputManager();
-    InputManager(std::shared_ptr<World> world, WindowManager *windowManager,
-                 std::shared_ptr<RenderManager> renderManager);
+    InputManager(std::shared_ptr<World> world, Window *windowManager,
+                 std::shared_ptr<Renderer> renderManager);
 
     void handleMouseClickCallback(GLFWwindow *window, int button, int action,
                                   int mods);
@@ -25,8 +25,8 @@ class InputManager {
     std::unordered_set<Action> activeActions;
 
     std::shared_ptr<World> world;
-    WindowManager *windowManager;
-    std::shared_ptr<RenderManager> renderManager;
+    Window *windowManager;
+    std::shared_ptr<Renderer> renderManager;
 
     float sensibility;
 

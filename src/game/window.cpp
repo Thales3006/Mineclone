@@ -1,10 +1,10 @@
-#include "game/windowManager.h"
+#include "game/window.h"
 
 #include "game/game.h"
 
 #include <iostream>
 
-WindowManager::WindowManager() : window(nullptr), monitor(nullptr) {
+Window::Window() : window(nullptr), monitor(nullptr) {
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW.\n";
         return;
@@ -43,14 +43,14 @@ WindowManager::WindowManager() : window(nullptr), monitor(nullptr) {
     glfwSetKeyCallback(window, Game::keyboardCallback);
 }
 
-void WindowManager::setUserPointer(void *game) {
+void Window::setUserPointer(void *game) {
     glfwSetWindowUserPointer(window, game);
 }
 
-GLFWwindow *WindowManager::getWindow() { return window; }
-GLFWmonitor *WindowManager::getMonitor() { return monitor; }
+GLFWwindow *Window::getWindow() { return window; }
+GLFWmonitor *Window::getMonitor() { return monitor; }
 
-glm::uvec2 WindowManager::getWindowSize() {
+glm::uvec2 Window::getWindowSize() {
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
     return glm::ivec2(windowWidth, windowHeight);

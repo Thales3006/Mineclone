@@ -1,13 +1,13 @@
-#ifndef WINDOW_MANAGER_CLASS_H
-#define WINDOW_MANAGER_CLASS_H
+#ifndef WINDOW_CLASS_H
+#define WINDOW_CLASS_H
 
 #include "render/renderLib.h"
 
 #include <glm/vec2.hpp>
 
-class WindowManager {
+class Window {
   public:
-    WindowManager();
+    Window();
 
     GLFWwindow *getWindow();
     GLFWmonitor *getMonitor();

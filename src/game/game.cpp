@@ -8,7 +8,7 @@ Game::Game() : isRunning(false), world(std::make_shared<World>(42)) {
     // static GLFW callbacks can reach us.
     windowManager.setUserPointer(this);
 
-    renderManager = std::make_shared<RenderManager>(&windowManager, world);
+    renderManager = std::make_shared<Renderer>(&windowManager, world);
     inputManager =
         std::make_unique<InputManager>(world, &windowManager, renderManager);
 

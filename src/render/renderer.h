@@ -1,7 +1,7 @@
-#ifndef RENDER_MANAGER_CLASS_H
-#define RENDER_MANAGER_CLASS_H
+#ifndef RENDERER_CLASS_H
+#define RENDERER_CLASS_H
 
-#include "game/windowManager.h"
+#include "game/window.h"
 #include "render/camera.h"
 #include "render/mesh/mesh.h"
 #include "render/mesh/terrainVertexMap.h"
@@ -13,10 +13,10 @@
 
 #include <queue>
 
-class RenderManager {
+class Renderer {
   public:
-    RenderManager();
-    RenderManager(WindowManager *windowManager, std::shared_ptr<World> world);
+    Renderer();
+    Renderer(Window *windowManager, std::shared_ptr<World> world);
 
     void initOpenGL();
 
@@ -35,7 +35,7 @@ class RenderManager {
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;
 
-    WindowManager *windowManager;
+    Window *windowManager;
     std::shared_ptr<World> world;
 
     void renderChunks(int chunkx, int chunkz);
