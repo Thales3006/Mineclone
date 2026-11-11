@@ -42,8 +42,6 @@ FirstPersonView::FirstPersonView(std::shared_ptr<Player> player, World *world,
           createBoxMesh(*player, *world, terrainVertexMap, texture, shader)) {}
 
 void FirstPersonView::render(int chunkx, int chunkz) {
-    selectionBoxMesh.setupMesh();
-
     if (auto og_pos = get_player_looking(*player, *world); og_pos.has_value()) {
 
         glm::vec3 pos = floor(og_pos.value());

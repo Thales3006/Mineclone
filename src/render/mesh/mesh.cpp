@@ -2,20 +2,82 @@
 
 #include "render/renderLib.h"
 
+#include <utility>
+
+template <typename T>
+Mesh<T>::Mesh(std::shared_ptr<Texture> texture, std::shared_ptr<Shader> shader)
+    : texture(std::move(texture)), shader(std::move(shader)), geometry(),
+      VAO(0), VBO(0), EBO(0), dirty(true) {}
+
 template <typename T>
 Mesh<T>::Mesh(Geometry<T> geometry, std::shared_ptr<Texture> texture,
               std::shared_ptr<Shader> shader)
-    : VAO(0), VBO(0), EBO(0), geometry(geometry), texture(texture),
-      shader(shader) {}
+    : texture(std::move(texture)), shader(std::move(shader)),
+      geometry(std::move(geometry)), VAO(0), VBO(0), EBO(0), dirty(true) {}
 
-template <typename T> void Mesh<T>::setupMesh() {
-    if (VAO != 0) {
-        return;
+template <typename T>
+Mesh<T>::Mesh(const Mesh &other)
+    : texture(other.texture), shader(other.shader), geometry(other.geometry),
+      VAO(0), VBO(0), EBO(0), dirty(true) {}
+
+template <typename T>
+Mesh<T>::Mesh(Mesh &&other) noexcept
+    : texture(std::move(other.texture)), shader(std::move(other.shader)),
+      geometry(std::move(other.geometry)), VAO(other.VAO), VBO(other.VBO),
+      EBO(other.EBO), dirty(other.dirty) {
+    other.VAO = 0;
+    other.VBO = 0;
+    other.EBO = 0;
+    other.dirty = true;
+}
+
+template <typename T> Mesh<T> &Mesh<T>::operator=(const Mesh &other) {
+    if (this != &other) {
+        release();
+        texture = other.texture;
+        shader = other.shader;
+        geometry = other.geometry;
+        dirty = true;
     }
+    return *this;
+}
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+template <typename T> Mesh<T> &Mesh<T>::operator=(Mesh &&other) noexcept {
+    if (this != &other) {
+        release();
+        texture = std::move(other.texture);
+        shader = std::move(other.shader);
+        geometry = std::move(other.geometry);
+        VAO = other.VAO;
+        VBO = other.VBO;
+        EBO = other.EBO;
+        dirty = other.dirty;
+        other.VAO = 0;
+        other.VBO = 0;
+        other.EBO = 0;
+        other.dirty = true;
+    }
+    return *this;
+}
+
+template <typename T> Mesh<T>::~Mesh() { release(); }
+
+template <typename T> void Mesh<T>::release() {
+    if (VAO)
+        glDeleteVertexArrays(1, &VAO);
+    if (VBO)
+        glDeleteBuffers(1, &VBO);
+    if (EBO)
+        glDeleteBuffers(1, &EBO);
+    VAO = VBO = EBO = 0;
+}
+
+template <typename T> void Mesh<T>::upload() {
+    if (VAO == 0) {
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+    }
 
     glBindVertexArray(VAO);
 
@@ -33,9 +95,14 @@ template <typename T> void Mesh<T>::setupMesh() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    dirty = false;
 }
 
 template <typename T> void Mesh<T>::render() {
+    if (dirty)
+        upload();
+
     shader->use();
     texture->bind();
 
@@ -46,13 +113,40 @@ template <typename T> void Mesh<T>::render() {
     glBindVertexArray(0);
 }
 
-template <typename T> Mesh<T>::~Mesh() {
-    if (VAO)
-        glDeleteVertexArrays(1, &VAO);
-    if (VBO)
-        glDeleteBuffers(1, &VBO);
-    if (EBO)
-        glDeleteBuffers(1, &EBO);
+template <typename T> const Geometry<T> &Mesh<T>::getGeometry() const {
+    return geometry;
+}
+
+template <typename T> void Mesh<T>::setGeometry(Geometry<T> newGeometry) {
+    geometry = std::move(newGeometry);
+    dirty = true;
+}
+
+template <typename T> unsigned int Mesh<T>::addVertex(const T &vertex) {
+    dirty = true;
+    return geometry.addVertex(vertex);
+}
+
+template <typename T>
+void Mesh<T>::addTriangle(unsigned int a, unsigned int b, unsigned int c) {
+    geometry.addTriangle(a, b, c);
+    dirty = true;
+}
+
+template <typename T> void Mesh<T>::append(const Geometry<T> &other) {
+    geometry.append(other);
+    dirty = true;
+}
+
+template <typename T>
+void Mesh<T>::removeVertices(unsigned int start, unsigned int count) {
+    geometry.removeVertices(start, count);
+    dirty = true;
+}
+
+template <typename T> void Mesh<T>::clear() {
+    geometry.clear();
+    dirty = true;
 }
 
 template <> void Mesh<TerrainVertex>::setupAttributes() {

@@ -38,7 +38,6 @@ ChunkView::ChunkView(ChunkRegion region, TerrainVertexMap &terrainVertexMap,
                                              textureManager, shader)) {}
 
 void ChunkView::render(int chunkx, int chunkz) {
-    mesh.setupMesh();
     mesh.shader->setMat4(
         "model",
         glm::translate(glm::mat4(1.0f),
