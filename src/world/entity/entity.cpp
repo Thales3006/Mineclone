@@ -29,8 +29,8 @@ void Entity::update(ChunkManager &chunkManager, float deltaTime) {
     glm::vec3 nV = glm::vec3(velocity.x >= 0 ? 1 : -1, velocity.y >= 0 ? 1 : -1,
                              velocity.z >= 0 ? 1 : -1);
     glm::vec3 nSize = glm::vec3(velocity.x >= 0 ? 0 : -ceil(size.x),
-                                velocity.y >= 0 ? 0 : -ceil(size.z),
-                                velocity.z >= 0 ? 0 : -ceil(size.y));
+                                velocity.y >= 0 ? 0 : -ceil(size.y),
+                                velocity.z >= 0 ? 0 : -ceil(size.z));
     glm::vec3 dV = velocity * deltaTime + nSize;
 
     for (int x = 0; abs(x) <= abs(dV.x) + abs(size.x) + 1; x += nV.x) {

@@ -58,7 +58,7 @@ std::shared_ptr<Chunk> Chunk::generateChunk(int x, int z) {
                     // stone or dirt
                     if (j > CHUNK_HEIGHT / 4) {
                         // grass or dirt
-                        if (j == CHUNK_WIDTH - 1 ||
+                        if (j == CHUNK_HEIGHT - 1 ||
                             chunk->blocks[i][j + 1][k].id == BlockID::air) {
                             id = BlockID::grass_block;
                             if (cave_val < -0.4) {
