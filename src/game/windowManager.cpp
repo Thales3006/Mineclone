@@ -4,9 +4,7 @@
 
 #include <iostream>
 
-WindowManager::WindowManager() : window(nullptr), monitor(nullptr) {}
-
-void WindowManager::createWindow(void *game) {
+WindowManager::WindowManager() : window(nullptr), monitor(nullptr) {
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW.\n";
         return;
@@ -35,7 +33,6 @@ void WindowManager::createWindow(void *game) {
         exit(-1);
     }
     glfwMakeContextCurrent(window);
-    glfwSetWindowUserPointer(window, game);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPos(window, static_cast<double>(defaultWidth) / 2,
@@ -44,6 +41,10 @@ void WindowManager::createWindow(void *game) {
     glfwSetCursorPosCallback(window, Game::mouseMoveCallback);
     glfwSetMouseButtonCallback(window, Game::mouseClickCallback);
     glfwSetKeyCallback(window, Game::keyboardCallback);
+}
+
+void WindowManager::setUserPointer(void *game) {
+    glfwSetWindowUserPointer(window, game);
 }
 
 GLFWwindow *WindowManager::getWindow() { return window; }

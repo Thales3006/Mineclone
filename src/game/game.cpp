@@ -2,14 +2,15 @@
 
 #include <thread>
 
-Game::Game()
-    : isRunning(false), world(std::make_shared<World>(42)),
-      windowManager(std::make_shared<WindowManager>()) {
+Game::Game() : isRunning(false), world(std::make_shared<World>(42)) {
+    // windowManager is a value member: its constructor already created the
+    // window + GL context. We only need to point it back at this Game so the
+    // static GLFW callbacks can reach us.
+    windowManager.setUserPointer(this);
 
-    windowManager->createWindow(this);
-    renderManager = std::make_shared<RenderManager>(windowManager, world);
+    renderManager = std::make_shared<RenderManager>(&windowManager, world);
     inputManager =
-        std::make_unique<InputManager>(world, windowManager, renderManager);
+        std::make_unique<InputManager>(world, &windowManager, renderManager);
 
     deltaTime = 0;
     glfwSetTime(0);
@@ -28,7 +29,7 @@ void Game::run() {
     isRunning = true;
     std::thread chunkLoader(&Game::autoLoadChunks, this);
 
-    while (!glfwWindowShouldClose(windowManager->getWindow())) {
+    while (!glfwWindowShouldClose(windowManager.getWindow())) {
         deltaTime = glfwGetTime();
         glfwSetTime(0);
 
@@ -39,7 +40,7 @@ void Game::run() {
 
         // std::cout << "FPS: "<< 1/deltaTime <<" \n";
 
-        glfwSwapBuffers(windowManager->getWindow());
+        glfwSwapBuffers(windowManager.getWindow());
         glfwPollEvents();
     }
 

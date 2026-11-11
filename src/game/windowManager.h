@@ -14,7 +14,7 @@ class WindowManager {
 
     glm::uvec2 getWindowSize();
 
-    void createWindow(void *game);
+    void setUserPointer(void *game);
     void bindContext();
 
   private:

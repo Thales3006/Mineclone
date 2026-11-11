@@ -30,7 +30,7 @@ class Game {
 
     std::unique_ptr<InputManager> inputManager;
 
-    std::shared_ptr<WindowManager> windowManager;
+    WindowManager windowManager;
     std::shared_ptr<RenderManager> renderManager;
 
     std::shared_ptr<World> world;

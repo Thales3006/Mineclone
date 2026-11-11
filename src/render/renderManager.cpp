@@ -7,7 +7,7 @@
 
 RenderManager::RenderManager() {}
 
-RenderManager::RenderManager(std::shared_ptr<WindowManager> windowManager,
+RenderManager::RenderManager(WindowManager *windowManager,
                              std::shared_ptr<World> world)
     : windowManager(windowManager), world(world) {
     initOpenGL();

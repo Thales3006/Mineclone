@@ -5,7 +5,7 @@
 InputManager::InputManager() {}
 
 InputManager::InputManager(std::shared_ptr<World> world,
-                           std::shared_ptr<WindowManager> windowManager,
+                           WindowManager *windowManager,
                            std::shared_ptr<RenderManager> renderManager)
     : world(world), windowManager(windowManager), renderManager(renderManager),
       sensibility(0.005f) {}
