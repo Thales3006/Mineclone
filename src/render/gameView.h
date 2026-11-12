@@ -28,9 +28,11 @@ class GameView {
 
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;
+    std::unique_ptr<Mesh<TerrainVertex>> sun;
 
     World &world;
 
+    void renderSun(float ratio);
     void renderChunks(glm::ivec2 chunk);
 
     void addChunkView(ChunkMeshData data);

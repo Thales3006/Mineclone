@@ -85,6 +85,7 @@ void FirstPersonView::render(glm::ivec2 chunk) {
         outline.append(buildOutline(box, localCamera, selectionUV));
     selectionBoxMesh.setGeometry(outline);
 
+    selectionBoxMesh.shader->use();
     selectionBoxMesh.shader->setMat4(
         "model", glm::translate(glm::mat4(1.0f), glm::vec3(hit->block)));
 

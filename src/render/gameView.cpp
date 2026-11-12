@@ -5,6 +5,24 @@
 
 #include <algorithm>
 
+namespace {
+
+const glm::vec3 kLightDir = glm::normalize(glm::vec3(1.0f, 10.0f, 10.0f));
+
+Geometry<TerrainVertex> buildSquare() {
+    const glm::vec3 corners[4] = {
+        {-1, -1, 0}, {1, -1, 0}, {1, 1, 0}, {-1, 1, 0}};
+    Geometry<TerrainVertex> geometry{};
+    for (const glm::vec3 &corner : corners)
+        geometry.addVertex(
+            {corner, glm::vec3(0.0f), glm::vec2(0.0f), glm::vec3(0.0f)});
+    geometry.addTriangle(0, 1, 2);
+    geometry.addTriangle(0, 2, 3);
+    return geometry;
+}
+
+} // namespace
+
 GameView::GameView(World &world, Renderer &renderer)
     : renderer(renderer), world(world) {
     camera.setMinMax(0.01f, 400.0f);
@@ -14,8 +32,13 @@ GameView::GameView(World &world, Renderer &renderer)
     shaders = {
         {"terrain", std::make_shared<Shader>("shaders/shader.vert",
                                              "shaders/shader.frag")},
+        {"sun",
+         std::make_shared<Shader>("shaders/sun.vert", "shaders/sun.frag")},
     };
     terrainVertexMap = std::make_shared<TerrainVertexMap>(textureManager);
+
+    sun = std::make_unique<Mesh<TerrainVertex>>(
+        buildSquare(), textureManager->getTexture("blocks"), shaders["sun"]);
 
     world.getChunkManager().onChunkAdded.connect([&](RegionSnapshot snapshot) {
         TaskManager::instance().run([this, snapshot = std::move(snapshot)]() {
@@ -53,12 +76,37 @@ void GameView::render() {
 
     float ratio = static_cast<float>(viewportSize.x) /
                   static_cast<float>(viewportSize.y);
+    shaders["terrain"]->use();
     shaders["terrain"]->setMat4("projection",
                                 camera.getMatrixProjection(ratio));
     shaders["terrain"]->setMat4("view", camera.getMatrixView());
 
+    renderSun(ratio);
     renderChunks(player.chunk);
     firstPersonView->render(player.chunk);
+}
+
+void GameView::renderSun(float ratio) {
+    glm::vec3 sunPos = camera.position + kLightDir * 300.0f;
+    glm::vec3 toCam = glm::normalize(camera.position - sunPos);
+    glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0, 1, 0), toCam));
+    glm::vec3 up = glm::cross(toCam, right);
+
+    float radius = 18.0f;
+    glm::mat4 model(1.0f);
+    model[0] = glm::vec4(right * radius, 0.0f);
+    model[1] = glm::vec4(up * radius, 0.0f);
+    model[2] = glm::vec4(toCam, 0.0f);
+    model[3] = glm::vec4(sunPos, 1.0f);
+
+    shaders["sun"]->use();
+    shaders["sun"]->setMat4("projection", camera.getMatrixProjection(ratio));
+    shaders["sun"]->setMat4("view", camera.getMatrixView());
+    shaders["sun"]->setMat4("model", model);
+
+    glDepthMask(GL_FALSE);
+    sun->render();
+    glDepthMask(GL_TRUE);
 }
 
 void GameView::renderChunks(glm::ivec2 chunk) {

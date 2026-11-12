@@ -100,6 +100,7 @@ void ChunkView::updateBlock(const RegionSnapshot &region, glm::ivec3 worldEdit) 
 }
 
 void ChunkView::render(glm::ivec2 chunk) {
+    mesh.shader->use();
     mesh.shader->setMat4(
         "model", glm::translate(glm::mat4(1.0f),
                                 glm::vec3((coord.x - chunk.x) * CHUNK_WIDTH, 0,
