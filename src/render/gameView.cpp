@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-GameView::GameView(World *world, Renderer &renderer)
+GameView::GameView(World &world, Renderer &renderer)
     : renderer(renderer), world(world) {
     camera.setMinMax(0.01f, 400.0f);
     camera.setFOV(glm::radians(90.0f));
@@ -16,15 +16,15 @@ GameView::GameView(World *world, Renderer &renderer)
     };
     terrainVertexMap = std::make_shared<TerrainVertexMap>(textureManager);
 
-    world->getChunkManager()->onChunkAdded.connect([&](ChunkRegion region) {
+    world.getChunkManager().onChunkAdded.connect([&](ChunkRegion region) {
         this->renderer.runOnMain([this, region]() { addChunkView(region); });
     });
 
-    world->getChunkManager()->onChunkRemoved.connect([&](ChunkRegion region) {
+    world.getChunkManager().onChunkRemoved.connect([&](ChunkRegion region) {
         this->renderer.runOnMain([this, region]() { removeChunkView(region); });
     });
 
-    world->getChunkManager()->onChunkUpdated.connect(
+    world.getChunkManager().onChunkUpdated.connect(
         [&](ChunkRegion region, glm::ivec3 worldEdit) {
             this->renderer.runOnMain([this, region, worldEdit]() {
                 updateChunkView(region, worldEdit);
@@ -32,14 +32,14 @@ GameView::GameView(World *world, Renderer &renderer)
         });
 
     firstPersonView = std::make_unique<FirstPersonView>(
-        world->getEntityManager()->player, world, *terrainVertexMap,
+        world.getEntityManager().player, world, *terrainVertexMap,
         textureManager->getTexture("blocks"), shaders["terrain"]);
 }
 
 void GameView::render() {
     glm::uvec2 viewportSize = renderer.getViewportSize();
 
-    Player &player = *world->getEntityManager()->player;
+    Player &player = *world.getEntityManager().player;
     camera.position =
         player.position +
         glm::vec3(player.size.x / 2, player.size.y * 0.9, player.size.z / 2);

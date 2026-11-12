@@ -13,7 +13,7 @@
 
 class GameView {
   public:
-    GameView(World *world, Renderer &renderer);
+    GameView(World &world, Renderer &renderer);
 
     void render();
 
@@ -29,7 +29,7 @@ class GameView {
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;
 
-    World *world;
+    World &world;
 
     void renderChunks(int chunkx, int chunkz);
 

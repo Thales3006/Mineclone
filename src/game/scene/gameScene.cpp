@@ -5,11 +5,11 @@
 #include <optional>
 
 GameScene::GameScene(InputBus &bus, Renderer &renderer)
-    : world(42), gameView(&world, renderer), bus(bus), sensibility(0.005f) {}
+    : world(42), gameView(world, renderer), bus(bus), sensibility(0.005f) {}
 
-void GameScene::onEnter() { world.getChunkManager()->startLoading(); }
+void GameScene::onEnter() { world.getChunkManager().startLoading(); }
 
-void GameScene::onExit() { world.getChunkManager()->stopLoading(); }
+void GameScene::onExit() { world.getChunkManager().stopLoading(); }
 
 void GameScene::update(float dt) {
     applyMovement(dt);
@@ -32,11 +32,11 @@ void GameScene::onEvent(const InputEvent &e) {
     }
 
     if (auto m = std::get_if<MouseMove>(&e))
-        world.getEntityManager()->player->look(m->dx, m->dy, sensibility);
+        world.getEntityManager().player->look(m->dx, m->dy, sensibility);
 }
 
 void GameScene::applyMovement(float dt) {
-    Player &player = *world.getEntityManager()->player;
+    Player &player = *world.getEntityManager().player;
 
     glm::vec3 newDir = glm::vec3(0.0f);
     if (bus.isActionActive(MoveFoward))
@@ -76,7 +76,7 @@ void GameScene::triggerAction(Action action) {
     case HotbarSlot7:
     case HotbarSlot8:
     case HotbarSlot9:
-        world.getEntityManager()->player->hotbarIndex =
+        world.getEntityManager().player->hotbarIndex =
             action - HotbarSlot1 + 1;
         break;
     default:
@@ -85,33 +85,33 @@ void GameScene::triggerAction(Action action) {
 }
 
 void GameScene::destroyLookedBlock() {
-    Player &player = *world.getEntityManager()->player;
+    Player &player = *world.getEntityManager().player;
     glm::vec3 initial_pos =
         player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
     glm::vec3 dir = glm::normalize(player.direction);
     glm::vec3 i = glm::vec3(0);
 
     while (world.getChunkManager()
-               ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
+               .getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
                .id == BlockID::air) {
         if (i.x > 6)
             return;
         i += glm::vec3(0.25);
     }
 
-    world.getChunkManager()->setBlock(player.chunkx, player.chunkz,
+    world.getChunkManager().setBlock(player.chunkx, player.chunkz,
                                       initial_pos + dir * i, Block());
 }
 
 void GameScene::placeLookedBlock() {
-    Player &player = *world.getEntityManager()->player;
+    Player &player = *world.getEntityManager().player;
     glm::vec3 initial_pos =
         player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
     glm::vec3 dir = glm::normalize(player.direction);
     glm::vec3 i = glm::vec3(0);
 
     while (world.getChunkManager()
-               ->getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
+               .getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
                .id == BlockID::air) {
         if (i.x > 6)
             return;
@@ -123,7 +123,7 @@ void GameScene::placeLookedBlock() {
                           glm::floor(player.position),
                           glm::ceil(player.position + player.size) -
                               glm::floor(player.position))) {
-        world.getChunkManager()->setBlock(
+        world.getChunkManager().setBlock(
             player.chunkx, player.chunkz, initial_pos + dir * i,
             Block((BlockID)player.hotbarIndex, true));
     }

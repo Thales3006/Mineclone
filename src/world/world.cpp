@@ -2,9 +2,9 @@
 
 World::World(int seed) : seed(seed), chunkManager(seed) {}
 
-ChunkManager *World::getChunkManager() { return &chunkManager; }
+ChunkManager &World::getChunkManager() { return chunkManager; }
 
-EntityManager *World::getEntityManager() { return &entityManager; }
+EntityManager &World::getEntityManager() { return entityManager; }
 
 void World::updateTick(float deltaTime) {
     entityManager.update(chunkManager, deltaTime);

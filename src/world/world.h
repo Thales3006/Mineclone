@@ -7,8 +7,8 @@
 class World {
   public:
     World(int seed);
-    ChunkManager *getChunkManager();
-    EntityManager *getEntityManager();
+    ChunkManager &getChunkManager();
+    EntityManager &getEntityManager();
 
     void updateTick(float deltaTime);
 
