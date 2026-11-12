@@ -37,21 +37,6 @@ std::shared_ptr<Chunk> ChunkManager::getChunk(int x, int z) {
     return nullptr;
 }
 
-ChunkRegion ChunkManager::getChunkRegion(int x, int z) {
-    return ChunkRegion{
-        .main = getChunk(x, z),
-        .right = getChunk(x + 1, z),
-        .left = getChunk(x - 1, z),
-        .front = getChunk(x, z + 1),
-        .back = getChunk(x, z - 1),
-
-        .frontRight = getChunk(x + 1, z + 1),
-        .backRight = getChunk(x + 1, z - 1),
-        .frontLeft = getChunk(x - 1, z + 1),
-        .backLeft = getChunk(x - 1, z - 1),
-    };
-}
-
 void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
     if (chunks.find({chunk->x, chunk->z}) != chunks.end())
         return;
@@ -60,7 +45,8 @@ void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
     int z = chunk->z;
     chunks[{x, z}] = std::move(chunk);
 
-    onChunkAdded(getChunkRegion(x, z));
+    if (auto snapshot = buildSnapshot(x, z))
+        onChunkAdded(std::move(*snapshot));
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
@@ -71,23 +57,16 @@ void ChunkManager::unloadChunk(int x, int z) {
     chunks.erase({x, z});
 }
 
-void ChunkManager::updateRegion(const ChunkRegion &region, int x, int y,
-                                int z) {
+void ChunkManager::updateRegion(int chunkx, int chunkz, int x, int y, int z) {
+    glm::ivec3 worldEdit = {chunkx * CHUNK_WIDTH + x, y,
+                            chunkz * CHUNK_WIDTH + z};
 
-    std::shared_ptr<Chunk> main = region.main.lock();
-    if (!main)
-        return;
-
-    glm::ivec3 worldEdit = {main->x * CHUNK_WIDTH + x, y,
-                            main->z * CHUNK_WIDTH + z};
-
-    onChunkUpdated(region, worldEdit);
-
-    auto update = [this, worldEdit](const std::weak_ptr<Chunk> &weak) {
-        if (std::shared_ptr<Chunk> chunk = weak.lock()) {
-            onChunkUpdated(getChunkRegion(chunk->x, chunk->z), worldEdit);
-        }
+    auto emit = [this, worldEdit](int cx, int cz) {
+        if (auto snapshot = buildSnapshot(cx, cz))
+            onChunkUpdated(std::move(*snapshot), worldEdit);
     };
+
+    emit(chunkx, chunkz);
 
     bool atLeft = (x == 0);
     bool atRight = (x == CHUNK_WIDTH - 1);
@@ -95,22 +74,22 @@ void ChunkManager::updateRegion(const ChunkRegion &region, int x, int y,
     bool atFront = (z == CHUNK_WIDTH - 1);
 
     if (atRight)
-        update(region.right);
+        emit(chunkx + 1, chunkz);
     if (atLeft)
-        update(region.left);
+        emit(chunkx - 1, chunkz);
     if (atFront)
-        update(region.front);
+        emit(chunkx, chunkz + 1);
     if (atBack)
-        update(region.back);
+        emit(chunkx, chunkz - 1);
 
     if (atFront && atRight)
-        update(region.frontRight);
+        emit(chunkx + 1, chunkz + 1);
     if (atBack && atRight)
-        update(region.backRight);
+        emit(chunkx + 1, chunkz - 1);
     if (atFront && atLeft)
-        update(region.frontLeft);
+        emit(chunkx - 1, chunkz + 1);
     if (atBack && atLeft)
-        update(region.backLeft);
+        emit(chunkx - 1, chunkz - 1);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
@@ -123,7 +102,7 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
 
     chunks.at({chunkx, chunkz})->setBlock(x, y, z, block);
 
-    updateRegion(getChunkRegion(chunkx, chunkz), x, y, z);
+    updateRegion(chunkx, chunkz, x, y, z);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
@@ -203,9 +182,7 @@ bool ChunkManager::isEmpty(int x, int z) {
     return !getChunk(x, z);
 }
 
-std::optional<RegionSnapshot> ChunkManager::snapshotRegion(int x, int z) {
-    std::lock_guard<std::mutex> lock(chunks_mutex);
-
+std::optional<RegionSnapshot> ChunkManager::buildSnapshot(int x, int z) {
     std::shared_ptr<Chunk> main = getChunk(x, z);
     if (!main)
         return std::nullopt;
@@ -221,6 +198,11 @@ std::optional<RegionSnapshot> ChunkManager::snapshotRegion(int x, int z) {
         .frontLeft = getChunk(x - 1, z + 1),
         .backLeft = getChunk(x - 1, z - 1),
     };
+}
+
+std::optional<RegionSnapshot> ChunkManager::snapshotRegion(int x, int z) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+    return buildSnapshot(x, z);
 }
 
 std::pair<std::mutex *, chunk_map *> ChunkManager::unsafe_getChunkMap() {

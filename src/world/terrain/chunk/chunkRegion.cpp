@@ -1,23 +1,5 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
-std::optional<RegionSnapshot> ChunkRegion::lock() const {
-    std::shared_ptr<Chunk> m = main.lock();
-    if (!m)
-        return std::nullopt;
-
-    return RegionSnapshot{
-        .main = std::move(m),
-        .right = right.lock(),
-        .left = left.lock(),
-        .front = front.lock(),
-        .back = back.lock(),
-        .frontRight = frontRight.lock(),
-        .backRight = backRight.lock(),
-        .frontLeft = frontLeft.lock(),
-        .backLeft = backLeft.lock(),
-    };
-}
-
 Block RegionSnapshot::getBlock(int x, int y, int z) const {
     int ox = (x < 0) ? -1 : (x >= CHUNK_WIDTH) ? 1 : 0;
     int oz = (z < 0) ? -1 : (z >= CHUNK_WIDTH) ? 1 : 0;

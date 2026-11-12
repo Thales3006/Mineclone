@@ -37,12 +37,4 @@ struct RegionSnapshot {
                                            unsigned char face) const;
 };
 
-struct ChunkRegion {
-    std::weak_ptr<Chunk> main;
-    std::weak_ptr<Chunk> right, left, front, back;
-    std::weak_ptr<Chunk> frontRight, backRight, frontLeft, backLeft;
-
-    std::optional<RegionSnapshot> lock() const;
-};
-
 #endif

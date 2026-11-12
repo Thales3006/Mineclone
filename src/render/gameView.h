@@ -35,7 +35,7 @@ class GameView {
 
     void addChunkView(ChunkMeshData data);
     void removeChunkView(int x, int z);
-    void updateChunkView(const ChunkRegion &region, glm::ivec3 worldEdit);
+    void updateChunkView(const RegionSnapshot &snapshot, glm::ivec3 worldEdit);
 };
 
 #endif

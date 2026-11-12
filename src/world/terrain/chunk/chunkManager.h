@@ -21,9 +21,9 @@ class ChunkManager {
     std::mutex chunks_mutex;
     chunk_map chunks;
 
-    sigslot::signal<ChunkRegion> onChunkAdded;
+    sigslot::signal<RegionSnapshot> onChunkAdded;
     sigslot::signal<int, int> onChunkRemoved;
-    sigslot::signal<ChunkRegion, glm::ivec3> onChunkUpdated;
+    sigslot::signal<RegionSnapshot, glm::ivec3> onChunkUpdated;
 
     ChunkManager(int seed);
     ~ChunkManager();
@@ -53,9 +53,9 @@ class ChunkManager {
     void loadChunk(std::shared_ptr<Chunk> chunk);
     void unloadChunk(int x, int z);
 
-    ChunkRegion getChunkRegion(int x, int z);
-    void updateRegion(const ChunkRegion &region, int x, int y, int z);
+    void updateRegion(int chunkx, int chunkz, int x, int y, int z);
     std::shared_ptr<Chunk> getChunk(int x, int z);
+    std::optional<RegionSnapshot> buildSnapshot(int x, int z);
 };
 
 #endif
