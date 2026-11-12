@@ -12,10 +12,12 @@ out vec3 color;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float depthBias;
 
 void main(){
     texCoord = vaUV;
     normal = mat3(transpose(inverse(model)))*vaNormal;
     color = vaColor;
     gl_Position = projection * view * model * vec4(vaPosition, 1.0);
+    gl_Position.z -= depthBias * gl_Position.w;
 }
