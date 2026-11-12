@@ -22,23 +22,23 @@ class ChunkManager {
     chunk_map chunks;
 
     sigslot::signal<RegionSnapshot> onChunkAdded;
-    sigslot::signal<int, int> onChunkRemoved;
+    sigslot::signal<glm::ivec2> onChunkRemoved;
     sigslot::signal<RegionSnapshot, glm::ivec3> onChunkUpdated;
 
     ChunkManager(int seed);
     ~ChunkManager();
 
-    bool isEmpty(int x, int z);
+    bool isEmpty(glm::ivec2 coord);
 
-    std::optional<RegionSnapshot> snapshotRegion(int x, int z);
+    std::optional<RegionSnapshot> snapshotRegion(glm::ivec2 coord);
 
-    void setBlock(int chunkx, int chunkz, int x, int y, int z, Block block);
-    void setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block);
-    Block getBlock(int chunkx, int chunkz, glm::vec3 pos);
+    void setBlock(glm::ivec2 chunk, glm::ivec3 block, Block value);
+    void setBlock(glm::ivec2 chunk, glm::vec3 pos, Block value);
+    Block getBlock(glm::ivec2 chunk, glm::vec3 pos);
 
     void startLoading();
     void stopLoading();
-    void updateLoading(int centerX, int centerZ);
+    void updateLoading(glm::ivec2 center);
 
     std::pair<std::mutex *, chunk_map *> unsafe_getChunkMap();
 
@@ -48,14 +48,14 @@ class ChunkManager {
     std::atomic<bool> active;
     std::atomic<bool> fillInFlight;
 
-    void fillChunkRadius(int radius, int chunkx, int chunkz);
+    void fillChunkRadius(int radius, glm::ivec2 center);
 
     void loadChunk(std::shared_ptr<Chunk> chunk);
-    void unloadChunk(int x, int z);
+    void unloadChunk(glm::ivec2 coord);
 
-    void updateRegion(int chunkx, int chunkz, int x, int y, int z);
-    std::shared_ptr<Chunk> getChunk(int x, int z);
-    std::optional<RegionSnapshot> buildSnapshot(int x, int z);
+    void updateRegion(glm::ivec2 chunk, glm::ivec3 block);
+    std::shared_ptr<Chunk> getChunk(glm::ivec2 coord);
+    std::optional<RegionSnapshot> buildSnapshot(glm::ivec2 coord);
 };
 
 #endif

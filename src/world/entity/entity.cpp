@@ -7,8 +7,8 @@ Entity::Entity()
              glm::vec3(0.0f, 0.0f, 1.0f)) {}
 
 Entity::Entity(glm::vec3 position, glm::vec3 size, glm::vec3 direction)
-    : position(position), size(size), direction(direction), chunkx(0),
-      chunkz(0), velocity(0.0f), acceleration(32.0, 7.0, 32.0), gravity(20),
+    : position(position), size(size), direction(direction), chunk(0, 0),
+      velocity(0.0f), acceleration(32.0, 7.0, 32.0), gravity(20),
       onGround(false) {}
 
 typedef struct {
@@ -18,7 +18,7 @@ typedef struct {
 } blockDist;
 
 void Entity::update(ChunkManager &chunkManager, float deltaTime) {
-    std::optional<RegionSnapshot> region = chunkManager.snapshotRegion(chunkx, chunkz);
+    std::optional<RegionSnapshot> region = chunkManager.snapshotRegion(chunk);
     if (!region) {
         return;
     }
@@ -39,8 +39,7 @@ void Entity::update(ChunkManager &chunkManager, float deltaTime) {
             for (int z = 0; abs(z) <= abs(dV.z) + abs(size.z) + 1; z += nV.z) {
                 const glm::vec3 colisionPos =
                     glm::floor(position) + glm::vec3(x, y, z) - nSize;
-                const Block block = region->getBlock(
-                    (int)colisionPos.x, (int)colisionPos.y, (int)colisionPos.z);
+                const Block block = region->getBlock(glm::ivec3(colisionPos));
 
                 if (block.solid == false)
                     continue;
@@ -92,8 +91,7 @@ void Entity::update(ChunkManager &chunkManager, float deltaTime) {
 
     glm::vec3 chunkOffset = Chunk::chunkOffSet(position);
 
-    chunkx += chunkOffset.x;
-    chunkz += chunkOffset.z;
+    chunk += glm::ivec2(chunkOffset.x, chunkOffset.z);
 
     position -= chunkOffset * float(CHUNK_WIDTH);
 }

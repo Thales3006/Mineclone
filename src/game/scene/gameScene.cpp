@@ -88,29 +88,28 @@ void GameScene::triggerAction(Action action) {
 void GameScene::destroyLookedBlock() {
     Player &player = *world.getEntityManager().player;
 
-    auto hit = raycastVoxel(world.getChunkManager(), player.chunkx,
-                            player.chunkz, player.eyePosition(),
-                            player.direction, 6.0f);
+    auto hit = raycastVoxel(world.getChunkManager(), player.chunk,
+                            player.eyePosition(), player.direction, 6.0f);
     if (!hit)
         return;
 
-    world.getChunkManager().setBlock(player.chunkx, player.chunkz,
+    world.getChunkManager().setBlock(player.chunk,
                                      glm::vec3(hit->block) + 0.5f, Block());
 
-    Block block = world.getChunkManager().getBlock(player.chunkx, player.chunkz,
-                                     glm::vec3(hit->block) + 0.5f + glm::vec3(0,1,0));
-    if(block.id == BlockID::grass) {
-        world.getChunkManager().setBlock(player.chunkx, player.chunkz,
-                                         glm::vec3(hit->block) + 0.5f + glm::vec3(0,1,0), Block());
+    Block block = world.getChunkManager().getBlock(
+        player.chunk, glm::vec3(hit->block) + 0.5f + glm::vec3(0, 1, 0));
+    if (block.id == BlockID::grass) {
+        world.getChunkManager().setBlock(
+            player.chunk, glm::vec3(hit->block) + 0.5f + glm::vec3(0, 1, 0),
+            Block());
     }
 }
 
 void GameScene::placeLookedBlock() {
     Player &player = *world.getEntityManager().player;
 
-    auto hit = raycastVoxel(world.getChunkManager(), player.chunkx,
-                            player.chunkz, player.eyePosition(),
-                            player.direction, 6.0f);
+    auto hit = raycastVoxel(world.getChunkManager(), player.chunk,
+                            player.eyePosition(), player.direction, 6.0f);
     if (!hit)
         return;
 
@@ -119,7 +118,7 @@ void GameScene::placeLookedBlock() {
     if (!Entity::colision(glm::vec3(placeBlock), glm::vec3(1.0f),
                           player.position, player.size)) {
         world.getChunkManager().setBlock(
-            player.chunkx, player.chunkz, glm::vec3(placeBlock) + 0.5f,
+            player.chunk, glm::vec3(placeBlock) + 0.5f,
             Block((BlockID)player.hotbarIndex, true));
     }
 }

@@ -19,19 +19,19 @@ void ChunkManager::stopLoading() {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
-void ChunkManager::updateLoading(int centerX, int centerZ) {
+void ChunkManager::updateLoading(glm::ivec2 center) {
     if (!active || fillInFlight)
         return;
 
     fillInFlight = true;
-    TaskManager::instance().run([this, centerX, centerZ]() {
-        fillChunkRadius(6, centerX, centerZ);
+    TaskManager::instance().run([this, center]() {
+        fillChunkRadius(6, center);
         fillInFlight = false;
     });
 }
 
-std::shared_ptr<Chunk> ChunkManager::getChunk(int x, int z) {
-    auto it = chunks.find({x, z});
+std::shared_ptr<Chunk> ChunkManager::getChunk(glm::ivec2 coord) {
+    auto it = chunks.find({coord.x, coord.y});
     if (it != chunks.end()) {
         return it->second;
     }
@@ -39,92 +39,90 @@ std::shared_ptr<Chunk> ChunkManager::getChunk(int x, int z) {
 }
 
 void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
-    if (chunks.find({chunk->x, chunk->z}) != chunks.end())
+    if (chunks.find({chunk->coord.x, chunk->coord.y}) != chunks.end())
         return;
 
-    chunks[{chunk->x, chunk->z}] = std::move(chunk);
+    chunks[{chunk->coord.x, chunk->coord.y}] = std::move(chunk);
 }
 
-void ChunkManager::unloadChunk(int x, int z) {
-    if (chunks.find({x, z}) == chunks.end())
+void ChunkManager::unloadChunk(glm::ivec2 coord) {
+    if (chunks.find({coord.x, coord.y}) == chunks.end())
         return;
 
-    onChunkRemoved(x, z);
-    chunks.erase({x, z});
+    onChunkRemoved(coord);
+    chunks.erase({coord.x, coord.y});
 }
 
-void ChunkManager::updateRegion(int chunkx, int chunkz, int x, int y, int z) {
-    glm::ivec3 worldEdit = {chunkx * CHUNK_WIDTH + x, y,
-                            chunkz * CHUNK_WIDTH + z};
+void ChunkManager::updateRegion(glm::ivec2 chunk, glm::ivec3 block) {
+    glm::ivec3 worldEdit = {chunk.x * CHUNK_WIDTH + block.x, block.y,
+                            chunk.y * CHUNK_WIDTH + block.z};
 
-    auto emit = [this, worldEdit](int cx, int cz) {
-        if (auto snapshot = buildSnapshot(cx, cz))
+    auto emit = [this, worldEdit](glm::ivec2 c) {
+        if (auto snapshot = buildSnapshot(c))
             onChunkUpdated(std::move(*snapshot), worldEdit);
     };
 
-    emit(chunkx, chunkz);
+    emit(chunk);
 
-    bool atLeft = (x == 0);
-    bool atRight = (x == CHUNK_WIDTH - 1);
-    bool atBack = (z == 0);
-    bool atFront = (z == CHUNK_WIDTH - 1);
+    bool atLeft = (block.x == 0);
+    bool atRight = (block.x == CHUNK_WIDTH - 1);
+    bool atBack = (block.z == 0);
+    bool atFront = (block.z == CHUNK_WIDTH - 1);
 
     if (atRight)
-        emit(chunkx + 1, chunkz);
+        emit(chunk + glm::ivec2(1, 0));
     if (atLeft)
-        emit(chunkx - 1, chunkz);
+        emit(chunk + glm::ivec2(-1, 0));
     if (atFront)
-        emit(chunkx, chunkz + 1);
+        emit(chunk + glm::ivec2(0, 1));
     if (atBack)
-        emit(chunkx, chunkz - 1);
+        emit(chunk + glm::ivec2(0, -1));
 
     if (atFront && atRight)
-        emit(chunkx + 1, chunkz + 1);
+        emit(chunk + glm::ivec2(1, 1));
     if (atBack && atRight)
-        emit(chunkx + 1, chunkz - 1);
+        emit(chunk + glm::ivec2(1, -1));
     if (atFront && atLeft)
-        emit(chunkx - 1, chunkz + 1);
+        emit(chunk + glm::ivec2(-1, 1));
     if (atBack && atLeft)
-        emit(chunkx - 1, chunkz - 1);
+        emit(chunk + glm::ivec2(-1, -1));
 }
 
-void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
-                            Block block) {
+void ChunkManager::setBlock(glm::ivec2 chunk, glm::ivec3 block, Block value) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
-    if ((chunks.find({chunkx, chunkz}) == chunks.end()) ||
-        (x < 0 || x >= CHUNK_WIDTH) || (y < 0 || y >= CHUNK_HEIGHT) ||
-        (z < 0 || z >= CHUNK_WIDTH))
+    if ((chunks.find({chunk.x, chunk.y}) == chunks.end()) ||
+        (block.x < 0 || block.x >= CHUNK_WIDTH) ||
+        (block.y < 0 || block.y >= CHUNK_HEIGHT) ||
+        (block.z < 0 || block.z >= CHUNK_WIDTH))
         return;
 
-    chunks.at({chunkx, chunkz})->setBlock(x, y, z, block);
+    chunks.at({chunk.x, chunk.y})->setBlock(block, value);
 
-    updateRegion(chunkx, chunkz, x, y, z);
+    updateRegion(chunk, block);
 }
 
-void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
-                            Block block) {
+void ChunkManager::setBlock(glm::ivec2 chunk, glm::vec3 pos, Block value) {
     glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
     pos -= chunkOffset * float(CHUNK_WIDTH);
-    chunkx += chunkOffset.x;
-    chunkz += chunkOffset.z;
-    setBlock(chunkx, chunkz, (int)pos.x, (int)pos.y, (int)pos.z, block);
+    chunk += glm::ivec2(chunkOffset.x, chunkOffset.z);
+    setBlock(chunk, glm::ivec3((int)pos.x, (int)pos.y, (int)pos.z), value);
 }
 
-Block ChunkManager::getBlock(int chunkx, int chunkz, glm::vec3 pos) {
+Block ChunkManager::getBlock(glm::ivec2 chunk, glm::vec3 pos) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
     glm::vec3 chunkOffset = Chunk::chunkOffSet(pos);
     pos -= chunkOffset * float(CHUNK_WIDTH);
-    chunkx += chunkOffset.x;
-    chunkz += chunkOffset.z;
+    chunk += glm::ivec2(chunkOffset.x, chunkOffset.z);
 
-    if ((chunks.find({chunkx, chunkz}) == chunks.end()))
+    if ((chunks.find({chunk.x, chunk.y}) == chunks.end()))
         return Block();
 
-    return chunks[{chunkx, chunkz}]->blocks[int(pos.x)][int(pos.y)][int(pos.z)];
+    return chunks[{chunk.x, chunk.y}]->blocks[int(pos.x)][int(pos.y)]
+                                             [int(pos.z)];
 }
 
-void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
+void ChunkManager::fillChunkRadius(int radius, glm::ivec2 center) {
     std::vector<std::tuple<int, int>> to_delete{};
     std::vector<std::tuple<int, int>> to_add{};
 
@@ -135,14 +133,14 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
             int x = std::get<0>(coord);
             int z = std::get<1>(coord);
 
-            if (x < -radius + chunkx || x > radius + chunkx ||
-                z < -radius + chunkz || z > radius + chunkz) {
+            if (x < -radius + center.x || x > radius + center.x ||
+                z < -radius + center.y || z > radius + center.y) {
                 to_delete.push_back(coord);
             }
         }
 
-        for (int i = -radius + chunkx; i <= radius + chunkx; i++) {
-            for (int j = -radius + chunkz; j <= radius + chunkz; j++) {
+        for (int i = -radius + center.x; i <= radius + center.x; i++) {
+            for (int j = -radius + center.y; j <= radius + center.y; j++) {
                 if (chunks.find({i, j}) == chunks.end()) {
                     to_add.push_back({i, j});
                 }
@@ -151,20 +149,15 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
     }
 
     std::vector<std::shared_ptr<Chunk>> to_add_chunks{};
-    for (auto &coord : to_add) {
-        int x = std::get<0>(coord);
-        int z = std::get<1>(coord);
-        to_add_chunks.push_back(Chunk::generateChunk(seed, x, z));
-    }
+    for (auto &coord : to_add)
+        to_add_chunks.push_back(Chunk::generateChunk(
+            seed, glm::ivec2(std::get<0>(coord), std::get<1>(coord))));
 
     {
         std::lock_guard<std::mutex> lock(chunks_mutex);
 
-        for (auto &coord : to_delete) {
-            int x = std::get<0>(coord);
-            int z = std::get<1>(coord);
-            unloadChunk(x, z);
-        }
+        for (auto &coord : to_delete)
+            unloadChunk(glm::ivec2(std::get<0>(coord), std::get<1>(coord)));
 
         for (auto &chunk : to_add_chunks) {
             loadChunk(std::move(chunk));
@@ -182,39 +175,39 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
             markNeighborhood(std::get<0>(coord), std::get<1>(coord));
 
         for (auto &coord : affected)
-            if (auto snapshot =
-                    buildSnapshot(std::get<0>(coord), std::get<1>(coord)))
+            if (auto snapshot = buildSnapshot(
+                    glm::ivec2(std::get<0>(coord), std::get<1>(coord))))
                 onChunkAdded(std::move(*snapshot));
     }
 }
 
-bool ChunkManager::isEmpty(int x, int z) {
+bool ChunkManager::isEmpty(glm::ivec2 coord) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
-    return !getChunk(x, z);
+    return !getChunk(coord);
 }
 
-std::optional<RegionSnapshot> ChunkManager::buildSnapshot(int x, int z) {
-    std::shared_ptr<Chunk> main = getChunk(x, z);
+std::optional<RegionSnapshot> ChunkManager::buildSnapshot(glm::ivec2 coord) {
+    std::shared_ptr<Chunk> main = getChunk(coord);
     if (!main)
         return std::nullopt;
 
     return RegionSnapshot{
         .main = std::move(main),
-        .right = getChunk(x + 1, z),
-        .left = getChunk(x - 1, z),
-        .front = getChunk(x, z + 1),
-        .back = getChunk(x, z - 1),
-        .frontRight = getChunk(x + 1, z + 1),
-        .backRight = getChunk(x + 1, z - 1),
-        .frontLeft = getChunk(x - 1, z + 1),
-        .backLeft = getChunk(x - 1, z - 1),
+        .right = getChunk(coord + glm::ivec2(1, 0)),
+        .left = getChunk(coord + glm::ivec2(-1, 0)),
+        .front = getChunk(coord + glm::ivec2(0, 1)),
+        .back = getChunk(coord + glm::ivec2(0, -1)),
+        .frontRight = getChunk(coord + glm::ivec2(1, 1)),
+        .backRight = getChunk(coord + glm::ivec2(1, -1)),
+        .frontLeft = getChunk(coord + glm::ivec2(-1, 1)),
+        .backLeft = getChunk(coord + glm::ivec2(-1, -1)),
     };
 }
 
-std::optional<RegionSnapshot> ChunkManager::snapshotRegion(int x, int z) {
+std::optional<RegionSnapshot> ChunkManager::snapshotRegion(glm::ivec2 coord) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
-    return buildSnapshot(x, z);
+    return buildSnapshot(coord);
 }
 
 std::pair<std::mutex *, chunk_map *> ChunkManager::unsafe_getChunkMap() {

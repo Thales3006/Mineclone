@@ -31,10 +31,10 @@ class GameView {
 
     World &world;
 
-    void renderChunks(int chunkx, int chunkz);
+    void renderChunks(glm::ivec2 chunk);
 
     void addChunkView(ChunkMeshData data);
-    void removeChunkView(int x, int z);
+    void removeChunkView(glm::ivec2 coord);
     void updateChunkView(const RegionSnapshot &snapshot, glm::ivec3 worldEdit);
 };
 

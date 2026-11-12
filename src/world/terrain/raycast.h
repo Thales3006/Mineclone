@@ -14,8 +14,8 @@ struct RaycastHit {
     BlockID id;
 };
 
-std::optional<RaycastHit> raycastVoxel(ChunkManager &chunkManager, int chunkx,
-                                       int chunkz, glm::vec3 origin,
+std::optional<RaycastHit> raycastVoxel(ChunkManager &chunkManager,
+                                       glm::ivec2 chunk, glm::vec3 origin,
                                        glm::vec3 direction, float maxDistance);
 
 #endif

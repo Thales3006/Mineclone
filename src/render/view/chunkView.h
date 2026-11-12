@@ -11,7 +11,7 @@
 #include <utility>
 
 struct ChunkMeshData {
-    int x, z;
+    glm::ivec2 coord;
     Geometry<TerrainVertex> geometry;
     std::map<int, std::pair<unsigned int, unsigned int>> blockRanges;
 };
@@ -25,22 +25,22 @@ class ChunkView {
     static ChunkMeshData buildMeshData(const RegionSnapshot &region,
                                        TerrainVertexMap &terrainVertexMap);
 
-    void render(int chunkx, int chunkz);
+    void render(glm::ivec2 chunk);
 
     void updateBlock(const RegionSnapshot &region, glm::ivec3 worldEdit);
 
-    int x, z;
+    glm::ivec2 coord;
 
   private:
     TerrainVertexMap *terrainVertexMap;
     Mesh<TerrainVertex> mesh;
     std::map<int, std::pair<unsigned int, unsigned int>> blockRanges;
 
-    static int blockIndex(int i, int j, int k);
+    static int blockIndex(glm::ivec3 pos);
     static Geometry<TerrainVertex> blockGeometry(TerrainVertexMap &terrainVertexMap,
                                                  const RegionSnapshot &region,
-                                                 int i, int j, int k);
-    void respliceBlock(const RegionSnapshot &region, int i, int j, int k);
+                                                 glm::ivec3 pos);
+    void respliceBlock(const RegionSnapshot &region, glm::ivec3 pos);
 };
 
 #endif

@@ -5,44 +5,43 @@
 ChunkView::ChunkView(ChunkMeshData data, TerrainVertexMap &terrainVertexMap,
                      const std::shared_ptr<TextureManager> &textureManager,
                      std::shared_ptr<Shader> shader)
-    : x(data.x), z(data.z), terrainVertexMap(&terrainVertexMap),
+    : coord(data.coord), terrainVertexMap(&terrainVertexMap),
       mesh(std::move(data.geometry), textureManager->getTexture("blocks"),
            std::move(shader)),
       blockRanges(std::move(data.blockRanges)) {}
 
-int ChunkView::blockIndex(int i, int j, int k) {
-    return (i * CHUNK_HEIGHT + j) * CHUNK_WIDTH + k;
+int ChunkView::blockIndex(glm::ivec3 pos) {
+    return (pos.x * CHUNK_HEIGHT + pos.y) * CHUNK_WIDTH + pos.z;
 }
 
 Geometry<TerrainVertex> ChunkView::blockGeometry(
-    TerrainVertexMap &terrainVertexMap, const RegionSnapshot &region, int i,
-    int j, int k) {
-    Geometry<TerrainVertex> geometry =
-        terrainVertexMap.getGeometry(region, i, j, k);
-    geometry.addVertexOffset(glm::vec3(i, j, k));
+    TerrainVertexMap &terrainVertexMap, const RegionSnapshot &region,
+    glm::ivec3 pos) {
+    Geometry<TerrainVertex> geometry = terrainVertexMap.getGeometry(region, pos);
+    geometry.addVertexOffset(glm::vec3(pos));
     return geometry;
 }
 
 ChunkMeshData ChunkView::buildMeshData(const RegionSnapshot &region,
                                        TerrainVertexMap &terrainVertexMap) {
     ChunkMeshData data;
-    data.x = region.main->x;
-    data.z = region.main->z;
+    data.coord = region.main->coord;
 
     for (int i = 0; i < CHUNK_WIDTH; i++) {
         for (int j = 0; j < CHUNK_HEIGHT; j++) {
             for (int k = 0; k < CHUNK_WIDTH; k++) {
-                if (region.getBlockFaces(i, j, k) == NO_FACE)
+                glm::ivec3 pos(i, j, k);
+                if (region.getBlockFaces(pos) == NO_FACE)
                     continue;
 
                 Geometry<TerrainVertex> geometry =
-                    blockGeometry(terrainVertexMap, region, i, j, k);
+                    blockGeometry(terrainVertexMap, region, pos);
                 if (geometry.vertices.empty())
                     continue;
 
                 unsigned int start = data.geometry.vertices.size();
                 data.geometry.append(geometry);
-                data.blockRanges[blockIndex(i, j, k)] = {
+                data.blockRanges[blockIndex(pos)] = {
                     start, static_cast<unsigned int>(geometry.vertices.size())};
             }
         }
@@ -51,8 +50,8 @@ ChunkMeshData ChunkView::buildMeshData(const RegionSnapshot &region,
     return data;
 }
 
-void ChunkView::respliceBlock(const RegionSnapshot &region, int i, int j, int k) {
-    int index = blockIndex(i, j, k);
+void ChunkView::respliceBlock(const RegionSnapshot &region, glm::ivec3 pos) {
+    int index = blockIndex(pos);
 
     auto it = blockRanges.find(index);
     if (it != blockRanges.end()) {
@@ -67,11 +66,11 @@ void ChunkView::respliceBlock(const RegionSnapshot &region, int i, int j, int k)
                 entry.second.first -= count;
     }
 
-    if (region.getBlockFaces(i, j, k) == NO_FACE)
+    if (region.getBlockFaces(pos) == NO_FACE)
         return;
 
     Geometry<TerrainVertex> geometry =
-        blockGeometry(*terrainVertexMap, region, i, j, k);
+        blockGeometry(*terrainVertexMap, region, pos);
     if (geometry.vertices.empty())
         return;
 
@@ -82,31 +81,28 @@ void ChunkView::respliceBlock(const RegionSnapshot &region, int i, int j, int k)
 }
 
 void ChunkView::updateBlock(const RegionSnapshot &region, glm::ivec3 worldEdit) {
-    int lx = worldEdit.x - x * CHUNK_WIDTH;
-    int ly = worldEdit.y;
-    int lz = worldEdit.z - z * CHUNK_WIDTH;
+    glm::ivec3 local(worldEdit.x - coord.x * CHUNK_WIDTH, worldEdit.y,
+                     worldEdit.z - coord.y * CHUNK_WIDTH);
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
             for (int dz = -1; dz <= 1; dz++) {
-                int bx = lx + dx;
-                int by = ly + dy;
-                int bz = lz + dz;
+                glm::ivec3 pos = local + glm::ivec3(dx, dy, dz);
 
-                if (bx < 0 || bx >= CHUNK_WIDTH || by < 0 ||
-                    by >= CHUNK_HEIGHT || bz < 0 || bz >= CHUNK_WIDTH)
+                if (pos.x < 0 || pos.x >= CHUNK_WIDTH || pos.y < 0 ||
+                    pos.y >= CHUNK_HEIGHT || pos.z < 0 || pos.z >= CHUNK_WIDTH)
                     continue;
 
-                respliceBlock(region, bx, by, bz);
+                respliceBlock(region, pos);
             }
         }
     }
 }
 
-void ChunkView::render(int chunkx, int chunkz) {
+void ChunkView::render(glm::ivec2 chunk) {
     mesh.shader->setMat4(
         "model", glm::translate(glm::mat4(1.0f),
-                                glm::vec3((x - chunkx) * CHUNK_WIDTH, 0,
-                                          (z - chunkz) * CHUNK_WIDTH)));
+                                glm::vec3((coord.x - chunk.x) * CHUNK_WIDTH, 0,
+                                          (coord.y - chunk.y) * CHUNK_WIDTH)));
     mesh.render();
 }

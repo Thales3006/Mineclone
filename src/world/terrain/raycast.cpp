@@ -50,10 +50,10 @@ bool rayBox(glm::vec3 origin, glm::vec3 dir, glm::vec3 bmin, glm::vec3 bmax,
 
 } // namespace
 
-std::optional<RaycastHit> raycastVoxel(ChunkManager &chunkManager, int chunkx,
-                                       int chunkz, glm::vec3 origin,
+std::optional<RaycastHit> raycastVoxel(ChunkManager &chunkManager,
+                                       glm::ivec2 chunk, glm::vec3 origin,
                                        glm::vec3 direction, float maxDistance) {
-    std::optional<RegionSnapshot> region = chunkManager.snapshotRegion(chunkx, chunkz);
+    std::optional<RegionSnapshot> region = chunkManager.snapshotRegion(chunk);
     if (!region)
         return std::nullopt;
 
@@ -84,7 +84,7 @@ std::optional<RaycastHit> raycastVoxel(ChunkManager &chunkManager, int chunkx,
 
     while (t <= maxDistance) {
         if (voxel.y >= 0 && voxel.y < CHUNK_HEIGHT) {
-            BlockID id = region->getBlock(voxel.x, voxel.y, voxel.z).id;
+            BlockID id = region->getBlock(voxel).id;
             if (id != BlockID::air) {
                 const BlockDef &def = blockDef(id);
 

@@ -8,6 +8,5 @@ EntityManager &World::getEntityManager() { return entityManager; }
 
 void World::updateTick(float deltaTime) {
     entityManager.update(chunkManager, deltaTime);
-    chunkManager.updateLoading(entityManager.player->chunkx,
-                               entityManager.player->chunkz);
+    chunkManager.updateLoading(entityManager.player->chunk);
 }

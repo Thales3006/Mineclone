@@ -14,7 +14,7 @@ class FirstPersonView {
                     std::shared_ptr<Texture> texture,
                     std::shared_ptr<Shader> shader);
 
-    void render(int chunkx, int chunkz);
+    void render(glm::ivec2 chunk);
 
   private:
     Mesh<TerrainVertex> selectionBoxMesh;

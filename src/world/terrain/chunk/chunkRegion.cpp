@@ -1,13 +1,13 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
-Block RegionSnapshot::getBlock(int x, int y, int z) const {
-    int ox = (x < 0) ? -1 : (x >= CHUNK_WIDTH) ? 1 : 0;
-    int oz = (z < 0) ? -1 : (z >= CHUNK_WIDTH) ? 1 : 0;
+Block RegionSnapshot::getBlock(glm::ivec3 pos) const {
+    int ox = (pos.x < 0) ? -1 : (pos.x >= CHUNK_WIDTH) ? 1 : 0;
+    int oz = (pos.z < 0) ? -1 : (pos.z >= CHUNK_WIDTH) ? 1 : 0;
 
-    int localX = x - ox * CHUNK_WIDTH;
-    int localZ = z - oz * CHUNK_WIDTH;
+    int localX = pos.x - ox * CHUNK_WIDTH;
+    int localZ = pos.z - oz * CHUNK_WIDTH;
 
-    if (y < 0 || y >= CHUNK_HEIGHT)
+    if (pos.y < 0 || pos.y >= CHUNK_HEIGHT)
         return Block();
 
     const std::shared_ptr<Chunk> *neighbors[3][3] = {
@@ -17,16 +17,20 @@ Block RegionSnapshot::getBlock(int x, int y, int z) const {
     };
 
     if (ox == 0 && oz == 0)
-        return main->blocks[localX][y][localZ];
+        return main->blocks[localX][pos.y][localZ];
 
     auto &neighbor = neighbors[ox + 1][oz + 1];
     if (neighbor && *neighbor)
-        return (*neighbor)->blocks[localX][y][localZ];
+        return (*neighbor)->blocks[localX][pos.y][localZ];
 
     return Block();
 }
 
-unsigned char RegionSnapshot::getBlockFaces(int x, int y, int z) const {
+unsigned char RegionSnapshot::getBlockFaces(glm::ivec3 pos) const {
+    int x = pos.x;
+    int y = pos.y;
+    int z = pos.z;
+
     if (main->blocks[x][y][z].id == BlockID::air) {
         return NO_FACE;
     }
@@ -61,7 +65,7 @@ unsigned char RegionSnapshot::getBlockFaces(int x, int y, int z) const {
     return faces;
 }
 
-std::array<float, 4> RegionSnapshot::getBlockOcclusion(int x, int y, int z,
+std::array<float, 4> RegionSnapshot::getBlockOcclusion(glm::ivec3 pos,
                                                      unsigned char face) const {
     std::array<float, 4> occlusion;
 
@@ -112,24 +116,11 @@ std::array<float, 4> RegionSnapshot::getBlockOcclusion(int x, int y, int z,
 
     int fi = __builtin_ctz(face);
     for (int v = 0; v < 4; v++) {
-        int s1 = getBlock(x + vertexAO[fi][v][0].x, y + vertexAO[fi][v][0].y,
-                          z + vertexAO[fi][v][0].z)
-                         .solid
-                     ? 1
-                     : 0;
-        int s2 = getBlock(x + vertexAO[fi][v][1].x, y + vertexAO[fi][v][1].y,
-                          z + vertexAO[fi][v][1].z)
-                         .solid
-                     ? 1
-                     : 0;
-        int diag =
-            (s1 && s2)
-                ? 1
-                : (getBlock(x + vertexAO[fi][v][2].x, y + vertexAO[fi][v][2].y,
-                            z + vertexAO[fi][v][2].z)
-                           .solid
-                       ? 1
-                       : 0);
+        int s1 = getBlock(pos + vertexAO[fi][v][0]).solid ? 1 : 0;
+        int s2 = getBlock(pos + vertexAO[fi][v][1]).solid ? 1 : 0;
+        int diag = (s1 && s2) ? 1
+                              : (getBlock(pos + vertexAO[fi][v][2]).solid ? 1
+                                                                          : 0);
 
         static const float aoValues[4] = {0.25f, 0.4f, 0.6f, 1.0f};
         occlusion[v] = aoValues[3 - (s1 + s2 + diag)];

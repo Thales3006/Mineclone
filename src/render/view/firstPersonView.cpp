@@ -72,10 +72,9 @@ FirstPersonView::FirstPersonView(std::shared_ptr<Player> player, World &world,
       selectionUV(terrainVertexMap.getSelectionBox().vertices[0].uv),
       player(std::move(player)), world(world) {}
 
-void FirstPersonView::render(int chunkx, int chunkz) {
-    auto hit = raycastVoxel(world.getChunkManager(), player->chunkx,
-                            player->chunkz, player->eyePosition(),
-                            player->direction, 6.0f);
+void FirstPersonView::render(glm::ivec2 chunk) {
+    auto hit = raycastVoxel(world.getChunkManager(), player->chunk,
+                            player->eyePosition(), player->direction, 6.0f);
     if (!hit)
         return;
 

@@ -29,11 +29,11 @@ struct RegionSnapshot {
     std::shared_ptr<Chunk> right, left, front, back;
     std::shared_ptr<Chunk> frontRight, backRight, frontLeft, backLeft;
 
-    Block getBlock(int x, int y, int z) const;
+    Block getBlock(glm::ivec3 pos) const;
 
-    unsigned char getBlockFaces(int x, int y, int z) const;
+    unsigned char getBlockFaces(glm::ivec3 pos) const;
 
-    std::array<float, 4> getBlockOcclusion(int x, int y, int z,
+    std::array<float, 4> getBlockOcclusion(glm::ivec3 pos,
                                            unsigned char face) const;
 };
 

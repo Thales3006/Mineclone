@@ -101,8 +101,8 @@ TerrainVertexMap::setUV(Geometry<TerrainVertex> geometry, BlockTextureID id) {
 }
 
 Geometry<TerrainVertex> TerrainVertexMap::getGeometry(const RegionSnapshot &region,
-                                                      int x, int y, int z) {
-    BlockID id = region.main->blocks[x][y][z].id;
+                                                      glm::ivec3 pos) {
+    BlockID id = region.main->blocks[pos.x][pos.y][pos.z].id;
     if (id == BlockID::air)
         return Geometry<TerrainVertex>{};
 
@@ -118,7 +118,7 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(const RegionSnapshot &regi
     static const unsigned char faceBits[6] = {FRONT_FACE, BACK_FACE, LEFT_FACE,
                                                RIGHT_FACE, UP_FACE, DOWN_FACE};
 
-    unsigned char faces = region.getBlockFaces(x, y, z);
+    unsigned char faces = region.getBlockFaces(pos);
     Geometry<TerrainVertex> blockGeometry{};
     for (int i = 0; i < 6; i++) {
         if (!(faces & faceBits[i]))
@@ -127,7 +127,7 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(const RegionSnapshot &regi
         Geometry<TerrainVertex> face =
             setUV(fullBlock.at(faceBits[i]), def.faces[i]);
         std::array<float, 4> occlusion =
-            region.getBlockOcclusion(x, y, z, faceBits[i]);
+            region.getBlockOcclusion(pos, faceBits[i]);
         for (int v = 0; v < 4; v++)
             face.vertices[v].color = def.tint[i] * occlusion[v];
         blockGeometry.append(face);

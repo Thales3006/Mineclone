@@ -27,8 +27,8 @@ GameView::GameView(World &world, Renderer &renderer)
         });
     });
 
-    world.getChunkManager().onChunkRemoved.connect([&](int x, int z) {
-        this->renderer.runOnMain([this, x, z]() { removeChunkView(x, z); });
+    world.getChunkManager().onChunkRemoved.connect([&](glm::ivec2 coord) {
+        this->renderer.runOnMain([this, coord]() { removeChunkView(coord); });
     });
 
     world.getChunkManager().onChunkUpdated.connect(
@@ -57,19 +57,19 @@ void GameView::render() {
                                 camera.getMatrixProjection(ratio));
     shaders["terrain"]->setMat4("view", camera.getMatrixView());
 
-    renderChunks(player.chunkx, player.chunkz);
-    firstPersonView->render(player.chunkx, player.chunkz);
+    renderChunks(player.chunk);
+    firstPersonView->render(player.chunk);
 }
 
-void GameView::renderChunks(int chunkx, int chunkz) {
+void GameView::renderChunks(glm::ivec2 chunk) {
     for (auto &chunkView : chunkViews) {
-        chunkView->render(chunkx, chunkz);
+        chunkView->render(chunk);
     }
 }
 
 void GameView::addChunkView(ChunkMeshData data) {
     for (auto &chunkView : chunkViews)
-        if (chunkView->x == data.x && chunkView->z == data.z) {
+        if (chunkView->coord == data.coord) {
             chunkView = std::make_unique<ChunkView>(std::move(data),
                                                     *terrainVertexMap,
                                                     textureManager,
@@ -81,10 +81,10 @@ void GameView::addChunkView(ChunkMeshData data) {
         std::move(data), *terrainVertexMap, textureManager, shaders["terrain"]));
 }
 
-void GameView::removeChunkView(int x, int z) {
+void GameView::removeChunkView(glm::ivec2 coord) {
     auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
                              [&](const std::unique_ptr<ChunkView> &chunkView) {
-                                 return chunkView->x == x && chunkView->z == z;
+                                 return chunkView->coord == coord;
                              });
     if (it != chunkViews.end()) {
         chunkViews.erase(it, chunkViews.end());
@@ -93,11 +93,10 @@ void GameView::removeChunkView(int x, int z) {
 
 void GameView::updateChunkView(const RegionSnapshot &snapshot,
                                glm::ivec3 worldEdit) {
-    int cx = snapshot.main->x;
-    int cz = snapshot.main->z;
+    glm::ivec2 coord = snapshot.main->coord;
 
     for (auto &chunkView : chunkViews) {
-        if (chunkView->x == cx && chunkView->z == cz) {
+        if (chunkView->coord == coord) {
             chunkView->updateBlock(snapshot, worldEdit);
             return;
         }

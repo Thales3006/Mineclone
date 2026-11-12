@@ -7,12 +7,13 @@
 
 #include <FastNoiseLite.h>
 
-Chunk::Chunk() : Chunk(0, 0) {}
+Chunk::Chunk() : Chunk(glm::ivec2(0, 0)) {}
 
-Chunk::Chunk(int x, int z) : x(x), z(z) {}
+Chunk::Chunk(glm::ivec2 coord) : coord(coord) {}
 
-Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
-    : Chunk(x, z) {
+Chunk::Chunk(glm::ivec2 coord,
+             Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
+    : Chunk(coord) {
 
     for (int h = 0; h < CHUNK_WIDTH; ++h) {
         for (int w = 0; w < CHUNK_HEIGHT; ++w) {
@@ -25,8 +26,8 @@ Chunk::Chunk(int x, int z, Block blocks[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH])
 
 Chunk::~Chunk() {}
 
-std::shared_ptr<Chunk> Chunk::generateChunk(int seed, int x, int z) {
-    std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(x, z);
+std::shared_ptr<Chunk> Chunk::generateChunk(int seed, glm::ivec2 coord) {
+    std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(coord);
 
     FastNoiseLite noise;
     noise.SetSeed(seed);
@@ -42,14 +43,14 @@ std::shared_ptr<Chunk> Chunk::generateChunk(int seed, int x, int z) {
         for (int j = CHUNK_HEIGHT - 1; j >= 0; j--) {
             for (int k = CHUNK_WIDTH - 1; k >= 0; k--) {
 
-                float val =
-                    5 * noise.GetNoise(static_cast<float>(x * CHUNK_WIDTH + i),
-                                       static_cast<float>(z * CHUNK_WIDTH + k));
+                float val = 5 * noise.GetNoise(
+                                    static_cast<float>(coord.x * CHUNK_WIDTH + i),
+                                    static_cast<float>(coord.y * CHUNK_WIDTH + k));
 
                 float cave_val = cave_noise.GetNoise(
-                    static_cast<float>(x * CHUNK_WIDTH + i),
+                    static_cast<float>(coord.x * CHUNK_WIDTH + i),
                     static_cast<float>(j),
-                    static_cast<float>(z * CHUNK_WIDTH + k));
+                    static_cast<float>(coord.y * CHUNK_WIDTH + k));
 
                 Block block{};
                 if ((j < static_cast<float>(CHUNK_HEIGHT) / 3 + val) &&
@@ -78,8 +79,8 @@ std::shared_ptr<Chunk> Chunk::generateChunk(int seed, int x, int z) {
     return chunk;
 }
 
-void Chunk::setBlock(int x, int y, int z, Block block) {
-    blocks[x][y][z] = block;
+void Chunk::setBlock(glm::ivec3 pos, Block block) {
+    blocks[pos.x][pos.y][pos.z] = block;
 }
 
 glm::vec3 Chunk::chunkOffSet(glm::vec3 position) {
