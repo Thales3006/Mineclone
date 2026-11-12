@@ -82,7 +82,7 @@ void FirstPersonView::render(int chunkx, int chunkz) {
 
     glLineWidth(1.0f);
     glDepthFunc(GL_LEQUAL);
-    selectionBoxMesh.shader->setFloat("depthBias", 0.0002f);
+    selectionBoxMesh.shader->setFloat("depthBias", 0.01f);
     selectionBoxMesh.render();
     selectionBoxMesh.shader->setFloat("depthBias", 0.0f);
     glDepthFunc(GL_LESS);

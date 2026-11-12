@@ -18,6 +18,7 @@ void main(){
     texCoord = vaUV;
     normal = mat3(transpose(inverse(model)))*vaNormal;
     color = vaColor;
-    gl_Position = projection * view * model * vec4(vaPosition, 1.0);
-    gl_Position.z -= depthBias * gl_Position.w;
+    vec4 viewPos = view * model * vec4(vaPosition, 1.0);
+    viewPos.z += depthBias;
+    gl_Position = projection * viewPos;
 }
