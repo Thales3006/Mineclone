@@ -1,11 +1,11 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
-std::optional<LockedRegion> ChunkRegion::lock() const {
+std::optional<RegionSnapshot> ChunkRegion::lock() const {
     std::shared_ptr<Chunk> m = main.lock();
     if (!m)
         return std::nullopt;
 
-    return LockedRegion{
+    return RegionSnapshot{
         .main = std::move(m),
         .right = right.lock(),
         .left = left.lock(),
@@ -18,7 +18,7 @@ std::optional<LockedRegion> ChunkRegion::lock() const {
     };
 }
 
-Block LockedRegion::getBlock(int x, int y, int z) const {
+Block RegionSnapshot::getBlock(int x, int y, int z) const {
     int ox = (x < 0) ? -1 : (x >= CHUNK_WIDTH) ? 1 : 0;
     int oz = (z < 0) ? -1 : (z >= CHUNK_WIDTH) ? 1 : 0;
 
@@ -44,7 +44,7 @@ Block LockedRegion::getBlock(int x, int y, int z) const {
     return Block();
 }
 
-unsigned char LockedRegion::getBlockFaces(int x, int y, int z) const {
+unsigned char RegionSnapshot::getBlockFaces(int x, int y, int z) const {
     if (main->blocks[x][y][z].id == BlockID::air) {
         return NO_FACE;
     }
@@ -79,7 +79,7 @@ unsigned char LockedRegion::getBlockFaces(int x, int y, int z) const {
     return faces;
 }
 
-std::array<float, 4> LockedRegion::getBlockOcclusion(int x, int y, int z,
+std::array<float, 4> RegionSnapshot::getBlockOcclusion(int x, int y, int z,
                                                      unsigned char face) const {
     std::array<float, 4> occlusion;
 

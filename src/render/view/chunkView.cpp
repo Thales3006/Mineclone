@@ -15,7 +15,7 @@ int ChunkView::blockIndex(int i, int j, int k) {
 }
 
 Geometry<TerrainVertex> ChunkView::blockGeometry(
-    TerrainVertexMap &terrainVertexMap, const LockedRegion &region, int i,
+    TerrainVertexMap &terrainVertexMap, const RegionSnapshot &region, int i,
     int j, int k) {
     Geometry<TerrainVertex> geometry =
         terrainVertexMap.getGeometry(region, i, j, k);
@@ -23,7 +23,7 @@ Geometry<TerrainVertex> ChunkView::blockGeometry(
     return geometry;
 }
 
-ChunkMeshData ChunkView::buildMeshData(const LockedRegion &region,
+ChunkMeshData ChunkView::buildMeshData(const RegionSnapshot &region,
                                        TerrainVertexMap &terrainVertexMap) {
     ChunkMeshData data;
     data.x = region.main->x;
@@ -51,7 +51,7 @@ ChunkMeshData ChunkView::buildMeshData(const LockedRegion &region,
     return data;
 }
 
-void ChunkView::respliceBlock(const LockedRegion &region, int i, int j, int k) {
+void ChunkView::respliceBlock(const RegionSnapshot &region, int i, int j, int k) {
     int index = blockIndex(i, j, k);
 
     auto it = blockRanges.find(index);
@@ -81,7 +81,7 @@ void ChunkView::respliceBlock(const LockedRegion &region, int i, int j, int k) {
                           static_cast<unsigned int>(geometry.vertices.size())};
 }
 
-void ChunkView::updateBlock(const LockedRegion &region, glm::ivec3 worldEdit) {
+void ChunkView::updateBlock(const RegionSnapshot &region, glm::ivec3 worldEdit) {
     int lx = worldEdit.x - x * CHUNK_WIDTH;
     int ly = worldEdit.y;
     int lz = worldEdit.z - z * CHUNK_WIDTH;

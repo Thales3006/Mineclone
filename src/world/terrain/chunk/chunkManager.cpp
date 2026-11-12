@@ -203,6 +203,26 @@ bool ChunkManager::isEmpty(int x, int z) {
     return !getChunk(x, z);
 }
 
+std::optional<RegionSnapshot> ChunkManager::snapshotRegion(int x, int z) {
+    std::lock_guard<std::mutex> lock(chunks_mutex);
+
+    std::shared_ptr<Chunk> main = getChunk(x, z);
+    if (!main)
+        return std::nullopt;
+
+    return RegionSnapshot{
+        .main = std::move(main),
+        .right = getChunk(x + 1, z),
+        .left = getChunk(x - 1, z),
+        .front = getChunk(x, z + 1),
+        .back = getChunk(x, z - 1),
+        .frontRight = getChunk(x + 1, z + 1),
+        .backRight = getChunk(x + 1, z - 1),
+        .frontLeft = getChunk(x - 1, z + 1),
+        .backLeft = getChunk(x - 1, z - 1),
+    };
+}
+
 std::pair<std::mutex *, chunk_map *> ChunkManager::unsafe_getChunkMap() {
     return std::make_pair(&chunks_mutex, &chunks);
 }

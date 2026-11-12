@@ -8,6 +8,10 @@
 std::optional<RaycastHit> raycastVoxel(ChunkManager &chunkManager, int chunkx,
                                        int chunkz, glm::vec3 origin,
                                        glm::vec3 direction, float maxDistance) {
+    std::optional<RegionSnapshot> region = chunkManager.snapshotRegion(chunkx, chunkz);
+    if (!region)
+        return std::nullopt;
+
     glm::vec3 dir = glm::normalize(direction);
 
     glm::ivec3 voxel = glm::floor(origin);
@@ -36,8 +40,7 @@ std::optional<RaycastHit> raycastVoxel(ChunkManager &chunkManager, int chunkx,
 
     while (t <= maxDistance) {
         if (voxel.y >= 0 && voxel.y < CHUNK_HEIGHT &&
-            chunkManager.getBlock(chunkx, chunkz, glm::vec3(voxel) + 0.5f).id !=
-                BlockID::air)
+            region->getBlock(voxel.x, voxel.y, voxel.z).id != BlockID::air)
             return RaycastHit{voxel, normal};
 
         int axis = 0;

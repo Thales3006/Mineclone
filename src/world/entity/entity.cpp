@@ -18,7 +18,8 @@ typedef struct {
 } blockDist;
 
 void Entity::update(ChunkManager &chunkManager, float deltaTime) {
-    if (chunkManager.isEmpty(chunkx, chunkz)) {
+    std::optional<RegionSnapshot> region = chunkManager.snapshotRegion(chunkx, chunkz);
+    if (!region) {
         return;
     }
 
@@ -38,8 +39,8 @@ void Entity::update(ChunkManager &chunkManager, float deltaTime) {
             for (int z = 0; abs(z) <= abs(dV.z) + abs(size.z) + 1; z += nV.z) {
                 const glm::vec3 colisionPos =
                     glm::floor(position) + glm::vec3(x, y, z) - nSize;
-                const Block &block =
-                    chunkManager.getBlock(chunkx, chunkz, colisionPos);
+                const Block block = region->getBlock(
+                    (int)colisionPos.x, (int)colisionPos.y, (int)colisionPos.z);
 
                 if (block.solid == false)
                     continue;

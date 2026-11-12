@@ -98,7 +98,7 @@ TerrainVertexMap::setUV(Geometry<TerrainVertex> geometry, BlockTextureID id) {
     return geometry;
 }
 
-Geometry<TerrainVertex> TerrainVertexMap::getGeometry(const LockedRegion &region,
+Geometry<TerrainVertex> TerrainVertexMap::getGeometry(const RegionSnapshot &region,
                                                       int x, int y, int z) {
     Geometry<TerrainVertex> blockGeometry{};
     unsigned char faces = region.getBlockFaces(x, y, z);

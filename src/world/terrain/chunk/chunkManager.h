@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <sigslot/signal.hpp>
 #include <tuple>
 
@@ -28,6 +29,8 @@ class ChunkManager {
     ~ChunkManager();
 
     bool isEmpty(int x, int z);
+
+    std::optional<RegionSnapshot> snapshotRegion(int x, int z);
 
     void setBlock(int chunkx, int chunkz, int x, int y, int z, Block block);
     void setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block);

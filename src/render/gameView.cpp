@@ -19,7 +19,7 @@ GameView::GameView(World &world, Renderer &renderer)
 
     world.getChunkManager().onChunkAdded.connect([&](ChunkRegion region) {
         TaskManager::instance().run([this, region = std::move(region)]() {
-            std::optional<LockedRegion> locked = region.lock();
+            std::optional<RegionSnapshot> locked = region.lock();
             if (!locked)
                 return;
 
@@ -91,7 +91,7 @@ void GameView::removeChunkView(int x, int z) {
 }
 
 void GameView::updateChunkView(const ChunkRegion &region, glm::ivec3 worldEdit) {
-    std::optional<LockedRegion> locked = region.lock();
+    std::optional<RegionSnapshot> locked = region.lock();
     if (!locked)
         return;
 
