@@ -1,6 +1,6 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
-Block ChunkRegion::getBlock(int x, int y, int z) {
+Block ChunkRegion::getBlock(int x, int y, int z) const {
     int ox = (x < 0) ? -1 : (x >= CHUNK_WIDTH) ? 1 : 0;
     int oz = (z < 0) ? -1 : (z >= CHUNK_WIDTH) ? 1 : 0;
 
@@ -26,7 +26,7 @@ Block ChunkRegion::getBlock(int x, int y, int z) {
     return Block();
 }
 
-unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) {
+unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) const {
     if (main->blocks[x][y][z].id == BlockID::air) {
         return NO_FACE;
     }
@@ -64,7 +64,7 @@ unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) {
 }
 
 std::array<float, 4> ChunkRegion::getBlockOcclusion(int x, int y, int z,
-                                                    unsigned char face) {
+                                                    unsigned char face) const {
     std::array<float, 4> occlusion;
 
     static const glm::ivec3 vertexAO[6][4][3] = {

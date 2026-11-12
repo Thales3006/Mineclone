@@ -1,5 +1,6 @@
 #include "render/gameView.h"
 
+#include "game/task/taskManager.h"
 #include "render/renderLib.h"
 
 #include <algorithm>
@@ -17,18 +18,26 @@ GameView::GameView(World &world, Renderer &renderer)
     terrainVertexMap = std::make_shared<TerrainVertexMap>(textureManager);
 
     world.getChunkManager().onChunkAdded.connect([&](ChunkRegion region) {
-        this->renderer.runOnMain([this, region]() { addChunkView(region); });
+        TaskManager::instance().run([this, region = std::move(region)]() {
+            ChunkMeshData data =
+                ChunkView::buildMeshData(region, *terrainVertexMap);
+            this->renderer.runOnMain([this, data = std::move(data)]() mutable {
+                addChunkView(std::move(data));
+            });
+        });
     });
 
     world.getChunkManager().onChunkRemoved.connect([&](ChunkRegion region) {
-        this->renderer.runOnMain([this, region]() { removeChunkView(region); });
+        this->renderer.runOnMain(
+            [this, region = std::move(region)]() { removeChunkView(region); });
     });
 
     world.getChunkManager().onChunkUpdated.connect(
         [&](ChunkRegion region, glm::ivec3 worldEdit) {
-            this->renderer.runOnMain([this, region, worldEdit]() {
-                updateChunkView(region, worldEdit);
-            });
+            this->renderer.runOnMain(
+                [this, region = std::move(region), worldEdit]() {
+                    updateChunkView(region, worldEdit);
+                });
         });
 
     firstPersonView = std::make_unique<FirstPersonView>(
@@ -59,12 +68,16 @@ void GameView::renderChunks(int chunkx, int chunkz) {
     }
 }
 
-void GameView::addChunkView(ChunkRegion region) {
+void GameView::addChunkView(ChunkMeshData data) {
+    for (auto &chunkView : chunkViews)
+        if (chunkView->x == data.x && chunkView->z == data.z)
+            return;
+
     chunkViews.push_back(std::make_unique<ChunkView>(
-        region, *terrainVertexMap, textureManager, shaders["terrain"]));
+        std::move(data), *terrainVertexMap, textureManager, shaders["terrain"]));
 }
 
-void GameView::removeChunkView(ChunkRegion region) {
+void GameView::removeChunkView(const ChunkRegion &region) {
     auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
                              [&](const std::unique_ptr<ChunkView> &chunkView) {
                                  return chunkView->x == region.main->x &&
@@ -75,7 +88,7 @@ void GameView::removeChunkView(ChunkRegion region) {
     }
 }
 
-void GameView::updateChunkView(ChunkRegion region, glm::ivec3 worldEdit) {
+void GameView::updateChunkView(const ChunkRegion &region, glm::ivec3 worldEdit) {
     for (auto &chunkView : chunkViews) {
         if (chunkView->x == region.main->x && chunkView->z == region.main->z) {
             chunkView->updateBlock(region, worldEdit);
@@ -83,5 +96,5 @@ void GameView::updateChunkView(ChunkRegion region, glm::ivec3 worldEdit) {
         }
     }
 
-    addChunkView(region);
+    addChunkView(ChunkView::buildMeshData(region, *terrainVertexMap));
 }

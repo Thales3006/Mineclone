@@ -33,7 +33,7 @@ class TextureManager {
   public:
     TextureManager();
 
-    std::shared_ptr<Texture> getTexture(std::string key);
+    std::shared_ptr<Texture> getTexture(const std::string &key);
 
     std::array<glm::vec2, 4> getBlockUV(BlockTextureID id);
 };

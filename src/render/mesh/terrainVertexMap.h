@@ -11,7 +11,7 @@ class TerrainVertexMap {
   public:
     TerrainVertexMap(std::shared_ptr<TextureManager> textureManager);
 
-    Geometry<TerrainVertex> getGeometry(ChunkRegion &region, int x, int y,
+    Geometry<TerrainVertex> getGeometry(const ChunkRegion &region, int x, int y,
                                         int z);
 
     Geometry<TerrainVertex> getSelectionBox();

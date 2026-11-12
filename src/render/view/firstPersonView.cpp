@@ -52,8 +52,8 @@ Geometry<TerrainVertex> buildOutline(glm::vec3 localCamera, glm::vec2 uv) {
 Mesh<TerrainVertex> createBoxMesh(TerrainVertexMap &terrainVertexMap,
                                   std::shared_ptr<Texture> texture,
                                   std::shared_ptr<Shader> shader) {
-    Mesh<TerrainVertex> mesh(terrainVertexMap.getSelectionBox(), texture,
-                             shader);
+    Mesh<TerrainVertex> mesh(terrainVertexMap.getSelectionBox(),
+                             std::move(texture), std::move(shader));
     mesh.setDrawMode(GL_LINES);
     return mesh;
 }
@@ -62,9 +62,10 @@ FirstPersonView::FirstPersonView(std::shared_ptr<Player> player, World &world,
                                  TerrainVertexMap &terrainVertexMap,
                                  std::shared_ptr<Texture> texture,
                                  std::shared_ptr<Shader> shader)
-    : selectionBoxMesh(createBoxMesh(terrainVertexMap, texture, shader)),
+    : selectionBoxMesh(createBoxMesh(terrainVertexMap, std::move(texture),
+                                     std::move(shader))),
       selectionUV(terrainVertexMap.getSelectionBox().vertices[0].uv),
-      player(player), world(world) {}
+      player(std::move(player)), world(world) {}
 
 void FirstPersonView::render(int chunkx, int chunkz) {
     auto hit = raycastVoxel(world.getChunkManager(), player->chunkx,

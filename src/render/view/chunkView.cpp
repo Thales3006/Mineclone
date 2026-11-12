@@ -2,30 +2,32 @@
 
 #include "world/terrain/chunk/chunk.h"
 
-ChunkView::ChunkView(ChunkRegion region, TerrainVertexMap &terrainVertexMap,
-                     std::shared_ptr<TextureManager> textureManager,
+ChunkView::ChunkView(ChunkMeshData data, TerrainVertexMap &terrainVertexMap,
+                     const std::shared_ptr<TextureManager> &textureManager,
                      std::shared_ptr<Shader> shader)
-    : x(region.main->x), z(region.main->z),
-      terrainVertexMap(&terrainVertexMap),
-      mesh(textureManager->getTexture("blocks"), shader) {
-    buildMesh(region);
-}
+    : x(data.x), z(data.z), terrainVertexMap(&terrainVertexMap),
+      mesh(std::move(data.geometry), textureManager->getTexture("blocks"),
+           std::move(shader)),
+      blockRanges(std::move(data.blockRanges)) {}
 
-int ChunkView::blockIndex(int i, int j, int k) const {
+int ChunkView::blockIndex(int i, int j, int k) {
     return (i * CHUNK_HEIGHT + j) * CHUNK_WIDTH + k;
 }
 
-Geometry<TerrainVertex> ChunkView::blockGeometry(ChunkRegion &region, int i,
-                                                 int j, int k) {
+Geometry<TerrainVertex> ChunkView::blockGeometry(
+    TerrainVertexMap &terrainVertexMap, const ChunkRegion &region, int i, int j,
+    int k) {
     Geometry<TerrainVertex> geometry =
-        terrainVertexMap->getGeometry(region, i, j, k);
+        terrainVertexMap.getGeometry(region, i, j, k);
     geometry.addVertexOffset(glm::vec3(i, j, k));
     return geometry;
 }
 
-void ChunkView::buildMesh(ChunkRegion &region) {
-    mesh.clear();
-    blockRanges.clear();
+ChunkMeshData ChunkView::buildMeshData(const ChunkRegion &region,
+                                       TerrainVertexMap &terrainVertexMap) {
+    ChunkMeshData data;
+    data.x = region.main->x;
+    data.z = region.main->z;
 
     for (int i = 0; i < CHUNK_WIDTH; i++) {
         for (int j = 0; j < CHUNK_HEIGHT; j++) {
@@ -33,20 +35,23 @@ void ChunkView::buildMesh(ChunkRegion &region) {
                 if (region.getBlockFaces(i, j, k) == NO_FACE)
                     continue;
 
-                Geometry<TerrainVertex> geometry = blockGeometry(region, i, j, k);
+                Geometry<TerrainVertex> geometry =
+                    blockGeometry(terrainVertexMap, region, i, j, k);
                 if (geometry.vertices.empty())
                     continue;
 
-                unsigned int start = mesh.getGeometry().vertices.size();
-                mesh.append(geometry);
-                blockRanges[blockIndex(i, j, k)] = {
+                unsigned int start = data.geometry.vertices.size();
+                data.geometry.append(geometry);
+                data.blockRanges[blockIndex(i, j, k)] = {
                     start, static_cast<unsigned int>(geometry.vertices.size())};
             }
         }
     }
+
+    return data;
 }
 
-void ChunkView::respliceBlock(ChunkRegion &region, int i, int j, int k) {
+void ChunkView::respliceBlock(const ChunkRegion &region, int i, int j, int k) {
     int index = blockIndex(i, j, k);
 
     auto it = blockRanges.find(index);
@@ -65,7 +70,8 @@ void ChunkView::respliceBlock(ChunkRegion &region, int i, int j, int k) {
     if (region.getBlockFaces(i, j, k) == NO_FACE)
         return;
 
-    Geometry<TerrainVertex> geometry = blockGeometry(region, i, j, k);
+    Geometry<TerrainVertex> geometry =
+        blockGeometry(*terrainVertexMap, region, i, j, k);
     if (geometry.vertices.empty())
         return;
 
@@ -75,7 +81,7 @@ void ChunkView::respliceBlock(ChunkRegion &region, int i, int j, int k) {
                           static_cast<unsigned int>(geometry.vertices.size())};
 }
 
-void ChunkView::updateBlock(ChunkRegion region, glm::ivec3 worldEdit) {
+void ChunkView::updateBlock(const ChunkRegion &region, glm::ivec3 worldEdit) {
     int lx = worldEdit.x - x * CHUNK_WIDTH;
     int ly = worldEdit.y;
     int lz = worldEdit.z - z * CHUNK_WIDTH;

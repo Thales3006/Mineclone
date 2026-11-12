@@ -39,16 +39,16 @@ std::optional<std::shared_ptr<Chunk>> ChunkManager::getChunk(int x, int z) {
 
 ChunkRegion ChunkManager::getChunkRegion(int x, int z) {
     return ChunkRegion{
-        .main = std::move(getChunk(x, z).value()),
-        .right = std::move(getChunk(x + 1, z)),
-        .left = std::move(getChunk(x - 1, z)),
-        .front = std::move(getChunk(x, z + 1)),
-        .back = std::move(getChunk(x, z - 1)),
+        .main = getChunk(x, z).value(),
+        .right = getChunk(x + 1, z),
+        .left = getChunk(x - 1, z),
+        .front = getChunk(x, z + 1),
+        .back = getChunk(x, z - 1),
 
-        .frontRight = std::move(getChunk(x + 1, z + 1)),
-        .backRight = std::move(getChunk(x + 1, z - 1)),
-        .frontLeft = std::move(getChunk(x - 1, z + 1)),
-        .backLeft = std::move(getChunk(x - 1, z - 1)),
+        .frontRight = getChunk(x + 1, z + 1),
+        .backRight = getChunk(x + 1, z - 1),
+        .frontLeft = getChunk(x - 1, z + 1),
+        .backLeft = getChunk(x - 1, z - 1),
     };
 }
 
@@ -60,30 +60,30 @@ void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
     int z = chunk->z;
     chunks[{x, z}] = std::move(chunk);
 
-    onChunkAdded(std::move(getChunkRegion(x, z)));
+    onChunkAdded(getChunkRegion(x, z));
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
     if (chunks.find({x, z}) == chunks.end())
         return;
 
-    onChunkRemoved(std::move(getChunkRegion(x, z)));
+    onChunkRemoved(getChunkRegion(x, z));
     chunks.erase({x, z});
 }
 
-void ChunkManager::updateRegion(ChunkRegion region, int x, int y, int z) {
+void ChunkManager::updateRegion(const ChunkRegion &region, int x, int y,
+                                int z) {
 
     glm::ivec3 worldEdit = {region.main->x * CHUNK_WIDTH + x, y,
                             region.main->z * CHUNK_WIDTH + z};
 
     onChunkUpdated(region, worldEdit);
 
-    auto update = [this,
-                   worldEdit](std::optional<std::shared_ptr<Chunk>> chunk) {
+    auto update = [this, worldEdit](
+                      const std::optional<std::shared_ptr<Chunk>> &chunk) {
         if (chunk.has_value()) {
             onChunkUpdated(
-                std::move(getChunkRegion(chunk.value()->x, chunk.value()->z)),
-                worldEdit);
+                getChunkRegion(chunk.value()->x, chunk.value()->z), worldEdit);
         }
     };
 
@@ -123,7 +123,7 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
 
     region.main->setBlock(x, y, z, block);
 
-    updateRegion(std::move(region), x, y, z);
+    updateRegion(region, x, y, z);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
@@ -179,7 +179,7 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
     for (auto &coord : to_add) {
         int x = std::get<0>(coord);
         int z = std::get<1>(coord);
-        to_add_chunks.push_back(std::move(Chunk::generateChunk(seed, x, z)));
+        to_add_chunks.push_back(Chunk::generateChunk(seed, x, z));
     }
 
     {

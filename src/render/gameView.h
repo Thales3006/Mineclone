@@ -33,9 +33,9 @@ class GameView {
 
     void renderChunks(int chunkx, int chunkz);
 
-    void addChunkView(ChunkRegion region);
-    void removeChunkView(ChunkRegion region);
-    void updateChunkView(ChunkRegion region, glm::ivec3 worldEdit);
+    void addChunkView(ChunkMeshData data);
+    void removeChunkView(const ChunkRegion &region);
+    void updateChunkView(const ChunkRegion &region, glm::ivec3 worldEdit);
 };
 
 #endif

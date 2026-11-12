@@ -10,15 +10,24 @@
 #include <map>
 #include <utility>
 
+struct ChunkMeshData {
+    int x, z;
+    Geometry<TerrainVertex> geometry;
+    std::map<int, std::pair<unsigned int, unsigned int>> blockRanges;
+};
+
 class ChunkView {
   public:
-    ChunkView(ChunkRegion region, TerrainVertexMap &terrainVertexMap,
-              std::shared_ptr<TextureManager> textureManager,
+    ChunkView(ChunkMeshData data, TerrainVertexMap &terrainVertexMap,
+              const std::shared_ptr<TextureManager> &textureManager,
               std::shared_ptr<Shader> shader);
+
+    static ChunkMeshData buildMeshData(const ChunkRegion &region,
+                                       TerrainVertexMap &terrainVertexMap);
 
     void render(int chunkx, int chunkz);
 
-    void updateBlock(ChunkRegion region, glm::ivec3 worldEdit);
+    void updateBlock(const ChunkRegion &region, glm::ivec3 worldEdit);
 
     int x, z;
 
@@ -27,11 +36,11 @@ class ChunkView {
     Mesh<TerrainVertex> mesh;
     std::map<int, std::pair<unsigned int, unsigned int>> blockRanges;
 
-    int blockIndex(int i, int j, int k) const;
-    Geometry<TerrainVertex> blockGeometry(ChunkRegion &region, int i, int j,
-                                          int k);
-    void buildMesh(ChunkRegion &region);
-    void respliceBlock(ChunkRegion &region, int i, int j, int k);
+    static int blockIndex(int i, int j, int k);
+    static Geometry<TerrainVertex> blockGeometry(TerrainVertexMap &terrainVertexMap,
+                                                 const ChunkRegion &region,
+                                                 int i, int j, int k);
+    void respliceBlock(const ChunkRegion &region, int i, int j, int k);
 };
 
 #endif

@@ -37,13 +37,13 @@ struct ChunkRegion {
     std::optional<std::shared_ptr<Chunk>> frontLeft;
     std::optional<std::shared_ptr<Chunk>> backLeft;
 
-    unsigned char getBlockFaces(int x, int y, int z);
+    unsigned char getBlockFaces(int x, int y, int z) const;
 
     std::array<float, 4> getBlockOcclusion(int x, int y, int z,
-                                           unsigned char face);
+                                           unsigned char face) const;
 
   private:
-    Block getBlock(int x, int y, int z);
+    Block getBlock(int x, int y, int z) const;
 };
 
 #endif

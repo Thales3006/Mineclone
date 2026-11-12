@@ -2,7 +2,7 @@
 
 TerrainVertexMap::TerrainVertexMap(
     std::shared_ptr<TextureManager> textureManager)
-    : textureManager(textureManager) {
+    : textureManager(std::move(textureManager)) {
     fullBlock[FRONT_FACE] = Geometry<TerrainVertex>{
         {
             {glm::vec3(0, 0, 1), glm::vec3(0, 0, 1)},
@@ -98,7 +98,7 @@ TerrainVertexMap::setUV(Geometry<TerrainVertex> geometry, BlockTextureID id) {
     return geometry;
 }
 
-Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
+Geometry<TerrainVertex> TerrainVertexMap::getGeometry(const ChunkRegion &region,
                                                       int x, int y, int z) {
     Geometry<TerrainVertex> blockGeometry{};
     unsigned char faces = region.getBlockFaces(x, y, z);
@@ -106,7 +106,7 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
     auto add_face = [this, &blockGeometry, &region, x, y, z,
                      faces](BlockTextureID texture_id, unsigned char face) {
         if (faces & face) {
-            auto geometry = setUV(fullBlock[face], texture_id);
+            auto geometry = setUV(fullBlock.at(face), texture_id);
             auto occlusion = region.getBlockOcclusion(x, y, z, face);
             for (int i = 0; i < 4; i++) {
                 geometry.vertices[i].color = glm::vec3(occlusion[i]);
@@ -144,7 +144,7 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
     case BlockID::grass_block:
         if (faces & UP_FACE) {
             auto geometry =
-                setUV(fullBlock[UP_FACE], BlockTextureID::grass_block_top);
+                setUV(fullBlock.at(UP_FACE), BlockTextureID::grass_block_top);
             auto occlusion = region.getBlockOcclusion(x, y, z, UP_FACE);
             for (int i = 0; i < 4; i++)
                 geometry.vertices[i].color =
@@ -207,7 +207,7 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
 }
 
 Geometry<TerrainVertex> TerrainVertexMap::getSelectionBox() {
-    glm::vec2 uv = setUV(fullBlock[UP_FACE], BlockTextureID::stone).vertices[0].uv;
+    glm::vec2 uv = setUV(fullBlock.at(UP_FACE), BlockTextureID::stone).vertices[0].uv;
 
     const glm::vec3 corners[8] = {
         {0, 0, 0}, {1, 0, 0}, {1, 0, 1}, {0, 0, 1},

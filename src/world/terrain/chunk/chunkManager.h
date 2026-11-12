@@ -51,7 +51,7 @@ class ChunkManager {
     void unloadChunk(int x, int z);
 
     ChunkRegion getChunkRegion(int x, int z);
-    void updateRegion(ChunkRegion region, int x, int y, int z);
+    void updateRegion(const ChunkRegion &region, int x, int y, int z);
     std::optional<std::shared_ptr<Chunk>> getChunk(int x, int z);
 };
 

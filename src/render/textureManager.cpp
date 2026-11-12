@@ -7,7 +7,7 @@ TextureManager::TextureManager() {
     };
 }
 
-std::shared_ptr<Texture> TextureManager::getTexture(std::string key) {
+std::shared_ptr<Texture> TextureManager::getTexture(const std::string &key) {
     if (auto it = textures.find(key); it != textures.end()) {
         return it->second;
     }
@@ -15,7 +15,7 @@ std::shared_ptr<Texture> TextureManager::getTexture(std::string key) {
 }
 
 std::array<glm::vec2, 4> TextureManager::getBlockUV(BlockTextureID id) {
-    glm::vec2 size = textures["blocks"]->getSize();
+    glm::vec2 size = textures.at("blocks")->getSize();
     glm::vec2 sizeCell = glm::vec2(1.0f / (size / 16.0f));
     auto getUV = [=](int x, int y) -> std::array<glm::vec2, 4> {
         return {
