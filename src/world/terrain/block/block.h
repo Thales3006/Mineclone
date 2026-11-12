@@ -15,6 +15,22 @@ enum class BlockID {
     grass,
 };
 
+enum class BlockTextureID {
+    stone,
+    dirt,
+    grass_block_side,
+    grass_block_top,
+    bricks,
+    tnt_side,
+    tnt_top,
+    tnt_bottom,
+    smooth_stone,
+    oak_planks,
+    red_flower,
+    yellow_flower,
+    grass,
+};
+
 class Block {
   public:
     BlockID id;

@@ -1,14 +1,10 @@
 #include "render/view/firstPersonView.h"
 
+#include "world/terrain/block/blockRegistry.h"
 #include "world/terrain/raycast.h"
 #include "world/world.h"
 
 namespace {
-
-const glm::vec3 kCorners[8] = {
-    {0, 0, 0}, {1, 0, 0}, {1, 0, 1}, {0, 0, 1},
-    {0, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 1},
-};
 
 const unsigned int kFaceEdges[6][8] = {
     {1, 2, 2, 6, 6, 5, 5, 1}, // +X
@@ -19,9 +15,18 @@ const unsigned int kFaceEdges[6][8] = {
     {0, 1, 1, 5, 5, 4, 4, 0}, // -Z
 };
 
-Geometry<TerrainVertex> buildOutline(glm::vec3 localCamera, glm::vec2 uv) {
+Geometry<TerrainVertex> buildOutline(const AABB &box, glm::vec3 localCamera,
+                                     glm::vec2 uv) {
+    const glm::vec3 &lo = box.min;
+    const glm::vec3 &hi = box.max;
+    const glm::vec3 corners[8] = {
+        {lo.x, lo.y, lo.z}, {hi.x, lo.y, lo.z}, {hi.x, lo.y, hi.z},
+        {lo.x, lo.y, hi.z}, {lo.x, hi.y, lo.z}, {hi.x, hi.y, lo.z},
+        {hi.x, hi.y, hi.z}, {lo.x, hi.y, hi.z},
+    };
+
     Geometry<TerrainVertex> geometry{};
-    for (const glm::vec3 &corner : kCorners)
+    for (const glm::vec3 &corner : corners)
         geometry.addVertex({corner, glm::vec3(0.0f), uv, glm::vec3(0.0f)});
 
     auto addFace = [&geometry](int face) {
@@ -29,19 +34,19 @@ Geometry<TerrainVertex> buildOutline(glm::vec3 localCamera, glm::vec2 uv) {
             geometry.indices.push_back(kFaceEdges[face][i]);
     };
 
-    if (localCamera.x > 1.0f)
+    if (localCamera.x > hi.x)
         addFace(0);
-    else if (localCamera.x < 0.0f)
+    else if (localCamera.x < lo.x)
         addFace(1);
 
-    if (localCamera.y > 1.0f)
+    if (localCamera.y > hi.y)
         addFace(2);
-    else if (localCamera.y < 0.0f)
+    else if (localCamera.y < lo.y)
         addFace(3);
 
-    if (localCamera.z > 1.0f)
+    if (localCamera.z > hi.z)
         addFace(4);
-    else if (localCamera.z < 0.0f)
+    else if (localCamera.z < lo.z)
         addFace(5);
 
     return geometry;
@@ -75,7 +80,11 @@ void FirstPersonView::render(int chunkx, int chunkz) {
         return;
 
     glm::vec3 localCamera = player->eyePosition() - glm::vec3(hit->block);
-    selectionBoxMesh.setGeometry(buildOutline(localCamera, selectionUV));
+
+    Geometry<TerrainVertex> outline{};
+    for (const AABB &box : blockDef(hit->id).selection)
+        outline.append(buildOutline(box, localCamera, selectionUV));
+    selectionBoxMesh.setGeometry(outline);
 
     selectionBoxMesh.shader->setMat4(
         "model", glm::translate(glm::mat4(1.0f), glm::vec3(hit->block)));

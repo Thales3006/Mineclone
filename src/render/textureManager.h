@@ -10,22 +10,6 @@
 #include <memory>
 #include <string>
 
-enum class BlockTextureID {
-    stone,
-    dirt,
-    grass_block_side,
-    grass_block_top,
-    bricks,
-    tnt_side,
-    tnt_top,
-    tnt_bottom,
-    smooth_stone,
-    oak_planks,
-    red_flower,
-    yellow_flower,
-    grass,
-};
-
 class TextureManager {
   private:
     std::map<std::string, std::shared_ptr<Texture>> textures;
