@@ -110,9 +110,7 @@ void GameScene::placeLookedBlock() {
     glm::ivec3 placeBlock = hit->block + hit->normal;
 
     if (!Entity::colision(glm::vec3(placeBlock), glm::vec3(1.0f),
-                          glm::floor(player.position),
-                          glm::ceil(player.position + player.size) -
-                              glm::floor(player.position))) {
+                          player.position, player.size)) {
         world.getChunkManager().setBlock(
             player.chunkx, player.chunkz, glm::vec3(placeBlock) + 0.5f,
             Block((BlockID)player.hotbarIndex, true));
