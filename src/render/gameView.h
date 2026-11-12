@@ -39,7 +39,7 @@ class GameView {
 
     void addChunkView(ChunkRegion region);
     void removeChunkView(ChunkRegion region);
-    void updateChunkView(ChunkRegion region);
+    void updateChunkView(ChunkRegion region, glm::ivec3 worldEdit);
 
     void executeTasks();
 };

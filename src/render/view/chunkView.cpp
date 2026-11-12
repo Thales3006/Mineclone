@@ -2,40 +2,100 @@
 
 #include "world/terrain/chunk/chunk.h"
 
-Mesh<TerrainVertex>
-ChunkView::generateChunkMesh(ChunkRegion region,
-                             TerrainVertexMap &terrainVertexMap,
-                             std::shared_ptr<TextureManager> textureManager,
-                             std::shared_ptr<Shader> shader) {
-
-    Geometry<TerrainVertex> chunkGeometry{};
-    for (int i = 0; i < CHUNK_WIDTH; i++) {
-        for (int j = 0; j < CHUNK_HEIGHT; j++) {
-            for (int k = 0; k < CHUNK_WIDTH; k++) {
-                unsigned char faces = region.getBlockFaces(i, j, k);
-
-                if (faces == NO_FACE)
-                    continue;
-
-                Block &block = region.main->blocks[i][j][k];
-                auto blockGeometry =
-                    terrainVertexMap.getGeometry(region, i, j, k);
-
-                glm::vec3 pos = glm::vec3(i, j, k);
-                blockGeometry.addVertexOffset(pos);
-                chunkGeometry.append(blockGeometry);
-            }
-        }
-    }
-    return Mesh<TerrainVertex>(std::move(chunkGeometry),
-                               textureManager->getTexture("blocks"), shader);
-}
-
 ChunkView::ChunkView(ChunkRegion region, TerrainVertexMap &terrainVertexMap,
                      std::shared_ptr<TextureManager> textureManager,
                      std::shared_ptr<Shader> shader)
-    : region(region), mesh(generateChunkMesh(region, terrainVertexMap,
-                                             textureManager, shader)) {}
+    : region(region), terrainVertexMap(&terrainVertexMap),
+      mesh(textureManager->getTexture("blocks"), shader) {
+    buildMesh();
+}
+
+int ChunkView::blockIndex(int i, int j, int k) const {
+    return (i * CHUNK_HEIGHT + j) * CHUNK_WIDTH + k;
+}
+
+Geometry<TerrainVertex> ChunkView::blockGeometry(int i, int j, int k) {
+    Geometry<TerrainVertex> geometry =
+        terrainVertexMap->getGeometry(region, i, j, k);
+    geometry.addVertexOffset(glm::vec3(i, j, k));
+    return geometry;
+}
+
+void ChunkView::buildMesh() {
+    mesh.clear();
+    blockRanges.clear();
+
+    for (int i = 0; i < CHUNK_WIDTH; i++) {
+        for (int j = 0; j < CHUNK_HEIGHT; j++) {
+            for (int k = 0; k < CHUNK_WIDTH; k++) {
+                if (region.getBlockFaces(i, j, k) == NO_FACE)
+                    continue;
+
+                Geometry<TerrainVertex> geometry = blockGeometry(i, j, k);
+                if (geometry.vertices.empty())
+                    continue;
+
+                unsigned int start = mesh.getGeometry().vertices.size();
+                mesh.append(geometry);
+                blockRanges[blockIndex(i, j, k)] = {
+                    start, static_cast<unsigned int>(geometry.vertices.size())};
+            }
+        }
+    }
+}
+
+void ChunkView::respliceBlock(int i, int j, int k) {
+    int index = blockIndex(i, j, k);
+
+    auto it = blockRanges.find(index);
+    if (it != blockRanges.end()) {
+        unsigned int start = it->second.first;
+        unsigned int count = it->second.second;
+
+        mesh.removeVertices(start, count);
+        blockRanges.erase(it);
+
+        for (auto &entry : blockRanges)
+            if (entry.second.first > start)
+                entry.second.first -= count;
+    }
+
+    if (region.getBlockFaces(i, j, k) == NO_FACE)
+        return;
+
+    Geometry<TerrainVertex> geometry = blockGeometry(i, j, k);
+    if (geometry.vertices.empty())
+        return;
+
+    unsigned int start = mesh.getGeometry().vertices.size();
+    mesh.append(geometry);
+    blockRanges[index] = {start,
+                          static_cast<unsigned int>(geometry.vertices.size())};
+}
+
+void ChunkView::updateBlock(ChunkRegion newRegion, glm::ivec3 worldEdit) {
+    region = newRegion;
+
+    int lx = worldEdit.x - region.main->x * CHUNK_WIDTH;
+    int ly = worldEdit.y;
+    int lz = worldEdit.z - region.main->z * CHUNK_WIDTH;
+
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                int bx = lx + dx;
+                int by = ly + dy;
+                int bz = lz + dz;
+
+                if (bx < 0 || bx >= CHUNK_WIDTH || by < 0 ||
+                    by >= CHUNK_HEIGHT || bz < 0 || bz >= CHUNK_WIDTH)
+                    continue;
+
+                respliceBlock(bx, by, bz);
+            }
+        }
+    }
+}
 
 void ChunkView::render(int chunkx, int chunkz) {
     mesh.shader->setMat4(

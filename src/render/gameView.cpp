@@ -27,10 +27,13 @@ GameView::GameView(World *world) : world(world) {
         pendingTasks.push([this, region]() { removeChunkView(region); });
     });
 
-    world->getChunkManager()->onChunkUpdated.connect([&](ChunkRegion region) {
-        std::lock_guard<std::mutex> lock(taskMutex);
-        pendingTasks.push([this, region]() { updateChunkView(region); });
-    });
+    world->getChunkManager()->onChunkUpdated.connect(
+        [&](ChunkRegion region, glm::ivec3 worldEdit) {
+            std::lock_guard<std::mutex> lock(taskMutex);
+            pendingTasks.push([this, region, worldEdit]() {
+                updateChunkView(region, worldEdit);
+            });
+        });
 
     firstPersonView = std::make_unique<FirstPersonView>(
         world->getEntityManager()->player, world, *terrainVertexMap,
@@ -79,8 +82,14 @@ void GameView::removeChunkView(ChunkRegion region) {
     }
 }
 
-void GameView::updateChunkView(ChunkRegion region) {
-    removeChunkView(region);
+void GameView::updateChunkView(ChunkRegion region, glm::ivec3 worldEdit) {
+    for (auto &chunkView : chunkViews) {
+        if (chunkView->region.main == region.main) {
+            chunkView->updateBlock(region, worldEdit);
+            return;
+        }
+    }
+
     addChunkView(region);
 }
 
