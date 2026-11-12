@@ -18,6 +18,7 @@ class FirstPersonView {
 
   private:
     Mesh<TerrainVertex> selectionBoxMesh;
+    glm::vec2 selectionUV;
 
     std::shared_ptr<Player> player;
     World &world;

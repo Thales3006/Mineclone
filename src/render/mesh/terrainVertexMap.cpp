@@ -207,22 +207,24 @@ Geometry<TerrainVertex> TerrainVertexMap::getGeometry(ChunkRegion &region,
 }
 
 Geometry<TerrainVertex> TerrainVertexMap::getSelectionBox() {
-    Geometry<TerrainVertex> blockGeometry{};
+    glm::vec2 uv = setUV(fullBlock[UP_FACE], BlockTextureID::stone).vertices[0].uv;
 
-    auto add_face = [this, &blockGeometry](BlockTextureID texture_id,
-                                           unsigned char face) {
-        auto geometry = setUV(fullBlock[face], texture_id);
-        for (int i = 0; i < 4; i++) {
-            geometry.vertices[i].color = glm::vec3(0.2f);
-        }
-        blockGeometry.append(geometry);
+    const glm::vec3 corners[8] = {
+        {0, 0, 0}, {1, 0, 0}, {1, 0, 1}, {0, 0, 1},
+        {0, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 1},
     };
 
-    add_face(BlockTextureID::stone, UP_FACE);
-    add_face(BlockTextureID::stone, DOWN_FACE);
-    add_face(BlockTextureID::stone, FRONT_FACE);
-    add_face(BlockTextureID::stone, BACK_FACE);
-    add_face(BlockTextureID::stone, LEFT_FACE);
-    add_face(BlockTextureID::stone, RIGHT_FACE);
-    return blockGeometry;
+    const unsigned int edges[24] = {
+        0, 1, 1, 2, 2, 3, 3, 0, // bottom
+        4, 5, 5, 6, 6, 7, 7, 4, // top
+        0, 4, 1, 5, 2, 6, 3, 7, // verticals
+    };
+
+    Geometry<TerrainVertex> geometry{};
+    for (const glm::vec3 &corner : corners)
+        geometry.addVertex({corner, glm::vec3(0.0f), uv, glm::vec3(0.0f)});
+    for (unsigned int index : edges)
+        geometry.indices.push_back(index);
+
+    return geometry;
 }

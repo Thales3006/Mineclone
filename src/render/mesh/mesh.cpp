@@ -7,24 +7,25 @@
 template <typename T>
 Mesh<T>::Mesh(std::shared_ptr<Texture> texture, std::shared_ptr<Shader> shader)
     : texture(std::move(texture)), shader(std::move(shader)), geometry(),
-      VAO(0), VBO(0), EBO(0), dirty(true) {}
+      VAO(0), VBO(0), EBO(0), drawMode(GL_TRIANGLES), dirty(true) {}
 
 template <typename T>
 Mesh<T>::Mesh(Geometry<T> geometry, std::shared_ptr<Texture> texture,
               std::shared_ptr<Shader> shader)
     : texture(std::move(texture)), shader(std::move(shader)),
-      geometry(std::move(geometry)), VAO(0), VBO(0), EBO(0), dirty(true) {}
+      geometry(std::move(geometry)), VAO(0), VBO(0), EBO(0),
+      drawMode(GL_TRIANGLES), dirty(true) {}
 
 template <typename T>
 Mesh<T>::Mesh(const Mesh &other)
     : texture(other.texture), shader(other.shader), geometry(other.geometry),
-      VAO(0), VBO(0), EBO(0), dirty(true) {}
+      VAO(0), VBO(0), EBO(0), drawMode(other.drawMode), dirty(true) {}
 
 template <typename T>
 Mesh<T>::Mesh(Mesh &&other) noexcept
     : texture(std::move(other.texture)), shader(std::move(other.shader)),
       geometry(std::move(other.geometry)), VAO(other.VAO), VBO(other.VBO),
-      EBO(other.EBO), dirty(other.dirty) {
+      EBO(other.EBO), drawMode(other.drawMode), dirty(other.dirty) {
     other.VAO = 0;
     other.VBO = 0;
     other.EBO = 0;
@@ -37,6 +38,7 @@ template <typename T> Mesh<T> &Mesh<T>::operator=(const Mesh &other) {
         texture = other.texture;
         shader = other.shader;
         geometry = other.geometry;
+        drawMode = other.drawMode;
         dirty = true;
     }
     return *this;
@@ -51,6 +53,7 @@ template <typename T> Mesh<T> &Mesh<T>::operator=(Mesh &&other) noexcept {
         VAO = other.VAO;
         VBO = other.VBO;
         EBO = other.EBO;
+        drawMode = other.drawMode;
         dirty = other.dirty;
         other.VAO = 0;
         other.VBO = 0;
@@ -108,7 +111,7 @@ template <typename T> void Mesh<T>::render() {
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawElements(GL_TRIANGLES, geometry.indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(drawMode, geometry.indices.size(), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
 }
@@ -120,6 +123,10 @@ template <typename T> const Geometry<T> &Mesh<T>::getGeometry() const {
 template <typename T> void Mesh<T>::setGeometry(Geometry<T> newGeometry) {
     geometry = std::move(newGeometry);
     dirty = true;
+}
+
+template <typename T> void Mesh<T>::setDrawMode(unsigned int mode) {
+    drawMode = mode;
 }
 
 template <typename T> unsigned int Mesh<T>::addVertex(const T &vertex) {

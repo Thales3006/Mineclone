@@ -26,6 +26,7 @@ template <typename T> class Mesh {
 
     const Geometry<T> &getGeometry() const;
     void setGeometry(Geometry<T> geometry);
+    void setDrawMode(unsigned int mode);
     unsigned int addVertex(const T &vertex);
     void addTriangle(unsigned int a, unsigned int b, unsigned int c);
     void append(const Geometry<T> &other);
@@ -35,6 +36,7 @@ template <typename T> class Mesh {
   private:
     Geometry<T> geometry;
     unsigned int VAO, VBO, EBO;
+    unsigned int drawMode;
     bool dirty;
 
     void upload();
