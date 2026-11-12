@@ -25,7 +25,7 @@ void ChunkManager::updateLoading(glm::ivec2 center) {
 
     fillInFlight = true;
     TaskManager::instance().run([this, center]() {
-        fillChunkRadius(6, center);
+        fillChunkRadius(12, center);
         fillInFlight = false;
     });
 }
