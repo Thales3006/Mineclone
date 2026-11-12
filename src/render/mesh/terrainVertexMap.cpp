@@ -67,15 +67,15 @@ TerrainVertexMap::TerrainVertexMap(
 
     plantBlock = Geometry<TerrainVertex>{
         {
-            {glm::vec3(0, 0, 0), glm::vec3(0, 0, 1)},
-            {glm::vec3(1, 0, 1), glm::vec3(0, 0, 1)},
-            {glm::vec3(1, 1, 1), glm::vec3(0, 0, 1)},
-            {glm::vec3(0, 1, 0), glm::vec3(0, 0, 1)},
+            {glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)},
+            {glm::vec3(1, 0, 1), glm::vec3(0, 1, 0)},
+            {glm::vec3(1, 1, 1), glm::vec3(0, 1, 0)},
+            {glm::vec3(0, 1, 0), glm::vec3(0, 1, 0)},
 
-            {glm::vec3(1, 0, 0), glm::vec3(0, 0, -1)},
-            {glm::vec3(0, 0, 1), glm::vec3(0, 0, -1)},
-            {glm::vec3(0, 1, 1), glm::vec3(0, 0, -1)},
-            {glm::vec3(1, 1, 0), glm::vec3(0, 0, -1)},
+            {glm::vec3(1, 0, 0), glm::vec3(0, 1, 0)},
+            {glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)},
+            {glm::vec3(0, 1, 1), glm::vec3(0, 1, 0)},
+            {glm::vec3(1, 1, 0), glm::vec3(0, 1, 0)},
         },
         {0, 1, 3, 1, 2, 3, 6, 7, 4, 6, 4, 5,
          0, 3, 1, 1, 3, 2, 6, 4, 7, 6, 5, 4},
