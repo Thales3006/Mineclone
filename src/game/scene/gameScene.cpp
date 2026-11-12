@@ -2,32 +2,21 @@
 
 #include "world/terrain/block/block.h"
 
-#include <chrono>
 #include <optional>
 
-GameScene::GameScene(InputBus &bus)
-    : world(42), gameView(&world), bus(bus), sensibility(0.005f),
-      loadingChunks(false) {}
+GameScene::GameScene(InputBus &bus, Renderer &renderer)
+    : world(42), gameView(&world, renderer), bus(bus), sensibility(0.005f) {}
 
-GameScene::~GameScene() { onExit(); }
+void GameScene::onEnter() { world.getChunkManager()->startLoading(); }
 
-void GameScene::onEnter() {
-    loadingChunks = true;
-    chunkLoader = std::thread(&GameScene::autoLoadChunks, this);
-}
-
-void GameScene::onExit() {
-    loadingChunks = false;
-    if (chunkLoader.joinable())
-        chunkLoader.join();
-}
+void GameScene::onExit() { world.getChunkManager()->stopLoading(); }
 
 void GameScene::update(float dt) {
     applyMovement(dt);
     world.updateTick(dt);
 }
 
-void GameScene::render(Renderer &renderer) { gameView.render(renderer); }
+void GameScene::render(Renderer &renderer) { gameView.render(); }
 
 void GameScene::onEvent(const InputEvent &e) {
     if (auto a = bus.actionFor(e)) {
@@ -140,11 +129,3 @@ void GameScene::placeLookedBlock() {
     }
 }
 
-void GameScene::autoLoadChunks() {
-    Player &player = *world.getEntityManager()->player;
-    while (loadingChunks) {
-        world.getChunkManager()->fillChunkRadius(6, player.chunkx,
-                                                 player.chunkz);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
-}

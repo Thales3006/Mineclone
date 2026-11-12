@@ -4,7 +4,7 @@
 
 Game::Game() : deltaTime(0), window(), renderer(window), bus(inputMap) {
     window.setUserPointer(this);
-    scene = std::make_unique<GameScene>(bus);
+    scene = std::make_unique<GameScene>(bus, renderer);
     glfwSetTime(0);
 }
 

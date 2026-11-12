@@ -4,9 +4,8 @@
 
 #include <algorithm>
 
-GameView::GameView() {}
-
-GameView::GameView(World *world) : world(world) {
+GameView::GameView(World *world, Renderer &renderer)
+    : renderer(renderer), world(world) {
     camera.setMinMax(0.01f, 400.0f);
     camera.setFOV(glm::radians(90.0f));
 
@@ -18,19 +17,16 @@ GameView::GameView(World *world) : world(world) {
     terrainVertexMap = std::make_shared<TerrainVertexMap>(textureManager);
 
     world->getChunkManager()->onChunkAdded.connect([&](ChunkRegion region) {
-        std::lock_guard<std::mutex> lock(taskMutex);
-        pendingTasks.push([this, region]() { addChunkView(region); });
+        this->renderer.runOnMain([this, region]() { addChunkView(region); });
     });
 
     world->getChunkManager()->onChunkRemoved.connect([&](ChunkRegion region) {
-        std::lock_guard<std::mutex> lock(taskMutex);
-        pendingTasks.push([this, region]() { removeChunkView(region); });
+        this->renderer.runOnMain([this, region]() { removeChunkView(region); });
     });
 
     world->getChunkManager()->onChunkUpdated.connect(
         [&](ChunkRegion region, glm::ivec3 worldEdit) {
-            std::lock_guard<std::mutex> lock(taskMutex);
-            pendingTasks.push([this, region, worldEdit]() {
+            this->renderer.runOnMain([this, region, worldEdit]() {
                 updateChunkView(region, worldEdit);
             });
         });
@@ -40,9 +36,7 @@ GameView::GameView(World *world) : world(world) {
         textureManager->getTexture("blocks"), shaders["terrain"]);
 }
 
-void GameView::render(Renderer &renderer) {
-    executeTasks();
-
+void GameView::render() {
     glm::uvec2 viewportSize = renderer.getViewportSize();
 
     Player &player = *world->getEntityManager()->player;
@@ -91,14 +85,4 @@ void GameView::updateChunkView(ChunkRegion region, glm::ivec3 worldEdit) {
     }
 
     addChunkView(region);
-}
-
-void GameView::executeTasks() {
-    std::lock_guard<std::mutex> lock(taskMutex);
-
-    while (!pendingTasks.empty()) {
-        auto task = pendingTasks.front();
-        task();
-        pendingTasks.pop();
-    }
 }

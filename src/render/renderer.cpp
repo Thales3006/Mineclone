@@ -21,6 +21,8 @@ void Renderer::initOpenGL() {
 }
 
 void Renderer::beginFrame() {
+    executeTasks();
+
     glClearColor(0.4f, 0.6f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -29,3 +31,21 @@ void Renderer::beginFrame() {
 }
 
 glm::uvec2 Renderer::getViewportSize() { return viewportSize; }
+
+void Renderer::runOnMain(std::function<void()> task) {
+    std::lock_guard<std::mutex> lock(taskMutex);
+    pendingTasks.push(std::move(task));
+}
+
+void Renderer::executeTasks() {
+    std::queue<std::function<void()>> tasks;
+    {
+        std::lock_guard<std::mutex> lock(taskMutex);
+        std::swap(tasks, pendingTasks);
+    }
+
+    while (!tasks.empty()) {
+        tasks.front()();
+        tasks.pop();
+    }
+}

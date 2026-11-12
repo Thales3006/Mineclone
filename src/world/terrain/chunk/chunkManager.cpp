@@ -1,6 +1,33 @@
 #include "world/terrain/chunk/chunkManager.h"
 
-ChunkManager::ChunkManager(int seed): seed(seed) {}
+#include "game/task/taskManager.h"
+
+#include <chrono>
+#include <thread>
+
+ChunkManager::ChunkManager(int seed)
+    : seed(seed), active(false), fillInFlight(false) {}
+
+ChunkManager::~ChunkManager() { stopLoading(); }
+
+void ChunkManager::startLoading() { active = true; }
+
+void ChunkManager::stopLoading() {
+    active = false;
+    while (fillInFlight)
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+}
+
+void ChunkManager::updateLoading(int centerX, int centerZ) {
+    if (!active || fillInFlight)
+        return;
+
+    fillInFlight = true;
+    TaskManager::instance().run([this, centerX, centerZ]() {
+        fillChunkRadius(6, centerX, centerZ);
+        fillInFlight = false;
+    });
+}
 
 std::optional<std::shared_ptr<Chunk>> ChunkManager::getChunk(int x, int z) {
     auto it = chunks.find({x, z});

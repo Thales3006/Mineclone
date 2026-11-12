@@ -11,14 +11,11 @@
 #include "render/view/firstPersonView.h"
 #include "world/world.h"
 
-#include <queue>
-
 class GameView {
   public:
-    GameView();
-    GameView(World *world);
+    GameView(World *world, Renderer &renderer);
 
-    void render(Renderer &renderer);
+    void render();
 
     Camera camera;
 
@@ -27,8 +24,7 @@ class GameView {
     std::map<std::string, std::shared_ptr<Shader>> shaders;
     std::shared_ptr<TerrainVertexMap> terrainVertexMap;
 
-    std::mutex taskMutex;
-    std::queue<std::function<void()>> pendingTasks;
+    Renderer &renderer;
 
     std::vector<std::unique_ptr<ChunkView>> chunkViews;
     std::unique_ptr<FirstPersonView> firstPersonView;
@@ -40,8 +36,6 @@ class GameView {
     void addChunkView(ChunkRegion region);
     void removeChunkView(ChunkRegion region);
     void updateChunkView(ChunkRegion region, glm::ivec3 worldEdit);
-
-    void executeTasks();
 };
 
 #endif

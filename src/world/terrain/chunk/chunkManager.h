@@ -5,6 +5,7 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
 #include <array>
+#include <atomic>
 #include <glm/glm.hpp>
 #include <map>
 #include <memory>
@@ -24,6 +25,7 @@ class ChunkManager {
     sigslot::signal<ChunkRegion, glm::ivec3> onChunkUpdated;
 
     ChunkManager(int seed);
+    ~ChunkManager();
 
     bool isEmpty(int x, int z);
 
@@ -31,13 +33,20 @@ class ChunkManager {
     void setBlock(int chunkx, int chunkz, glm::vec3 pos, Block block);
     Block getBlock(int chunkx, int chunkz, glm::vec3 pos);
 
-    void fillChunkRadius(int radius, int chunkx, int chunkz);
+    void startLoading();
+    void stopLoading();
+    void updateLoading(int centerX, int centerZ);
 
     std::pair<std::mutex *, chunk_map *> unsafe_getChunkMap();
 
   private:
     int seed;
-    
+
+    std::atomic<bool> active;
+    std::atomic<bool> fillInFlight;
+
+    void fillChunkRadius(int radius, int chunkx, int chunkz);
+
     void loadChunk(std::shared_ptr<Chunk> chunk);
     void unloadChunk(int x, int z);
 

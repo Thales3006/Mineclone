@@ -6,13 +6,9 @@
 #include "render/gameView.h"
 #include "world/world.h"
 
-#include <atomic>
-#include <thread>
-
 class GameScene : public Scene {
   public:
-    GameScene(InputBus &bus);
-    ~GameScene();
+    GameScene(InputBus &bus, Renderer &renderer);
 
     void onEnter() override;
     void onExit() override;
@@ -28,11 +24,6 @@ class GameScene : public Scene {
     InputBus &bus;
 
     float sensibility;
-
-    std::atomic<bool> loadingChunks;
-    std::thread chunkLoader;
-
-    void autoLoadChunks();
 
     void applyMovement(float dt);
     void triggerAction(Action action);
