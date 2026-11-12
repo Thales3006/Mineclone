@@ -69,8 +69,13 @@ void GameView::renderChunks(int chunkx, int chunkz) {
 
 void GameView::addChunkView(ChunkMeshData data) {
     for (auto &chunkView : chunkViews)
-        if (chunkView->x == data.x && chunkView->z == data.z)
+        if (chunkView->x == data.x && chunkView->z == data.z) {
+            chunkView = std::make_unique<ChunkView>(std::move(data),
+                                                    *terrainVertexMap,
+                                                    textureManager,
+                                                    shaders["terrain"]);
             return;
+        }
 
     chunkViews.push_back(std::make_unique<ChunkView>(
         std::move(data), *terrainVertexMap, textureManager, shaders["terrain"]));

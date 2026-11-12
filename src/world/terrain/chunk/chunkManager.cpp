@@ -3,6 +3,7 @@
 #include "game/task/taskManager.h"
 
 #include <chrono>
+#include <set>
 #include <thread>
 
 ChunkManager::ChunkManager(int seed)
@@ -41,12 +42,7 @@ void ChunkManager::loadChunk(std::shared_ptr<Chunk> chunk) {
     if (chunks.find({chunk->x, chunk->z}) != chunks.end())
         return;
 
-    int x = chunk->x;
-    int z = chunk->z;
-    chunks[{x, z}] = std::move(chunk);
-
-    if (auto snapshot = buildSnapshot(x, z))
-        onChunkAdded(std::move(*snapshot));
+    chunks[{chunk->x, chunk->z}] = std::move(chunk);
 }
 
 void ChunkManager::unloadChunk(int x, int z) {
@@ -173,6 +169,22 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
         for (auto &chunk : to_add_chunks) {
             loadChunk(std::move(chunk));
         }
+
+        std::set<std::tuple<int, int>> affected;
+        auto markNeighborhood = [&affected](int x, int z) {
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dz = -1; dz <= 1; dz++)
+                    affected.insert({x + dx, z + dz});
+        };
+        for (auto &coord : to_add)
+            markNeighborhood(std::get<0>(coord), std::get<1>(coord));
+        for (auto &coord : to_delete)
+            markNeighborhood(std::get<0>(coord), std::get<1>(coord));
+
+        for (auto &coord : affected)
+            if (auto snapshot =
+                    buildSnapshot(std::get<0>(coord), std::get<1>(coord)))
+                onChunkAdded(std::move(*snapshot));
     }
 }
 
