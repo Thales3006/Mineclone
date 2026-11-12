@@ -96,6 +96,13 @@ void GameScene::destroyLookedBlock() {
 
     world.getChunkManager().setBlock(player.chunkx, player.chunkz,
                                      glm::vec3(hit->block) + 0.5f, Block());
+
+    Block block = world.getChunkManager().getBlock(player.chunkx, player.chunkz,
+                                     glm::vec3(hit->block) + 0.5f + glm::vec3(0,1,0));
+    if(block.id == BlockID::grass) {
+        world.getChunkManager().setBlock(player.chunkx, player.chunkz,
+                                         glm::vec3(hit->block) + 0.5f + glm::vec3(0,1,0), Block());
+    }
 }
 
 void GameScene::placeLookedBlock() {
