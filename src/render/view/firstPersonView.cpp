@@ -80,9 +80,10 @@ void FirstPersonView::render(int chunkx, int chunkz) {
     selectionBoxMesh.shader->setMat4(
         "model", glm::translate(glm::mat4(1.0f), glm::vec3(hit->block)));
 
-    glDisable(GL_DEPTH_TEST);
-    glLineWidth(2.0f);
-    selectionBoxMesh.render();
     glLineWidth(1.0f);
-    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    selectionBoxMesh.shader->setFloat("depthBias", 0.0002f);
+    selectionBoxMesh.render();
+    selectionBoxMesh.shader->setFloat("depthBias", 0.0f);
+    glDepthFunc(GL_LESS);
 }
