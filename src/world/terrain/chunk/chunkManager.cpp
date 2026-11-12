@@ -44,26 +44,44 @@ void ChunkManager::unloadChunk(int x, int z) {
     chunks.erase({x, z});
 }
 
-void ChunkManager::updateRegion(ChunkRegion region) {
+void ChunkManager::updateRegion(ChunkRegion region, int x, int y, int z) {
 
-    onChunkUpdated(region);
+    glm::ivec3 worldEdit = {region.main->x * CHUNK_WIDTH + x, y,
+                            region.main->z * CHUNK_WIDTH + z};
 
-    auto update = [this](std::optional<std::shared_ptr<Chunk>> chunk) {
+    onChunkUpdated(region, worldEdit);
+
+    auto update = [this,
+                   worldEdit](std::optional<std::shared_ptr<Chunk>> chunk) {
         if (chunk.has_value()) {
             onChunkUpdated(
-                std::move(getChunkRegion(chunk.value()->x, chunk.value()->z)));
+                std::move(getChunkRegion(chunk.value()->x, chunk.value()->z)),
+                worldEdit);
         }
     };
 
-    update(region.right);
-    update(region.left);
-    update(region.front);
-    update(region.back);
+    bool atLeft = (x == 0);
+    bool atRight = (x == CHUNK_WIDTH - 1);
+    bool atBack = (z == 0);
+    bool atFront = (z == CHUNK_WIDTH - 1);
 
-    update(region.frontRight);
-    update(region.backRight);
-    update(region.frontLeft);
-    update(region.backLeft);
+    if (atRight)
+        update(region.right);
+    if (atLeft)
+        update(region.left);
+    if (atFront)
+        update(region.front);
+    if (atBack)
+        update(region.back);
+
+    if (atFront && atRight)
+        update(region.frontRight);
+    if (atBack && atRight)
+        update(region.backRight);
+    if (atFront && atLeft)
+        update(region.frontLeft);
+    if (atBack && atLeft)
+        update(region.backLeft);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
@@ -78,7 +96,7 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
 
     region.main->setBlock(x, y, z, block);
 
-    updateRegion(std::move(region));
+    updateRegion(std::move(region), x, y, z);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,

@@ -5,6 +5,7 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
 #include <array>
+#include <glm/glm.hpp>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -20,7 +21,7 @@ class ChunkManager {
 
     sigslot::signal<ChunkRegion> onChunkAdded;
     sigslot::signal<ChunkRegion> onChunkRemoved;
-    sigslot::signal<ChunkRegion> onChunkUpdated;
+    sigslot::signal<ChunkRegion, glm::ivec3> onChunkUpdated;
 
     ChunkManager(int seed);
 
@@ -41,7 +42,7 @@ class ChunkManager {
     void unloadChunk(int x, int z);
 
     ChunkRegion getChunkRegion(int x, int z);
-    void updateRegion(ChunkRegion region);
+    void updateRegion(ChunkRegion region, int x, int y, int z);
     std::optional<std::shared_ptr<Chunk>> getChunk(int x, int z);
 };
 
