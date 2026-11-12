@@ -19,17 +19,20 @@ GameView::GameView(World &world, Renderer &renderer)
 
     world.getChunkManager().onChunkAdded.connect([&](ChunkRegion region) {
         TaskManager::instance().run([this, region = std::move(region)]() {
+            std::optional<LockedRegion> locked = region.lock();
+            if (!locked)
+                return;
+
             ChunkMeshData data =
-                ChunkView::buildMeshData(region, *terrainVertexMap);
+                ChunkView::buildMeshData(*locked, *terrainVertexMap);
             this->renderer.runOnMain([this, data = std::move(data)]() mutable {
                 addChunkView(std::move(data));
             });
         });
     });
 
-    world.getChunkManager().onChunkRemoved.connect([&](ChunkRegion region) {
-        this->renderer.runOnMain(
-            [this, region = std::move(region)]() { removeChunkView(region); });
+    world.getChunkManager().onChunkRemoved.connect([&](int x, int z) {
+        this->renderer.runOnMain([this, x, z]() { removeChunkView(x, z); });
     });
 
     world.getChunkManager().onChunkUpdated.connect(
@@ -77,11 +80,10 @@ void GameView::addChunkView(ChunkMeshData data) {
         std::move(data), *terrainVertexMap, textureManager, shaders["terrain"]));
 }
 
-void GameView::removeChunkView(const ChunkRegion &region) {
+void GameView::removeChunkView(int x, int z) {
     auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
                              [&](const std::unique_ptr<ChunkView> &chunkView) {
-                                 return chunkView->x == region.main->x &&
-                                        chunkView->z == region.main->z;
+                                 return chunkView->x == x && chunkView->z == z;
                              });
     if (it != chunkViews.end()) {
         chunkViews.erase(it, chunkViews.end());
@@ -89,12 +91,17 @@ void GameView::removeChunkView(const ChunkRegion &region) {
 }
 
 void GameView::updateChunkView(const ChunkRegion &region, glm::ivec3 worldEdit) {
+    std::optional<LockedRegion> locked = region.lock();
+    if (!locked)
+        return;
+
     for (auto &chunkView : chunkViews) {
-        if (chunkView->x == region.main->x && chunkView->z == region.main->z) {
-            chunkView->updateBlock(region, worldEdit);
+        if (chunkView->x == locked->main->x &&
+            chunkView->z == locked->main->z) {
+            chunkView->updateBlock(*locked, worldEdit);
             return;
         }
     }
 
-    addChunkView(ChunkView::buildMeshData(region, *terrainVertexMap));
+    addChunkView(ChunkView::buildMeshData(*locked, *terrainVertexMap));
 }

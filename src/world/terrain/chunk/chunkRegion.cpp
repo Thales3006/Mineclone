@@ -1,6 +1,24 @@
 #include "world/terrain/chunk/chunkRegion.h"
 
-Block ChunkRegion::getBlock(int x, int y, int z) const {
+std::optional<LockedRegion> ChunkRegion::lock() const {
+    std::shared_ptr<Chunk> m = main.lock();
+    if (!m)
+        return std::nullopt;
+
+    return LockedRegion{
+        .main = std::move(m),
+        .right = right.lock(),
+        .left = left.lock(),
+        .front = front.lock(),
+        .back = back.lock(),
+        .frontRight = frontRight.lock(),
+        .backRight = backRight.lock(),
+        .frontLeft = frontLeft.lock(),
+        .backLeft = backLeft.lock(),
+    };
+}
+
+Block LockedRegion::getBlock(int x, int y, int z) const {
     int ox = (x < 0) ? -1 : (x >= CHUNK_WIDTH) ? 1 : 0;
     int oz = (z < 0) ? -1 : (z >= CHUNK_WIDTH) ? 1 : 0;
 
@@ -10,7 +28,7 @@ Block ChunkRegion::getBlock(int x, int y, int z) const {
     if (y < 0 || y >= CHUNK_HEIGHT)
         return Block();
 
-    const std::optional<std::shared_ptr<Chunk>> *neighbors[3][3] = {
+    const std::shared_ptr<Chunk> *neighbors[3][3] = {
         {&backLeft, &left, &frontLeft},
         {&back, nullptr, &front},
         {&backRight, &right, &frontRight},
@@ -20,38 +38,36 @@ Block ChunkRegion::getBlock(int x, int y, int z) const {
         return main->blocks[localX][y][localZ];
 
     auto &neighbor = neighbors[ox + 1][oz + 1];
-    if (neighbor && neighbor->has_value())
-        return neighbor->value()->blocks[localX][y][localZ];
+    if (neighbor && *neighbor)
+        return (*neighbor)->blocks[localX][y][localZ];
 
     return Block();
 }
 
-unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) const {
+unsigned char LockedRegion::getBlockFaces(int x, int y, int z) const {
     if (main->blocks[x][y][z].id == BlockID::air) {
         return NO_FACE;
     }
 
     unsigned char faces = ALL_FACE;
     if (x != CHUNK_WIDTH - 1 ? main->blocks[x + 1][y][z].solid != false
-        : right.has_value()  ? right.value()->blocks[0][y][z].solid != false
+        : right              ? right->blocks[0][y][z].solid != false
                              : false) {
         faces &= ~RIGHT_FACE;
     }
     if (x != 0 ? main->blocks[x - 1][y][z].solid != false
-        : left.has_value()
-            ? left.value()->blocks[CHUNK_WIDTH - 1][y][z].solid != false
-            : false) {
+        : left ? left->blocks[CHUNK_WIDTH - 1][y][z].solid != false
+               : false) {
         faces &= ~LEFT_FACE;
     }
     if (z != CHUNK_WIDTH - 1 ? main->blocks[x][y][z + 1].solid != false
-        : front.has_value()  ? front.value()->blocks[x][y][0].solid != false
+        : front              ? front->blocks[x][y][0].solid != false
                              : false) {
         faces &= ~FRONT_FACE;
     }
     if (z != 0 ? main->blocks[x][y][z - 1].solid != false
-        : back.has_value()
-            ? back.value()->blocks[x][y][CHUNK_WIDTH - 1].solid != false
-            : false) {
+        : back ? back->blocks[x][y][CHUNK_WIDTH - 1].solid != false
+               : false) {
         faces &= ~BACK_FACE;
     }
     if (y != CHUNK_HEIGHT - 1 && main->blocks[x][y + 1][z].solid != false) {
@@ -63,8 +79,8 @@ unsigned char ChunkRegion::getBlockFaces(int x, int y, int z) const {
     return faces;
 }
 
-std::array<float, 4> ChunkRegion::getBlockOcclusion(int x, int y, int z,
-                                                    unsigned char face) const {
+std::array<float, 4> LockedRegion::getBlockOcclusion(int x, int y, int z,
+                                                     unsigned char face) const {
     std::array<float, 4> occlusion;
 
     static const glm::ivec3 vertexAO[6][4][3] = {

@@ -22,12 +22,12 @@ class ChunkView {
               const std::shared_ptr<TextureManager> &textureManager,
               std::shared_ptr<Shader> shader);
 
-    static ChunkMeshData buildMeshData(const ChunkRegion &region,
+    static ChunkMeshData buildMeshData(const LockedRegion &region,
                                        TerrainVertexMap &terrainVertexMap);
 
     void render(int chunkx, int chunkz);
 
-    void updateBlock(const ChunkRegion &region, glm::ivec3 worldEdit);
+    void updateBlock(const LockedRegion &region, glm::ivec3 worldEdit);
 
     int x, z;
 
@@ -38,9 +38,9 @@ class ChunkView {
 
     static int blockIndex(int i, int j, int k);
     static Geometry<TerrainVertex> blockGeometry(TerrainVertexMap &terrainVertexMap,
-                                                 const ChunkRegion &region,
+                                                 const LockedRegion &region,
                                                  int i, int j, int k);
-    void respliceBlock(const ChunkRegion &region, int i, int j, int k);
+    void respliceBlock(const LockedRegion &region, int i, int j, int k);
 };
 
 #endif

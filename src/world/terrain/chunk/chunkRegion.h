@@ -24,18 +24,10 @@ enum Node {
     backLeft,
 };
 
-struct ChunkRegion {
-  public:
+struct LockedRegion {
     std::shared_ptr<Chunk> main;
-    std::optional<std::shared_ptr<Chunk>> right;
-    std::optional<std::shared_ptr<Chunk>> left;
-    std::optional<std::shared_ptr<Chunk>> front;
-    std::optional<std::shared_ptr<Chunk>> back;
-
-    std::optional<std::shared_ptr<Chunk>> frontRight;
-    std::optional<std::shared_ptr<Chunk>> backRight;
-    std::optional<std::shared_ptr<Chunk>> frontLeft;
-    std::optional<std::shared_ptr<Chunk>> backLeft;
+    std::shared_ptr<Chunk> right, left, front, back;
+    std::shared_ptr<Chunk> frontRight, backRight, frontLeft, backLeft;
 
     unsigned char getBlockFaces(int x, int y, int z) const;
 
@@ -44,6 +36,14 @@ struct ChunkRegion {
 
   private:
     Block getBlock(int x, int y, int z) const;
+};
+
+struct ChunkRegion {
+    std::weak_ptr<Chunk> main;
+    std::weak_ptr<Chunk> right, left, front, back;
+    std::weak_ptr<Chunk> frontRight, backRight, frontLeft, backLeft;
+
+    std::optional<LockedRegion> lock() const;
 };
 
 #endif

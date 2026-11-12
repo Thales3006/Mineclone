@@ -29,17 +29,17 @@ void ChunkManager::updateLoading(int centerX, int centerZ) {
     });
 }
 
-std::optional<std::shared_ptr<Chunk>> ChunkManager::getChunk(int x, int z) {
+std::shared_ptr<Chunk> ChunkManager::getChunk(int x, int z) {
     auto it = chunks.find({x, z});
     if (it != chunks.end()) {
-        return std::make_optional(it->second);
+        return it->second;
     }
-    return std::nullopt;
+    return nullptr;
 }
 
 ChunkRegion ChunkManager::getChunkRegion(int x, int z) {
     return ChunkRegion{
-        .main = getChunk(x, z).value(),
+        .main = getChunk(x, z),
         .right = getChunk(x + 1, z),
         .left = getChunk(x - 1, z),
         .front = getChunk(x, z + 1),
@@ -67,23 +67,25 @@ void ChunkManager::unloadChunk(int x, int z) {
     if (chunks.find({x, z}) == chunks.end())
         return;
 
-    onChunkRemoved(getChunkRegion(x, z));
+    onChunkRemoved(x, z);
     chunks.erase({x, z});
 }
 
 void ChunkManager::updateRegion(const ChunkRegion &region, int x, int y,
                                 int z) {
 
-    glm::ivec3 worldEdit = {region.main->x * CHUNK_WIDTH + x, y,
-                            region.main->z * CHUNK_WIDTH + z};
+    std::shared_ptr<Chunk> main = region.main.lock();
+    if (!main)
+        return;
+
+    glm::ivec3 worldEdit = {main->x * CHUNK_WIDTH + x, y,
+                            main->z * CHUNK_WIDTH + z};
 
     onChunkUpdated(region, worldEdit);
 
-    auto update = [this, worldEdit](
-                      const std::optional<std::shared_ptr<Chunk>> &chunk) {
-        if (chunk.has_value()) {
-            onChunkUpdated(
-                getChunkRegion(chunk.value()->x, chunk.value()->z), worldEdit);
+    auto update = [this, worldEdit](const std::weak_ptr<Chunk> &weak) {
+        if (std::shared_ptr<Chunk> chunk = weak.lock()) {
+            onChunkUpdated(getChunkRegion(chunk->x, chunk->z), worldEdit);
         }
     };
 
@@ -119,11 +121,9 @@ void ChunkManager::setBlock(int chunkx, int chunkz, int x, int y, int z,
         (z < 0 || z >= CHUNK_WIDTH))
         return;
 
-    ChunkRegion region = getChunkRegion(chunkx, chunkz);
+    chunks.at({chunkx, chunkz})->setBlock(x, y, z, block);
 
-    region.main->setBlock(x, y, z, block);
-
-    updateRegion(region, x, y, z);
+    updateRegion(getChunkRegion(chunkx, chunkz), x, y, z);
 }
 
 void ChunkManager::setBlock(int chunkx, int chunkz, glm::vec3 pos,
@@ -200,7 +200,7 @@ void ChunkManager::fillChunkRadius(int radius, int chunkx, int chunkz) {
 bool ChunkManager::isEmpty(int x, int z) {
     std::lock_guard<std::mutex> lock(chunks_mutex);
 
-    return !getChunk(x, z).has_value();
+    return !getChunk(x, z);
 }
 
 std::pair<std::mutex *, chunk_map *> ChunkManager::unsafe_getChunkMap() {

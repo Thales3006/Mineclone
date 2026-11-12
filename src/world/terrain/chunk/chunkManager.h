@@ -21,7 +21,7 @@ class ChunkManager {
     chunk_map chunks;
 
     sigslot::signal<ChunkRegion> onChunkAdded;
-    sigslot::signal<ChunkRegion> onChunkRemoved;
+    sigslot::signal<int, int> onChunkRemoved;
     sigslot::signal<ChunkRegion, glm::ivec3> onChunkUpdated;
 
     ChunkManager(int seed);
@@ -52,7 +52,7 @@ class ChunkManager {
 
     ChunkRegion getChunkRegion(int x, int z);
     void updateRegion(const ChunkRegion &region, int x, int y, int z);
-    std::optional<std::shared_ptr<Chunk>> getChunk(int x, int z);
+    std::shared_ptr<Chunk> getChunk(int x, int z);
 };
 
 #endif
