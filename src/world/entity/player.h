@@ -17,6 +17,7 @@ class Player : public Entity {
 
     glm::vec3 forward() const;
     glm::vec3 right() const;
+    glm::vec3 eyePosition() const;
 
     void move(glm::vec3 worldDir, float deltaTime);
     void jump();

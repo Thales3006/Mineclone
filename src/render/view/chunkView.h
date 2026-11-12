@@ -20,7 +20,7 @@ class ChunkView {
 
     void updateBlock(ChunkRegion region, glm::ivec3 worldEdit);
 
-    ChunkRegion region;
+    int x, z;
 
   private:
     TerrainVertexMap *terrainVertexMap;
@@ -28,9 +28,10 @@ class ChunkView {
     std::map<int, std::pair<unsigned int, unsigned int>> blockRanges;
 
     int blockIndex(int i, int j, int k) const;
-    Geometry<TerrainVertex> blockGeometry(int i, int j, int k);
-    void buildMesh();
-    void respliceBlock(int i, int j, int k);
+    Geometry<TerrainVertex> blockGeometry(ChunkRegion &region, int i, int j,
+                                          int k);
+    void buildMesh(ChunkRegion &region);
+    void respliceBlock(ChunkRegion &region, int i, int j, int k);
 };
 
 #endif

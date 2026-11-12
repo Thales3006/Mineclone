@@ -20,6 +20,10 @@ glm::vec3 Player::right() const {
     return glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
 }
 
+glm::vec3 Player::eyePosition() const {
+    return position + size * glm::vec3(0.5f, 0.9f, 0.5f);
+}
+
 void Player::move(glm::vec3 worldDir, float deltaTime) {
     if (worldDir == glm::vec3(0.0f))
         return;

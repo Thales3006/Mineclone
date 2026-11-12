@@ -5,23 +5,25 @@
 ChunkView::ChunkView(ChunkRegion region, TerrainVertexMap &terrainVertexMap,
                      std::shared_ptr<TextureManager> textureManager,
                      std::shared_ptr<Shader> shader)
-    : region(region), terrainVertexMap(&terrainVertexMap),
+    : x(region.main->x), z(region.main->z),
+      terrainVertexMap(&terrainVertexMap),
       mesh(textureManager->getTexture("blocks"), shader) {
-    buildMesh();
+    buildMesh(region);
 }
 
 int ChunkView::blockIndex(int i, int j, int k) const {
     return (i * CHUNK_HEIGHT + j) * CHUNK_WIDTH + k;
 }
 
-Geometry<TerrainVertex> ChunkView::blockGeometry(int i, int j, int k) {
+Geometry<TerrainVertex> ChunkView::blockGeometry(ChunkRegion &region, int i,
+                                                 int j, int k) {
     Geometry<TerrainVertex> geometry =
         terrainVertexMap->getGeometry(region, i, j, k);
     geometry.addVertexOffset(glm::vec3(i, j, k));
     return geometry;
 }
 
-void ChunkView::buildMesh() {
+void ChunkView::buildMesh(ChunkRegion &region) {
     mesh.clear();
     blockRanges.clear();
 
@@ -31,7 +33,7 @@ void ChunkView::buildMesh() {
                 if (region.getBlockFaces(i, j, k) == NO_FACE)
                     continue;
 
-                Geometry<TerrainVertex> geometry = blockGeometry(i, j, k);
+                Geometry<TerrainVertex> geometry = blockGeometry(region, i, j, k);
                 if (geometry.vertices.empty())
                     continue;
 
@@ -44,7 +46,7 @@ void ChunkView::buildMesh() {
     }
 }
 
-void ChunkView::respliceBlock(int i, int j, int k) {
+void ChunkView::respliceBlock(ChunkRegion &region, int i, int j, int k) {
     int index = blockIndex(i, j, k);
 
     auto it = blockRanges.find(index);
@@ -63,7 +65,7 @@ void ChunkView::respliceBlock(int i, int j, int k) {
     if (region.getBlockFaces(i, j, k) == NO_FACE)
         return;
 
-    Geometry<TerrainVertex> geometry = blockGeometry(i, j, k);
+    Geometry<TerrainVertex> geometry = blockGeometry(region, i, j, k);
     if (geometry.vertices.empty())
         return;
 
@@ -73,12 +75,10 @@ void ChunkView::respliceBlock(int i, int j, int k) {
                           static_cast<unsigned int>(geometry.vertices.size())};
 }
 
-void ChunkView::updateBlock(ChunkRegion newRegion, glm::ivec3 worldEdit) {
-    region = newRegion;
-
-    int lx = worldEdit.x - region.main->x * CHUNK_WIDTH;
+void ChunkView::updateBlock(ChunkRegion region, glm::ivec3 worldEdit) {
+    int lx = worldEdit.x - x * CHUNK_WIDTH;
     int ly = worldEdit.y;
-    int lz = worldEdit.z - region.main->z * CHUNK_WIDTH;
+    int lz = worldEdit.z - z * CHUNK_WIDTH;
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dy = -1; dy <= 1; dy++) {
@@ -91,7 +91,7 @@ void ChunkView::updateBlock(ChunkRegion newRegion, glm::ivec3 worldEdit) {
                     by >= CHUNK_HEIGHT || bz < 0 || bz >= CHUNK_WIDTH)
                     continue;
 
-                respliceBlock(bx, by, bz);
+                respliceBlock(region, bx, by, bz);
             }
         }
     }
@@ -99,9 +99,8 @@ void ChunkView::updateBlock(ChunkRegion newRegion, glm::ivec3 worldEdit) {
 
 void ChunkView::render(int chunkx, int chunkz) {
     mesh.shader->setMat4(
-        "model",
-        glm::translate(glm::mat4(1.0f),
-                       glm::vec3((region.main->x - chunkx) * CHUNK_WIDTH, 0,
-                                 (region.main->z - chunkz) * CHUNK_WIDTH)));
+        "model", glm::translate(glm::mat4(1.0f),
+                                glm::vec3((x - chunkx) * CHUNK_WIDTH, 0,
+                                          (z - chunkz) * CHUNK_WIDTH)));
     mesh.render();
 }

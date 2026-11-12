@@ -40,9 +40,7 @@ void GameView::render() {
     glm::uvec2 viewportSize = renderer.getViewportSize();
 
     Player &player = *world.getEntityManager().player;
-    camera.position =
-        player.position +
-        glm::vec3(player.size.x / 2, player.size.y * 0.9, player.size.z / 2);
+    camera.position = player.eyePosition();
     camera.direction = player.direction;
 
     float ratio = static_cast<float>(viewportSize.x) /
@@ -69,7 +67,8 @@ void GameView::addChunkView(ChunkRegion region) {
 void GameView::removeChunkView(ChunkRegion region) {
     auto it = std::remove_if(chunkViews.begin(), chunkViews.end(),
                              [&](const std::unique_ptr<ChunkView> &chunkView) {
-                                 return chunkView->region.main == region.main;
+                                 return chunkView->x == region.main->x &&
+                                        chunkView->z == region.main->z;
                              });
     if (it != chunkViews.end()) {
         chunkViews.erase(it, chunkViews.end());
@@ -78,7 +77,7 @@ void GameView::removeChunkView(ChunkRegion region) {
 
 void GameView::updateChunkView(ChunkRegion region, glm::ivec3 worldEdit) {
     for (auto &chunkView : chunkViews) {
-        if (chunkView->region.main == region.main) {
+        if (chunkView->x == region.main->x && chunkView->z == region.main->z) {
             chunkView->updateBlock(region, worldEdit);
             return;
         }

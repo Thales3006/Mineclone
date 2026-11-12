@@ -1,6 +1,7 @@
 #include "game/scene/gameScene.h"
 
 #include "world/terrain/block/block.h"
+#include "world/terrain/raycast.h"
 
 #include <optional>
 
@@ -86,45 +87,34 @@ void GameScene::triggerAction(Action action) {
 
 void GameScene::destroyLookedBlock() {
     Player &player = *world.getEntityManager().player;
-    glm::vec3 initial_pos =
-        player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
-    glm::vec3 dir = glm::normalize(player.direction);
-    glm::vec3 i = glm::vec3(0);
 
-    while (world.getChunkManager()
-               .getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
-               .id == BlockID::air) {
-        if (i.x > 6)
-            return;
-        i += glm::vec3(0.25);
-    }
+    auto hit = raycastVoxel(world.getChunkManager(), player.chunkx,
+                            player.chunkz, player.eyePosition(),
+                            player.direction, 6.0f);
+    if (!hit)
+        return;
 
     world.getChunkManager().setBlock(player.chunkx, player.chunkz,
-                                      initial_pos + dir * i, Block());
+                                     glm::vec3(hit->block) + 0.5f, Block());
 }
 
 void GameScene::placeLookedBlock() {
     Player &player = *world.getEntityManager().player;
-    glm::vec3 initial_pos =
-        player.position + player.size * glm::vec3(0.5f, 0.9f, 0.5f);
-    glm::vec3 dir = glm::normalize(player.direction);
-    glm::vec3 i = glm::vec3(0);
 
-    while (world.getChunkManager()
-               .getBlock(player.chunkx, player.chunkz, initial_pos + dir * i)
-               .id == BlockID::air) {
-        if (i.x > 6)
-            return;
-        i += glm::vec3(0.25);
-    }
-    i -= glm::vec3(0.25);
+    auto hit = raycastVoxel(world.getChunkManager(), player.chunkx,
+                            player.chunkz, player.eyePosition(),
+                            player.direction, 6.0f);
+    if (!hit)
+        return;
 
-    if (!Entity::colision(initial_pos + dir * i, glm::vec3(0, 0, 0),
+    glm::ivec3 placeBlock = hit->block + hit->normal;
+
+    if (!Entity::colision(glm::vec3(placeBlock), glm::vec3(1.0f),
                           glm::floor(player.position),
                           glm::ceil(player.position + player.size) -
                               glm::floor(player.position))) {
         world.getChunkManager().setBlock(
-            player.chunkx, player.chunkz, initial_pos + dir * i,
+            player.chunkx, player.chunkz, glm::vec3(placeBlock) + 0.5f,
             Block((BlockID)player.hotbarIndex, true));
     }
 }
